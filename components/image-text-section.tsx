@@ -97,7 +97,7 @@ export function ImageTextSection({
                         src={imageSrc || "/placeholder.svg"}
                         height={50}
                         width={50}
-                        alt=""
+                        alt={imageAlt ? `${imageAlt} icon` : "Feature icon"}
                         className="shadow-md rounded-full w-[30px] sm:w-auto"
                       />
                     </div>
@@ -107,7 +107,7 @@ export function ImageTextSection({
                   <div className="relative w-full h-full">
                     <Image
                       src={imageSrc || "/placeholder.svg"}
-                      alt=""
+                      alt={imageAlt || "Feature illustration"}
                       fill
                       className="object-contain p-4"
                     />

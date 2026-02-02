@@ -1,197 +1,108 @@
-import Banner from "@/components/banner";
-import { defaultHomepageFaqs, FAQSection } from "@/components/faq-section";
-import { ImageTextSection } from "@/components/image-text-section";
-import OurAIIntegrations from "@/components/OurAIIntegrations";
-import { TestimonialsSection } from "@/components/testimonials-section";
+"use client"
+
+import ProductPageLayout from "@/components/product-page-layout"
+import { Keyboard, Shield, BarChart3, FileText, Activity, Zap } from "lucide-react"
 
 
-const data = [
+const features = [
   {
-    title: "Billing & Timesheet Integration",
-    subtitle: "Use keystroke activity to validate logged hours and support client billing—without manual effort.",
-    description: "Track Nexus uses typing data to auto-fill timesheets and validate active work hours—making billing accurate and transparent.",
-    imageSrc: "/images/keystroke/1.jpg",
-    imageAlt: "Image",
-    imagePosition: "left",
-    backgroundColor: "white",
-    titleColor: "text-gray-900",
-    subtitleColor: "text-gray-800",
-    iconListItems: [
-      {
-        text: "Auto Timesheet Spyze",
-        subtext: "Fills timesheets based on real typing activity.",
-        checked: false
-      },
-      {
-        text: "Client-Ready Proof",
-        subtext: "Exports activity logs to support billing.",
-        checked: true
-      }
-    ],
-    version: "v1"
+    title: "AI-Powered Typing Analytics",
+    description: "It's not just about how much your team types—it's about when, where, and how efficiently. Track Nexus monitors typing speed and idle time to provide a clear view of productivity—without capturing personal content. It helps teams stay focused and manage work patterns more effectively.",
+    image: "https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=1000&q=80",
   },
   {
     title: "Privacy-Centered Approach",
-    subtitle: "Track Nexus captures typing frequency—not content. No personal data, no keylogging, just ethical analytics.",
-    description: "Track Nexus tracks only typing activity—not content—ensuring full transparency and team trust.",
-    imageSrc: "/images/keystroke/2.jpg",
-    imageAlt: "Image",
-    imagePosition: "right",
-    backgroundColor: "white",
-    titleColor: "text-gray-900",
-    subtitleColor: "text-gray-800",
-    iconListItems: [
-      {
-        text: "No Content Recorded",
-        subtext: "Only logs typing count and time, never what’s typed.",
-        checked: true
-      },
-      {
-        text: "Built for Compliance",
-        subtext: "Designed to respect privacy and support workplace trust.",
-        checked: true
-      }
-    ],
-    version: "v1"
-  },
-  {
-    title: "Individual & Team Dashboards",
-    subtitle: "Zoom into individuals or view collective team keystroke behavior to drive performance coaching.",
-    description: "Cut a clear view of how individuals and teams work, spot trends, and support performance with data-driven insights.",
-    imageSrc: "/images/keystroke/3.jpg",
-    imageAlt: "Image",
-    imagePosition: "left",
-    backgroundColor: "white",
-    titleColor: "text-gray-900",
-    subtitleColor: "text-gray-800",
-    iconListItems: [
-      {
-        text: "Individual View",
-        subtext: "Track active time, typing pace, and focus patterns.",
-        checked: true
-      },
-      {
-        text: "Team Overview",
-        subtext: "Compare team-wide activity for balanced coaching.",
-        checked: true
-      }
-    ],
-    version: "v1"
-  },
-  {
-    title: "Export-Ready Reports",
-    subtitle: "Export keystroke activity insights in formats like XLS, PDF, or CSV to support reviews and client audits.",
-    description: "Use customizable filters to create clear, billing-ready reports by team, date, task, or project.",
-    imageSrc: "/images/keystroke/4.jpg",
-    imageAlt: "Image",
-    imagePosition: "right",
-    backgroundColor: "white",
-    titleColor: "text-gray-900",
-    subtitleColor: "text-gray-800",
-    iconListItems: [
-      {
-        text: "Filter by What Matters",
-        subtext: "Sort data by team, day, task, or project.",
-        checked: true
-      },
-      {
-        text: "Billing-Ready Output",
-        subtext: "Generate exportable, client-friendly reports instantly.",
-        checked: true
-      }
-    ],
-    version: "v1"
-  },
-  {
-    title: "What Is Keystroke Monitoring?",
-    subtitle: "Understanding the Basics Behind Input Activity Tracking",
-    description: "Keystroke monitoring is the process of tracking keyboard activity to analyze how work is performed. Unlike keylogging, which can be invasive. AI-powered keystroke monitoring—like that used by Track Nexus—focuses on patterns, speed, and engagement levels rather than capturing specific content. It’s used to identify productivity trends, reduce idle time, and enhance workflow efficiency without compromising privacy.",
-    imageSrc: "/images/keystroke/5.jpg",
-    imageAlt: "Image",
-    imagePosition: "left",
-    backgroundColor: "white",
-    titleColor: "text-gray-900",
-    subtitleColor: "text-gray-800",
-    iconListItems: [],
-    version: "v1"
-  },
-  {
-    title: "AI-Powered Typing Analytics",
-    subtitle: "It’s not just about how much your team types—it’s about when, where, and how efficiently",
-    description: "Track Nexus monitors typing speed and idle time to provide a clear view of productivity—without capturing personal content. It helps teams stay focused and manage work patterns more effectively.",
-    imageSrc: "/images/keystroke/6.jpg",
-    imageAlt: "Image",
-    imagePosition: "right",
-    backgroundColor: "white",
-    titleColor: "text-gray-900",
-    subtitleColor: "text-gray-800",
-    iconListItems: [
-      {
-        text: "Typing Speed",
-        subtext: "Tracks words per minute to measure engagement.",
-        checked: false
-      },
-      {
-        text: "Idle Detection",
-        subtext: "Identifies pauses and break times through inactivity.",
-        checked: false
-      }
-    ],
-    version: "v1"
+    description: "Track Nexus captures typing frequency—not content. No personal data, no keylogging, just ethical analytics. We track only typing activity—not content—ensuring full transparency and team trust while providing actionable productivity insights.",
+    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=1000&q=80",
   },
   {
     title: "Productivity Insights from Keystrokes",
-    subtitle: "Typing trends reveal more than effort—they reveal workflow health.",
-    description: "Track Nexus uses AI to reveal deeper work patterns from typing behavior. It helps identify signs of burnout, focus time, and team-wide typing efficiency—all without invading privacy.",
-    imageSrc: "/images/keystroke/7.jpg",
-    imageAlt: "Image",
-    imagePosition: "left",
-    backgroundColor: "white",
-    titleColor: "text-gray-900",
-    subtitleColor: "text-gray-800",
-    iconListItems: [
-      {
-        text: "Spot burnout from erratic typing rhythms",
-        checked: false
-      },
-      {
-        text: "Detect deep work and focus periods",
-        checked: false
-      },
-      {
-        text: "Compare typing flow across teams",
-        checked: false
-      }
-    ],
-    version: "v1"
-  }
-];
+    description: "Typing trends reveal more than effort—they reveal workflow health. Track Nexus uses AI to reveal deeper work patterns from typing behavior, helping identify signs of burnout, focus time, and team-wide typing efficiency—all without invading privacy.",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    title: "Billing & Timesheet Integration",
+    description: "Use keystroke activity to validate logged hours and support client billing—without manual effort. Track Nexus uses typing data to auto-fill timesheets and validate active work hours—making billing accurate and transparent.",
+    image: "https://images.unsplash.com/photo-1554224155-8d04cb21cd6c?auto=format&fit=crop&w=1000&q=80",
+  },
+]
+
+const benefits = [
+  {
+    icon: Keyboard,
+    title: "Typing Speed Tracking",
+    description: "Track words per minute to measure engagement and identify productivity patterns.",
+  },
+  {
+    icon: Activity,
+    title: "Idle Detection",
+    description: "Identify pauses and break times through inactivity monitoring.",
+  },
+  {
+    icon: Shield,
+    title: "Privacy First",
+    description: "Only logs typing count and time, never what's typed. Built for compliance.",
+  },
+  {
+    icon: BarChart3,
+    title: "Team Dashboards",
+    description: "Compare team-wide activity for balanced coaching and performance insights.",
+  },
+  {
+    icon: FileText,
+    title: "Export-Ready Reports",
+    description: "Generate exportable, client-friendly reports in XLS, PDF, or CSV formats.",
+  },
+  {
+    icon: Zap,
+    title: "Real-Time Insights",
+    description: "Get instant visibility into work patterns and productivity levels.",
+  },
+]
+
+const stats = [
+  { value: "100%", label: "Privacy Focused" },
+  { value: "0", label: "Content Captured" },
+  { value: "50%", label: "More Accurate" },
+  { value: "24/7", label: "Monitoring" },
+]
+
+const faqs = [
+  {
+    question: "Does keystroke monitoring capture what I type?",
+    answer: "No. Track Nexus only tracks typing frequency and patterns—never the actual content. We focus on productivity metrics like words per minute and active/idle time, not personal data.",
+  },
+  {
+    question: "Is keystroke monitoring legal?",
+    answer: "Yes, when employees are informed and consent is obtained. Track Nexus provides transparent policies and focuses only on productivity metrics, not personal content.",
+  },
+  {
+    question: "How does it help with billing?",
+    answer: "Keystroke activity validates logged work hours, providing proof of active work time that can be used for client billing and timesheet verification.",
+  },
+  {
+    question: "Can it detect burnout?",
+    answer: "Yes, our AI analyzes typing patterns to identify signs of fatigue, erratic rhythms, and potential burnout, helping managers support their teams proactively.",
+  },
+]
 
 export default function KeystrokePage() {
-    return (
-        <div>
-            <Banner
-        mediaType="video"
-        mediaSrc="/images/productivity-reports/People_Statistical.mp4"
-        heading="AI-Based Keystroke Monitoring"
-        subheading="Boost Productivity with Intelligent Input Analysis – Track Nexus"
-      />
-      {data.map((feature,i) => (
-        <ImageTextSection
-          key={i}
-          title={feature.title}
-          subtitle={feature.subtitle}
-          description={feature.description}
-          imageSrc={feature.imageSrc}
-          imageAlt={feature.imageAlt}
-          imagePosition={feature.imagePosition}
-          titleColor="text-highlight"
-        />
-      ))}
-
-        <OurAIIntegrations />
-      <TestimonialsSection />
-      <FAQSection faqs={defaultHomepageFaqs} />
-        </div>
-    )
-} 
+  return (
+    <ProductPageLayout
+      badge="Keystroke Analytics"
+      title="Smart Keystroke"
+      titleHighlight="Monitoring"
+      subtitle="Privacy-first keyboard analytics that track productivity patterns without capturing content. Understand work habits with ethical monitoring."
+      heroImage="https://images.unsplash.com/photo-1587829741301-dc798b83add3?auto=format&fit=crop&w=1920&q=80"
+      floatingIcons={[Keyboard, Activity, Shield, BarChart3]}
+      features={features}
+      benefitsTitle="Ethical Keystroke Analytics"
+      benefitsSubtitle="Privacy-focused monitoring that delivers real productivity insights"
+      benefits={benefits}
+      stats={stats}
+      faqs={faqs}
+      ctaTitle="Ready for ethical productivity tracking?"
+      ctaSubtitle="Start your 14-day free trial today. No credit card required."
+    />
+  )
+}

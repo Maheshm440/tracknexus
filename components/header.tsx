@@ -1,125 +1,864 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { Button } from "@/components/ui/button";
-import { Phone, Globe } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { Search, Bell, User, ChevronDown, X, Clock, Settings, LogOut, Mail, Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import { MobileNav } from "@/components/mobile-nav";
-import { motion } from "framer-motion";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
-import AiFeaturesForModernTeams from "./AiFeaturesForModernTeams";
-import { useState } from "react";
+import { LogoWithoutDropdown } from "@/components/logo";
+import { useState, useEffect } from "react";
 
-interface HeaderProps {
-  onGetDemo?: () => void;
-}
+export function Header() {
+  const currentPathname = usePathname();
+  const pathname = currentPathname || "";
+  const router = useRouter();
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [isNotificationOpen, setIsNotificationOpen] = useState(false);
+  const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [isSignInOpen, setIsSignInOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [signInEmail, setSignInEmail] = useState("");
+  const [signInPassword, setSignInPassword] = useState("");
+  const [signInError, setSignInError] = useState("");
+  const [signInSuccess, setSignInSuccess] = useState("");
+  const [isSignInLoading, setIsSignInLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(false);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [userRole, setUserRole] = useState("");
+  const [isMounted, setIsMounted] = useState(false);
 
-export function Header({ onGetDemo }: HeaderProps) {
-  const pathname = usePathname();
-  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // Set mounted state after hydration
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  // Check authentication status on mount and when pathname changes
+  useEffect(() => {
+    const checkAuthStatus = () => {
+      try {
+        const userDataStr = localStorage.getItem('tracknexus_user');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          setIsSignedIn(true);
+          setSignInEmail(userData.email || "");
+          setUserName(userData.name || "");
+          setUserRole(userData.role || "");
+        } else {
+          setIsSignedIn(false);
+          setSignInEmail("");
+          setUserName("");
+          setUserRole("");
+        }
+      } catch (error) {
+        console.error('Error checking auth status:', error);
+        setIsSignedIn(false);
+      }
+    };
+
+    checkAuthStatus();
+
+    // Listen for storage changes (login/logout from other tabs)
+    window.addEventListener('storage', checkAuthStatus);
+    // Listen for custom auth-change event (login/logout from same tab)
+    window.addEventListener('auth-change', checkAuthStatus);
+
+    return () => {
+      window.removeEventListener('storage', checkAuthStatus);
+      window.removeEventListener('auth-change', checkAuthStatus);
+    };
+  }, [pathname]);
+
+  const notifications = [
+    {
+      id: 1,
+      title: "New Feature Released",
+      message: "Check out our new AI-powered analytics dashboard",
+      time: "5 min ago",
+      unread: true,
+    },
+    {
+      id: 2,
+      title: "Team Invited You",
+      message: "You've been invited to join the Sales team",
+      time: "2 hours ago",
+      unread: true,
+    },
+    {
+      id: 3,
+      title: "Report Ready",
+      message: "Your weekly productivity report is ready to view",
+      time: "1 day ago",
+      unread: false,
+    },
+  ];
+
+  const handleSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSignInError("");
+    setSignInSuccess("");
+    setIsSignInLoading(true);
+
+    // Validation
+    if (!signInEmail.trim()) {
+      setSignInError("Email is required");
+      setIsSignInLoading(false);
+      return;
+    }
+
+    try {
+      // First, logout any existing session
+      await fetch('/api/auth/logout', { method: 'POST' });
+
+      // Call actual login API
+      const response = await fetch('/api/auth/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: signInEmail.toLowerCase(),
+          password: signInPassword || undefined
+        }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+
+        // Store dashboard data in localStorage
+        // Only update if API returns actual data, don't overwrite with empty arrays
+        if (data.dashboardData) {
+          if (data.dashboardData.users && data.dashboardData.users.length > 0) {
+            localStorage.setItem('tracknexus_users', JSON.stringify(data.dashboardData.users));
+          }
+          if (data.dashboardData.leads && data.dashboardData.leads.length > 0) {
+            localStorage.setItem('tracknexus_leads', JSON.stringify(data.dashboardData.leads));
+          }
+          if (data.dashboardData.visitors && data.dashboardData.visitors.length > 0) {
+            localStorage.setItem('visitor_tracking', JSON.stringify(data.dashboardData.visitors));
+          }
+          if (data.dashboardData.activities && data.dashboardData.activities.length > 0) {
+            localStorage.setItem('tracknexus_activities', JSON.stringify(data.dashboardData.activities));
+          }
+        }
+        localStorage.setItem('tracknexus_user', JSON.stringify(data.user));
+
+        // Dispatch custom event to notify about auth change
+        window.dispatchEvent(new Event('auth-change'));
+
+        // Redirect based on role - admin to dashboard, users to homepage
+        const isAdmin = data.user?.role === 'admin';
+        const targetUrl = isAdmin ? '/dashboard' : '/';
+        const message = isAdmin ? 'Admin login successful!' : 'Sign in successful!';
+
+        setSignInSuccess(message);
+        setIsSignedIn(true);
+        setUserName(data.user?.name || "");
+        setSignInPassword("");
+
+        setTimeout(() => {
+          setIsSignInOpen(false);
+          setIsUserMenuOpen(false);
+          router.push(targetUrl);
+        }, 500);
+      } else {
+        const data = await response.json();
+        setSignInError(data.error || "Login failed. Please try again.");
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      setSignInError("An error occurred. Please try again.");
+    } finally {
+      setIsSignInLoading(false);
+    }
+  };
+
+  const handleLogout = async () => {
+    try {
+      // Call actual logout API
+      await fetch('/api/auth/logout', { method: 'POST' });
+
+      // Clear localStorage
+      localStorage.removeItem('tracknexus_user');
+      localStorage.removeItem('tracknexus_users');
+      localStorage.removeItem('tracknexus_leads');
+      localStorage.removeItem('visitor_tracking');
+      localStorage.removeItem('tracknexus_activities');
+
+      // Dispatch custom event to notify about auth change
+      window.dispatchEvent(new Event('auth-change'));
+
+      setIsSignedIn(false);
+      setSignInEmail("");
+      setUserName("");
+      setIsUserMenuOpen(false);
+
+      // Redirect to home page
+      router.push('/');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
-    <header className="sticky top-0 z-50 bg-white/95 backdrop-blur-sm border-b border-gray-200 px-4 py-3 lg:px-8 shadow-sm">
+    <header className="sticky top-0 z-50 bg-deloitte-black px-6 py-4 lg:px-8">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center">
-          <Image
-            style={{
-              width: "180px",
-              marginTop: "10px",
-            }}
-            src="/logo.png"
-            alt="Track Nexus Logo"
-            width={180}
-            height={150}
-            className="rounded-full cursor-pointer hover:opacity-80 transition-opacity"
-          />
-        </Link>
+        <div className="flex items-center gap-4">
+          <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+            <LogoWithoutDropdown />
+          </Link>
+        </div>
 
         <MobileNav />
 
         {/* Navigation */}
-        <nav className="hidden md:flex items-center space-x-8">
-          {[
-            { href: "/products", label: "Products" },
-            { href: "/about", label: "About Us" },
-            { href: "/pricing", label: "Pricing" },
-            { href: "/contact", label: "Contact Us" },
-          ].map((item) => (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`font-medium text-sm lg:text-base transition-colors relative ${
-                pathname === item.href
-                  ? "font-semibold text-highlight"
-                  : "text-gray-700 hover:text-highlight"
+        <nav className="hidden lg:flex items-center space-x-8">
+          {/* Products with dropdown */}
+          <div className="relative group">
+            <button
+              className={`flex items-center space-x-1 font-medium text-sm transition-colors py-2 ${
+                isMounted && (pathname === "/product" || pathname.startsWith("/product"))
+                  ? "text-white"
+                  : "text-gray-300 hover:text-white"
               }`}
-              onMouseEnter={(e) => {
-                if (pathname !== item.href) {
-                  e.currentTarget.classList.add("text-highlight");
-                }
-              }}
-              onMouseLeave={(e) => {
-                if (pathname !== item.href) {
-                  e.currentTarget.classList.remove("text-highlight");
-                }
-              }}
             >
-              {item.label}
-              {pathname === item.href && (
-                <motion.div
-                  className="absolute -bottom-1 left-0 right-0 h-0.5 bg-highlight"
-                  layoutId="activeTab"
-                />
-              )}
-            </Link>
-          ))}
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button variant="ghost" className="text-base font-medium text-[#374151] hover:text-sky-600 p-0 hover:bg-transparent">Features</Button>
-            </DialogTrigger>
-            <DialogContent className="max-w-4xl w-full flex justify-center items-center">
-              <DialogTitle className="hidden">
-      AI Features for Modern Teams
-    </DialogTitle>
-              <AiFeaturesForModernTeams
-                onAnyClick={() => setIsDialogOpen(false)}
-              />
-            </DialogContent>
-          </Dialog>
-        </nav>
+              <span>Product</span>
+              <ChevronDown className="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" />
+            </button>
+            {/* Invisible bridge to prevent flickering */}
+            <div className="absolute top-full left-0 h-2 w-full" />
+            {/* Dropdown Menu - Deloitte Style with Left Panel */}
+            <div className="absolute top-full left-0 pt-2 w-[480px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-out">
+              <div className="bg-white shadow-2xl rounded-lg overflow-hidden">
+              <div className="flex">
+                {/* Left Panel - Dark with menu items */}
+                <div className="w-56 bg-gradient-to-br from-gray-900 to-gray-800 py-6">
+                  <Link href="/product/productivity-monitoring" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all group/item opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '50ms' }}>
+                    <span className="font-medium text-sm">Productivity Monitoring</span>
+                    <span className="text-xs text-gray-400 mt-0.5">Track team performance</span>
+                  </Link>
+                  <Link href="/product/ai-powered-intelligence" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all group/item opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '100ms' }}>
+                    <span className="font-medium text-sm">AI-Powered Intelligence</span>
+                    <span className="text-xs text-gray-400 mt-0.5">Smart insights & analytics</span>
+                  </Link>
+                  <Link href="/product/workforce-analytics" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all group/item opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '150ms' }}>
+                    <span className="font-medium text-sm">Workforce Analytics</span>
+                    <span className="text-xs text-gray-400 mt-0.5">Data-driven decisions</span>
+                  </Link>
+                  <div className="border-t border-gray-700 my-3 mx-4 opacity-0 group-hover:opacity-100 transition-opacity" style={{ transitionDelay: '200ms' }}></div>
+                  <Link href="/product" className="flex items-center px-6 py-3 text-cyan-400 hover:text-cyan-300 font-medium text-sm transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '250ms' }}>
+                    View All Products →
+                  </Link>
+                </div>
 
-        {/* Right side */}
-        <div className="hidden md:flex items-center space-x-4">
-          <div className="hidden lg:flex items-center space-x-2 text-sm text-gray-600">
-            <Globe className="h-4 w-4" />
-            <span className="font-medium">EN</span>
+                {/* Right Panel - Features highlight */}
+                <div className="flex-1 p-6 bg-gradient-to-br from-gray-50 to-white">
+                  <h3 className="text-gray-900 font-semibold text-base mb-3">Why Track Nexus?</h3>
+                  <ul className="space-y-2 text-sm text-gray-600">
+                    <li className="flex items-start">
+                      <span className="text-cyan-500 mr-2">✓</span>
+                      <span>Real-time productivity insights</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-cyan-500 mr-2">✓</span>
+                      <span>AI-powered recommendations</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-cyan-500 mr-2">✓</span>
+                      <span>Easy integration with tools</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+              </div>
+            </div>
           </div>
 
-          <div className="flex items-center space-x-3">
-            <Button
-              size="sm"
-              className="text-white px-4 py-2 text-sm font-medium bg-highlight hover:bg-highlight/80"
-              onClick={onGetDemo}
+          {/* About Us with dropdown */}
+          <div className="relative group">
+            <button
+              className={`flex items-center space-x-1 font-medium text-sm transition-colors py-2 ${
+                isMounted && (pathname === "/about" || pathname.startsWith("/about"))
+                  ? "text-white"
+                  : "text-gray-300 hover:text-white"
+              }`}
             >
-              Get a Demo
-            </Button>
-            <Button
-              size="sm"
-              variant="outline"
-              className="bg-white px-4 py-2 text-sm font-medium text-highlight border-highlight hover:bg-highlight/80"
-              onClick={onGetDemo}
+              <span>About Us</span>
+              <ChevronDown className="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" />
+            </button>
+            {/* Invisible bridge to prevent flickering */}
+            <div className="absolute top-full left-0 h-2 w-full" />
+            {/* Dropdown Menu - Deloitte Style */}
+            <div className="absolute top-full left-0 pt-2 w-[440px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-out">
+              <div className="bg-white shadow-2xl rounded-lg overflow-hidden">
+              <div className="flex">
+                {/* Left Panel - Dark with menu items */}
+                <div className="w-52 bg-gradient-to-br from-gray-900 to-gray-800 py-6">
+                  <Link href="/about" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '50ms' }}>
+                    <span className="font-medium text-sm">Overview</span>
+                    <span className="text-xs text-gray-400 mt-0.5">Who we are</span>
+                  </Link>
+                  <Link href="/about#team" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '100ms' }}>
+                    <span className="font-medium text-sm">Our Team</span>
+                    <span className="text-xs text-gray-400 mt-0.5">Meet the experts</span>
+                  </Link>
+                  <Link href="/about/values" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '150ms' }}>
+                    <span className="font-medium text-sm">Our Values</span>
+                    <span className="text-xs text-gray-400 mt-0.5">What drives us</span>
+                  </Link>
+                  <Link href="/about/careers" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '200ms' }}>
+                    <span className="font-medium text-sm">Careers</span>
+                    <span className="text-xs text-gray-400 mt-0.5">Join our team</span>
+                  </Link>
+                  <div className="border-t border-gray-700 my-3 mx-4 opacity-0 group-hover:opacity-100 transition-opacity" style={{ transitionDelay: '250ms' }}></div>
+                  <Link href="/contact" className="flex items-center px-6 py-3 text-cyan-400 hover:text-cyan-300 font-medium text-sm transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '300ms' }}>
+                    Contact Us →
+                  </Link>
+                </div>
+
+                {/* Right Panel - Info highlight */}
+                <div className="flex-1 p-6 bg-gradient-to-br from-gray-50 to-white">
+                  <h3 className="text-gray-900 font-semibold text-base mb-3">Our Mission</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    Empowering teams with intelligent time tracking and productivity insights to drive real results.
+                  </p>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Solutions with dropdown */}
+          <div className="relative group">
+            <button
+              className={`flex items-center space-x-1 font-medium text-sm transition-colors py-2 ${
+                isMounted && (pathname === "/solutions" || pathname.startsWith("/solutions"))
+                  ? "text-white"
+                  : "text-gray-300 hover:text-white"
+              }`}
             >
-              Start now
-            </Button>
+              <span>Solutions</span>
+              <ChevronDown className="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" />
+            </button>
+            {/* Invisible bridge to prevent flickering */}
+            <div className="absolute top-full left-0 h-2 w-full" />
+            {/* Dropdown Menu - Deloitte Style */}
+            <div className="absolute top-full left-0 pt-2 w-[460px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-out">
+              <div className="bg-white shadow-2xl rounded-lg overflow-hidden">
+              <div className="flex">
+                {/* Left Panel - Dark with menu items */}
+                <div className="w-56 bg-gradient-to-br from-gray-900 to-gray-800 py-6">
+                  <Link href="/solutions/remote-teams" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '50ms' }}>
+                    <span className="font-medium text-sm">Remote Teams</span>
+                    <span className="text-xs text-gray-400 mt-0.5">Distributed workforce</span>
+                  </Link>
+                  <Link href="/solutions/hybrid-workforce" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '100ms' }}>
+                    <span className="font-medium text-sm">Hybrid Workforce</span>
+                    <span className="text-xs text-gray-400 mt-0.5">Flexible work models</span>
+                  </Link>
+                  <Link href="/solutions/enterprise" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '150ms' }}>
+                    <span className="font-medium text-sm">Enterprise</span>
+                    <span className="text-xs text-gray-400 mt-0.5">Large organizations</span>
+                  </Link>
+                  <Link href="/solutions/startups" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '200ms' }}>
+                    <span className="font-medium text-sm">Startups & SMBs</span>
+                    <span className="text-xs text-gray-400 mt-0.5">Growing businesses</span>
+                  </Link>
+                </div>
+
+                {/* Right Panel - Info highlight */}
+                <div className="flex-1 p-6 bg-gradient-to-br from-gray-50 to-white">
+                  <h3 className="text-gray-900 font-semibold text-base mb-3">Tailored Solutions</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                    Solutions designed for your specific business needs and team size.
+                  </p>
+                  <Link href="/solutions" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                    Explore all solutions →
+                  </Link>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Resources with dropdown */}
+          <div className="relative group">
+            <button
+              className={`flex items-center space-x-1 font-medium text-sm transition-colors py-2 ${
+                isMounted && (pathname === "/resources" || pathname.startsWith("/resources"))
+                  ? "text-white"
+                  : "text-gray-300 hover:text-white"
+              }`}
+            >
+              <span>Resources</span>
+              <ChevronDown className="w-4 h-4 transition-transform duration-200 group-hover:rotate-180" />
+            </button>
+            {/* Invisible bridge to prevent flickering */}
+            <div className="absolute top-full left-0 h-2 w-full" />
+            {/* Dropdown Menu - Deloitte Style */}
+            <div className="absolute top-full left-0 pt-2 w-[460px] opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-200 ease-out">
+              <div className="bg-white shadow-2xl rounded-lg overflow-hidden">
+              <div className="flex">
+                {/* Left Panel - Dark with menu items */}
+                <div className="w-52 bg-gradient-to-br from-gray-900 to-gray-800 py-6">
+                  <Link href="/resources/blog" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '50ms' }}>
+                    <span className="font-medium text-sm">Blog</span>
+                    <span className="text-xs text-gray-400 mt-0.5">Latest insights</span>
+                  </Link>
+                  <Link href="/resources/case-studies" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '100ms' }}>
+                    <span className="font-medium text-sm">Case Studies</span>
+                    <span className="text-xs text-gray-400 mt-0.5">Success stories</span>
+                  </Link>
+                  <Link href="/resources/whitepapers" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '150ms' }}>
+                    <span className="font-medium text-sm">Whitepapers</span>
+                    <span className="text-xs text-gray-400 mt-0.5">In-depth research</span>
+                  </Link>
+                  <Link href="/resources/webinars" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '200ms' }}>
+                    <span className="font-medium text-sm">Webinars</span>
+                    <span className="text-xs text-gray-400 mt-0.5">Live sessions</span>
+                  </Link>
+                  <div className="border-t border-gray-700 my-3 mx-4 opacity-0 group-hover:opacity-100 transition-opacity" style={{ transitionDelay: '250ms' }}></div>
+                  <Link href="/resources/help-center" className="flex items-center px-6 py-3 text-cyan-400 hover:text-cyan-300 font-medium text-sm transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '300ms' }}>
+                    Help Center →
+                  </Link>
+                </div>
+
+                {/* Right Panel - Info highlight */}
+                <div className="flex-1 p-6 bg-gradient-to-br from-gray-50 to-white">
+                  <h3 className="text-gray-900 font-semibold text-base mb-3">Learning Hub</h3>
+                  <p className="text-sm text-gray-600 leading-relaxed mb-3">
+                    Access expert insights, guides, and resources to maximize your productivity.
+                  </p>
+                  <Link href="/resources" className="text-sm text-blue-600 hover:text-blue-700 font-medium">
+                    Browse all resources →
+                  </Link>
+                </div>
+              </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Pricing */}
+          <Link
+            href="/pricing"
+            className={`font-medium text-sm transition-colors ${
+              isMounted && pathname === "/pricing"
+                ? "text-white"
+                : "text-gray-300 hover:text-white"
+            }`}
+          >
+            Pricing
+          </Link>
+        </nav>
+
+        {/* Right side icons */}
+        <div className="hidden md:flex items-center space-x-6">
+          {/* Search */}
+          <div className="relative">
+            <button
+              onClick={() => setIsSearchOpen(!isSearchOpen)}
+              className="text-gray-300 hover:text-white transition-colors"
+            >
+              <Search className="w-5 h-5" />
+            </button>
+
+            {/* Search Modal */}
+            {isSearchOpen && (
+              <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-2xl rounded-lg z-50">
+                <div className="p-4 border-b border-gray-200">
+                  <div className="flex items-center gap-2">
+                    <Search className="w-5 h-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Search features, docs, articles..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="flex-1 outline-none text-gray-900 text-sm"
+                      autoFocus
+                    />
+                    <button
+                      onClick={() => setIsSearchOpen(false)}
+                      className="text-gray-400 hover:text-gray-600"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+
+                <div className="p-4 max-h-96 overflow-y-auto">
+                  {searchQuery ? (
+                    <div className="space-y-3">
+                      <div className="p-3 hover:bg-gray-50 rounded cursor-pointer transition-colors">
+                        <div className="font-medium text-gray-900 text-sm">Productivity Monitoring</div>
+                        <div className="text-xs text-gray-500">Track team performance in real-time</div>
+                      </div>
+                      <div className="p-3 hover:bg-gray-50 rounded cursor-pointer transition-colors">
+                        <div className="font-medium text-gray-900 text-sm">AI-Powered Intelligence</div>
+                        <div className="text-xs text-gray-500">Smart insights and recommendations</div>
+                      </div>
+                      <div className="p-3 hover:bg-gray-50 rounded cursor-pointer transition-colors">
+                        <div className="font-medium text-gray-900 text-sm">Workforce Analytics</div>
+                        <div className="text-xs text-gray-500">Data-driven workforce decisions</div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="text-center py-8">
+                      <Search className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                      <p className="text-sm text-gray-500">Type to search for features and articles</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {isSearchOpen && (
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setIsSearchOpen(false)}
+              ></div>
+            )}
+          </div>
+
+          {/* Notifications */}
+          <div className="relative">
+            <button
+              onClick={() => setIsNotificationOpen(!isNotificationOpen)}
+              className="text-gray-300 hover:text-white transition-colors relative"
+            >
+              <Bell className="w-5 h-5" />
+              {notifications.some((n) => n.unread) && (
+                <span className="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              )}
+            </button>
+
+            {/* Notifications Panel */}
+            {isNotificationOpen && (
+              <div className="absolute right-0 top-full mt-2 w-96 bg-white shadow-2xl rounded-lg z-50 max-h-[500px] flex flex-col" onClick={(e) => e.stopPropagation()}>
+                <div className="p-4 border-b border-gray-200 flex items-center justify-between sticky top-0 bg-white rounded-t-lg">
+                  <h3 className="font-semibold text-gray-900">Notifications</h3>
+                  <button
+                    onClick={() => setIsNotificationOpen(false)}
+                    className="text-gray-400 hover:text-gray-600 transition-colors"
+                  >
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+
+                <div className="overflow-y-auto flex-1">
+                  {notifications.length > 0 ? (
+                    notifications.map((notification) => (
+                      <div
+                        key={notification.id}
+                        onClick={(e) => {
+                          e.stopPropagation();
+                        }}
+                        className={`p-4 border-b border-gray-100 hover:bg-gray-50 transition-colors cursor-pointer last:border-b-0 ${
+                          notification.unread ? "bg-blue-50" : ""
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div className={`w-2.5 h-2.5 rounded-full mt-1 flex-shrink-0 ${notification.unread ? "bg-deloitte-green" : "bg-gray-300"}`}></div>
+                          <div className="flex-1 min-w-0">
+                            <div className="font-semibold text-sm text-gray-900">
+                              {notification.title}
+                            </div>
+                            <div className="text-xs text-gray-600 mt-1">
+                              {notification.message}
+                            </div>
+                            <div className="text-xs text-gray-400 mt-2 flex items-center gap-1">
+                              <Clock className="w-3 h-3" />
+                              {notification.time}
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))
+                  ) : (
+                    <div className="p-8 text-center">
+                      <Bell className="w-12 h-12 text-gray-300 mx-auto mb-3" />
+                      <p className="text-sm text-gray-500">No notifications yet</p>
+                    </div>
+                  )}
+                </div>
+
+                {notifications.length > 0 && (
+                  <div className="p-3 border-t border-gray-200 text-center sticky bottom-0 bg-white rounded-b-lg">
+                    <button
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        setIsNotificationOpen(false);
+                      }}
+                      className="text-sm text-deloitte-green font-medium hover:text-deloitte-green-dark transition-colors"
+                    >
+                      View all notifications →
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+
+            {isNotificationOpen && (
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setIsNotificationOpen(false)}
+              ></div>
+            )}
+          </div>
+
+          {/* User Profile */}
+          <div className="relative">
+            <button
+              onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
+              className={`transition-colors ${isSignedIn ? "text-deloitte-green hover:text-deloitte-green-dark" : "text-gray-300 hover:text-white"}`}
+            >
+              <User className="w-5 h-5" />
+            </button>
+
+            {/* User Dropdown - appears on click */}
+            {isUserMenuOpen && (
+              <div className="absolute right-0 top-full mt-2 w-56 bg-white shadow-xl rounded-xl z-50 overflow-hidden border border-gray-100">
+                {!isSignedIn ? (
+                  <>
+                    {/* Not Signed In State */}
+                    <div className="p-4 bg-gradient-to-br from-cyan-50 to-blue-50">
+                      <div className="flex items-center gap-2 mb-3">
+                        <div className="w-8 h-8 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-lg flex items-center justify-center">
+                          <User className="w-4 h-4 text-white" />
+                        </div>
+                        <span className="text-sm font-semibold text-gray-900">Welcome!</span>
+                      </div>
+                      <button
+                        onClick={() => {
+                          setIsSignInOpen(true);
+                        }}
+                        className="w-full py-2 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg font-medium hover:from-cyan-600 hover:to-blue-700 transition-all text-sm flex items-center justify-center gap-2 shadow-sm"
+                      >
+                        <Lock className="w-3.5 h-3.5" />
+                        Sign In
+                      </button>
+                    </div>
+
+                    <div className="p-1.5">
+                      <Link href="/pricing">
+                        <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-700 font-medium">
+                          Pricing
+                        </button>
+                      </Link>
+                      <Link href="/resources/help-center">
+                        <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-700 font-medium">
+                          Help Center
+                        </button>
+                      </Link>
+                      <Link href="/dashboard/settings">
+                        <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-700 font-medium flex items-center gap-2">
+                          <Settings className="w-3.5 h-3.5 text-gray-400" />
+                          Settings
+                        </button>
+                      </Link>
+                    </div>
+
+                    <div className="px-4 py-3 border-t border-gray-100 bg-gray-50/50">
+                      <p className="text-xs text-gray-500 text-center">
+                        New here?{" "}
+                        <Link href="/signup" className="text-cyan-600 font-medium hover:text-cyan-700">
+                          Sign Up
+                        </Link>
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    {/* Signed In State */}
+                    <div className="p-3 bg-gradient-to-br from-green-50 to-emerald-50 border-b border-green-100">
+                      <div className="flex items-center gap-2">
+                        <div className="w-8 h-8 bg-gradient-to-br from-green-500 to-emerald-600 rounded-lg flex items-center justify-center">
+                          <CheckCircle className="w-4 h-4 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-xs font-semibold text-gray-900">{userName || "Signed In"}</div>
+                          <div className="text-[10px] text-gray-500 truncate max-w-[140px]">{signInEmail}</div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="p-1.5">
+                      {/* Only show Dashboard link for admin users */}
+                      {userRole === 'admin' && (
+                        <Link href="/dashboard">
+                          <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-700 font-medium">
+                            Dashboard
+                          </button>
+                        </Link>
+                      )}
+                      <Link href="/dashboard/settings">
+                        <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-700 font-medium flex items-center gap-2">
+                          <Settings className="w-3.5 h-3.5 text-gray-400" />
+                          Settings
+                        </button>
+                      </Link>
+                      <Link href="/resources/help-center">
+                        <button className="w-full text-left px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors text-sm text-gray-700 font-medium">
+                          Help Center
+                        </button>
+                      </Link>
+                    </div>
+
+                    <div className="p-1.5 border-t border-gray-100">
+                      <button
+                        onClick={() => {
+                          handleLogout();
+                        }}
+                        className="w-full text-left px-3 py-2 rounded-lg hover:bg-red-50 transition-colors text-sm text-red-600 font-medium flex items-center gap-2"
+                      >
+                        <LogOut className="w-3.5 h-3.5" />
+                        Sign Out
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
+            )}
+
+            {/* Sign In Modal */}
+            {isSignInOpen && (
+              <>
+                <div className="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center" onClick={() => setIsSignInOpen(false)}>
+                  <div className="bg-white rounded-2xl shadow-2xl w-full max-w-[340px] mx-4 overflow-hidden" onClick={(e) => e.stopPropagation()}>
+                    {/* Top Accent */}
+                    <div className="h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500" />
+
+                    {/* Header */}
+                    <div className="px-5 pt-5 pb-4">
+                      <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-3">
+                          <div className="w-9 h-9 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center shadow-lg">
+                            <Lock className="w-4 h-4 text-white" />
+                          </div>
+                          <div>
+                            <h2 className="text-base font-bold text-gray-900">Sign In</h2>
+                            <p className="text-[11px] text-gray-500">Access your account</p>
+                          </div>
+                        </div>
+                        <button
+                          onClick={() => setIsSignInOpen(false)}
+                          className="p-1.5 rounded-full bg-gray-100 text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-all"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
+                    </div>
+
+                    {/* Form */}
+                    <form onSubmit={handleSignIn} className="px-5 pb-5 space-y-3">
+                      {/* Email Input */}
+                      <div className="relative">
+                        <Mail className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
+                        <input
+                          type="email"
+                          value={signInEmail}
+                          onChange={(e) => setSignInEmail(e.target.value)}
+                          placeholder="Email address"
+                          disabled={isSignInLoading}
+                          className="w-full pl-9 pr-3 py-2.5 h-10 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 disabled:opacity-50 transition-all"
+                        />
+                      </div>
+
+                      {/* Password Input */}
+                      <div className="relative">
+                        <Lock className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
+                        <input
+                          type={showPassword ? "text" : "password"}
+                          value={signInPassword}
+                          onChange={(e) => setSignInPassword(e.target.value)}
+                          placeholder="Password"
+                          disabled={isSignInLoading}
+                          className="w-full pl-9 pr-10 py-2.5 h-10 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-cyan-500/20 focus:border-cyan-500 disabled:opacity-50 transition-all"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowPassword(!showPassword)}
+                          className="absolute right-2.5 top-2.5 text-gray-400 hover:text-gray-600"
+                        >
+                          {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+
+                      {/* Remember Me & Forgot Password */}
+                      <div className="flex items-center justify-between">
+                        <label className="flex items-center gap-1.5 cursor-pointer">
+                          <input
+                            type="checkbox"
+                            checked={rememberMe}
+                            onChange={(e) => setRememberMe(e.target.checked)}
+                            disabled={isSignInLoading}
+                            className="w-3.5 h-3.5 border border-gray-300 rounded text-cyan-500 focus:ring-cyan-500 cursor-pointer"
+                          />
+                          <span className="text-xs text-gray-600">Remember me</span>
+                        </label>
+                        <button type="button" className="text-xs text-cyan-600 hover:text-cyan-700 font-medium">
+                          Forgot password?
+                        </button>
+                      </div>
+
+                      {/* Error Message */}
+                      {signInError && (
+                        <div className="p-2.5 bg-red-50 border border-red-200 rounded-lg flex items-center gap-2">
+                          <X className="w-4 h-4 text-red-500" />
+                          <span className="text-xs text-red-700">{signInError}</span>
+                        </div>
+                      )}
+
+                      {/* Success Message */}
+                      {signInSuccess && (
+                        <div className="p-2.5 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2">
+                          <CheckCircle className="w-4 h-4 text-green-500" />
+                          <span className="text-xs text-green-700">{signInSuccess}</span>
+                        </div>
+                      )}
+
+                      {/* Sign In Button */}
+                      <button
+                        type="submit"
+                        disabled={isSignInLoading || !signInEmail.trim()}
+                        className="w-full h-10 bg-gradient-to-r from-cyan-500 to-blue-600 text-white rounded-lg font-semibold text-sm hover:from-cyan-600 hover:to-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-all flex items-center justify-center gap-2 shadow-md hover:shadow-lg"
+                      >
+                        {isSignInLoading ? (
+                          <>
+                            <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
+                            <span>Signing in...</span>
+                          </>
+                        ) : (
+                          <span>Sign In</span>
+                        )}
+                      </button>
+
+                      {/* Sign Up Link */}
+                      <p className="text-center text-xs text-gray-500 pt-1">
+                        New to Track Nexus?{" "}
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsSignInOpen(false);
+                          }}
+                          className="text-cyan-600 hover:text-cyan-700 font-semibold"
+                        >
+                          Create account
+                        </button>
+                      </p>
+                    </form>
+                  </div>
+                </div>
+              </>
+            )}
+
+            {isUserMenuOpen && (
+              <div
+                className="fixed inset-0 z-40"
+                onClick={() => setIsUserMenuOpen(false)}
+              ></div>
+            )}
           </div>
         </div>
       </div>

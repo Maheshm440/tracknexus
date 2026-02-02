@@ -1,239 +1,108 @@
-import Banner from "@/components/banner";
-import { defaultHomepageFaqs, FAQSection } from "@/components/faq-section";
-import { ImageTextSection } from "@/components/image-text-section";
-import { InsightsFeatureCardsSection } from "@/components/insightsFeatureCardsSection";
-import OurAIIntegrations from "@/components/OurAIIntegrations";
-import SectionHeader from "@/components/section-header";
-import { TestimonialsSection } from "@/components/testimonials-section";
-import { Clock, Monitor, TrendingUp } from "lucide-react";
-import Image from "next/image";
-import { ReactNode } from "react";
+"use client"
 
-const cards = [
-  {
-    id: "app-website-monitoring-ai-powered",
-    title: "App & Website Monitoring (AI-Powered)",
-    description:
-      "Track Nexus uses AI to monitor app usage and website activity in real time—revealing focus patterns, distractions, and productivity levels instantly.",
-    color: "#86CA00",
-    icon: <Monitor size={50} style={{ color: "#86CA00" }} />,
-  },
-  {
-    id: "idle-time-vs-active-time-ai-powered-insight",
-    title: "Idle Time vs Active Time (AI-Powered Insight)",
-    description:
-      "Track Nexus accurately detects when users are actively working versus idle—giving you a clear picture of productivity patterns.",
-    color: "#0DAA97",
-    icon: <Clock size={50} style={{ color: "#0DAA97" }} />,
-  },
-  {
-    id: "focus-score-by-task-ai-powered",
-    title: "Focus Score by Task (AI-Powered)",
-    description:
-      "Track Nexus analyzes attention levels and activity to assign a focus score for each task—helping you spot where deep work happens.",
-    color: "#037EB9",
-    icon: <TrendingUp size={50} style={{ color: "#037EB9" }} />,
-  },
-];
+import ProductPageLayout from "@/components/product-page-layout"
+import { FileText, BarChart3, Calendar, Download, Filter, Users } from "lucide-react"
 
-// Smarter Work Insights with AI – Track Nexus
 
-// Daily & Weekly Productivity Reports – Powered by AI & Track Nexus
-const cards3: {
-  subtitle: string;
-  description: string;
-  imageSrc: string;
-  imageAlt: string;
-  imagePosition: "left" | "right";
-}[] = [
+const features = [
   {
-    subtitle: "Exportable Reports (PDF, CSV)",
-    description:
-      "Track Nexus makes it simple to export detailed productivity reports in both PDF and CSV formats—perfect for sharing with clients, HR, or leadership teams. Each report is AI-generated, highlighting key metrics like active hours, app usage, task completion rates, and focus trends. Whether you’re preparing for a performance review, weekly sync, or compliance check, these reports are clear, customizable, and ready to use—no manual formatting needed.",
-    imageSrc: "/images/productivity-reports/2.png",
-    imageAlt: "Exportable Reports",
-    imagePosition: "right",
+    title: "AI-Generated Reports",
+    description: "Track Nexus makes it simple to export detailed productivity reports in both PDF and CSV formats—perfect for sharing with clients, HR, or leadership teams. Each report is AI-generated, highlighting key metrics like active hours, app usage, task completion rates, and focus trends.",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80",
   },
   {
-    subtitle: "Summary by Team/Individual",
-    description:
-      "Track Nexus delivers detailed, AI-generated summaries that break down productivity and performance by both team and individual. These insights include time spent on tasks, active vs idle time, focus scores, and tool usage—making it easy to see how work is happening across your organization. Whether you’re managing a small group or a large department, Track Nexus helps you compare performance, track improvement over time, and personalize coaching or support.",
-    imageSrc: "/images/productivity-reports/3.png",
-    imageAlt: "Summary by Team/Individual",
-    imagePosition: "left",
+    title: "Team & Individual Summaries",
+    description: "Track Nexus delivers detailed, AI-generated summaries that break down productivity and performance by both team and individual. These insights include time spent on tasks, active vs idle time, focus scores, and tool usage—making it easy to see how work is happening across your organization.",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80",
   },
-  {
-    subtitle: "Customizable Filters",
-    description:
-      "Drill deep into your data with fully customizable filters. Track Nexus allows you to segment productivity insights by user, team, role, date range, project, app usage, task type, and more. Whether you’re analyzing weekly output, comparing departments, or spotting performance gaps, these AI-enhanced filters help surface exactly what you need—fast. Tailor your view to focus on high performers, identify trends, or flag inefficiencies in specific workflows. No more digging through raw data—Track Nexus delivers targeted visibility so you can take meaningful action with precision.",
-    imageSrc: "/images/productivity-reports/4.png",
-    imageAlt: "Customizable Filters",
-    imagePosition: "right",
-  },
-];
-
-const imageWithText: {
-  title: string;
-  description: string;
-  videoSrc: string;
-  imagePosition: "left" | "right";
-  iconListItems: {
-    iconSrc: string;
-    iconAlt: string;
-    listTitle: string;
-    listSubtitle: string;
-  }[];
-}[] = [
   {
     title: "Performance Heatmaps",
-    description:
-      "Track Nexus uses AI heatmaps to show when your team is most active—helping you align meetings, breaks, and workflows with peak focus times.",
-    videoSrc: "/images/productivity-reports/v1.mp4",
-    imagePosition: "left",
-    iconListItems: [
-      {
-        iconSrc: "/monitor.png",
-        iconAlt: "Bar Chart Icon",
-        listTitle: "Productivity Patterns",
-        listSubtitle:
-          "Track Nexus visualizes when teams are most active or idle with easy-to-read, color-coded heatmaps.",
-      },
-      {
-        iconSrc: "/monitor.png",
-        iconAlt: "Line Chart Icon",
-        listTitle: "Focus & Workload Insights",
-        listSubtitle:
-          "Identify peak hours, downtime, and workload gaps to optimize schedules and boost team performance.",
-      },
-    ],
+    description: "Track Nexus uses AI heatmaps to show when your team is most active—helping you align meetings, breaks, and workflows with peak focus times. Visualize productivity patterns and identify peak hours for optimal scheduling.",
+    image: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=1000&q=80",
   },
   {
-    title: "Productivity Benchmarks & Alerts",
-    description:
-      "Track Nexus uses AI to set performance baselines and instantly notifies you of dips or unusual activity.",
-    videoSrc: "/images/productivity-reports/v2.mp4",
-    imagePosition: "right",
-    iconListItems: [
-      {
-        iconSrc: "/monitor.png",
-        iconAlt: "Activity Icon",
-        listTitle: "Smart Productivity Benchmarks",
-        listSubtitle:
-          "Track Nexus uses AI to define baseline performance by analyzing real work patterns and engagement trends.",
-      },
-      {
-        iconSrc: "/monitor.png",
-        iconAlt: "Bell Icon",
-        listTitle: "Real-Time Alerts",
-        listSubtitle:
-          "Get instant notifications when productivity drops or unusual activity is detected—so you can act fast.",
-      },
-    ],
+    title: "Customizable Filters",
+    description: "Drill deep into your data with fully customizable filters. Segment productivity insights by user, team, role, date range, project, app usage, task type, and more. Tailor your view to focus on high performers or flag inefficiencies.",
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1000&q=80",
   },
-  {
-    title: "Privacy-First Monitoring",
-    description:
-      "We believe in ethical tracking. Employees see what’s tracked, when, and why—helping you build trust while improving accountability.",
-    imagePosition: "left",
-    videoSrc: "/images/productivity-reports/v3.mp4",
-    iconListItems: [
-      {
-        iconSrc: "/monitor.png",
-        iconAlt: "Lock Icon",
-        listTitle: "Privacy-Focused Design",
-        listSubtitle:
-          "Track Nexus avoids capturing personal or sensitive data, focusing only on work-related patterns.",
-      },
-      {
-        iconSrc: "/monitor.png",
-        iconAlt: "User Check Icon",
-        listTitle: "Ethical Productivity Tracking",
-        listSubtitle:
-          "AI-powered insights that respect user boundaries while delivering clear, actionable data.",
-      },
-    ],
-  },
-];
+]
 
-export default function EmployeeProductivityPage() {
+const benefits = [
+  {
+    icon: FileText,
+    title: "Exportable Reports",
+    description: "Generate professional PDF and CSV reports for clients, HR, or leadership.",
+  },
+  {
+    icon: BarChart3,
+    title: "Visual Analytics",
+    description: "Color-coded heatmaps and charts make data easy to understand at a glance.",
+  },
+  {
+    icon: Calendar,
+    title: "Scheduled Reports",
+    description: "Automate daily, weekly, or monthly report delivery to your inbox.",
+  },
+  {
+    icon: Download,
+    title: "One-Click Export",
+    description: "Download comprehensive reports instantly in your preferred format.",
+  },
+  {
+    icon: Filter,
+    title: "Custom Filters",
+    description: "Segment data by team, role, date range, project, or any custom criteria.",
+  },
+  {
+    icon: Users,
+    title: "Team Comparisons",
+    description: "Compare performance across teams and individuals with side-by-side views.",
+  },
+]
+
+const stats = [
+  { value: "Auto", label: "Generated" },
+  { value: "PDF/CSV", label: "Formats" },
+  { value: "Daily", label: "Reports" },
+  { value: "AI", label: "Powered" },
+]
+
+const faqs = [
+  {
+    question: "What data is included in reports?",
+    answer: "Reports include active hours, app usage, task completion rates, focus scores, idle time, productivity trends, and customizable metrics based on your needs.",
+  },
+  {
+    question: "Can I schedule automatic reports?",
+    answer: "Yes, you can schedule reports to be generated and delivered automatically on a daily, weekly, or monthly basis to specified email addresses.",
+  },
+  {
+    question: "What formats are available?",
+    answer: "Reports can be exported in PDF format for presentations and sharing, or CSV format for further analysis in spreadsheet applications.",
+  },
+  {
+    question: "Can I customize what appears in reports?",
+    answer: "Absolutely. Use filters to include or exclude specific data, focus on particular teams or individuals, and customize the metrics shown in each report.",
+  },
+]
+
+export default function ProductivityReportsPage() {
   return (
-    <div>
-      <Banner
-        mediaType="video"
-        mediaSrc="/images/productivity-reports/People_Statistical.mp4"
-        heading="AI Smarts for Team Performance – Track Nexus"
-        subheading="Track Nexus uses AI to reveal patterns, streamline work, and show team performance—clearly and smartly."
-      />
-      <ImageTextSection
-        title="AI-Driven Real-Time Tracking – Track Nexus"
-        titleColor="text-highlight"
-        subtitle="See productivity unfold live—with AI insights that make every second count."
-        description="Track Nexus uses intelligent AI tracking to monitor app usage, website visits, and activity levels—giving you real-time visibility into how your team works, minute by minute. Understand which tools are being used, where time is spent, and how engaged your team is throughout the day. No more guesswork—just accurate, actionable productivity data to help you optimize performance and guide smarter decisions."
-        imageSrc="/images/productivity-reports/1.png"
-        imageAlt="AI-Driven Real-Time Tracking"
-        imagePosition="right"
-      />
-      <div className="flex justify-center items-center gap-5 mb-20">
-        {cards.map((card,i) => (
-          <div key={i} className="relative w-[24rem] h-[24rem] flex justify-center items-center">
-            <div className="relative z-10 h-72 w-72 flex flex-col items-center text-center gap-4 border-2 border-gray-200 rounded-2xl p-4 bg-white">
-              {/* <Image src="/monitor.png" alt="test" width={50} height={50} /> */}
-              {/* <Monitor size={50} style={{color: card.color}}/> */}
-              {card.icon}
-
-              <div>App & Website Monitoring (AI-Powered)</div>
-              <p>
-                Track Nexus uses AI to monitor app usage and website activity in
-                real time—revealing focus patterns, distractions, and
-                productivity levels instantly.
-              </p>
-            </div>
-            <div
-              style={{ backgroundColor: card.color }}
-              className={`h-72 w-72  rounded-2xl absolute bottom-0 right-0 z-0`}
-            ></div>
-          </div>
-        ))}
-      </div>
-
-      {/*  */}
-      <section>
-        <SectionHeader
-          title="Daily & Weekly Productivity Reports – Powered by AI & Track Nexus"
-          subtitle="Automated insights that help you track progress, spot trends, and improve performance—every day, every week"
-        />
-        {cards3.map((card,i) => (
-          <ImageTextSection
-          key={i}
-            version="v2"
-            subtitle={card.subtitle}
-            description={card.description}
-            imageSrc={card.imageSrc}
-            imageAlt={card.imageAlt}
-            imagePosition={card.imagePosition}
-          />
-        ))}
-      </section>
-      {/*  */}
-      <section>
-        {imageWithText.map((x,i) => (
-          <ImageTextSection
-          key={i}
-            title={x.title}
-            description={x.description}
-            videoSrc={x.videoSrc}
-            imagePosition={x.imagePosition}
-            iconListItems={x.iconListItems}
-            version="v1"
-          />
-        ))}
-      </section>
-
-      {/* Smarter Work Insights with AI – Track Nexus */}
-      <InsightsFeatureCardsSection />
-      <OurAIIntegrations />
-      <TestimonialsSection />
-      <FAQSection faqs={defaultHomepageFaqs} />
-    </div>
-  );
+    <ProductPageLayout
+      badge="Automated Reports"
+      title="Productivity"
+      titleHighlight="Reports"
+      subtitle="AI-generated reports that track progress, spot trends, and improve performance. Export detailed insights in PDF or CSV formats."
+      heroImage="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1920&q=80"
+      floatingIcons={[FileText, BarChart3, Calendar, Download]}
+      features={features}
+      benefitsTitle="Comprehensive Reporting"
+      benefitsSubtitle="Everything you need to track and share productivity insights"
+      benefits={benefits}
+      stats={stats}
+      faqs={faqs}
+      ctaTitle="Ready for automated insights?"
+      ctaSubtitle="Start your 14-day free trial today. No credit card required."
+    />
+  )
 }

@@ -1,9 +1,10 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useMemo } from "react"
 import Image from "next/image"
 import { motion, AnimatePresence } from "framer-motion"
 import { ChevronDown } from "lucide-react"
+import { generateFAQSchema } from "@/lib/seo/schemas"
 
 interface FAQ {
   id: number
@@ -79,8 +80,21 @@ export function FAQSection({
     setOpenFAQ(openFAQ === id ? null : id)
   }
 
+  // Generate FAQ schema for SEO
+  const faqSchema = useMemo(() => {
+    return generateFAQSchema(faqs.map(faq => ({
+      question: faq.question,
+      answer: faq.answer
+    })))
+  }, [faqs])
+
   return (
     <section className="bg-white px-4 py-16 lg:px-8 lg:py-24">
+      {/* FAQ Schema for SEO */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
       <div className="mx-auto max-w-7xl">
         {/* Header */}
         <motion.div

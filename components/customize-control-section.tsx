@@ -70,7 +70,7 @@ export const CustomizeControlSection = () => {
     {data.map((item) => (
         <div key={item.id} style={{ borderColor: item.color }} className=" relative w-[380px] h-[430px] flex flex-col justify-center items-center gap-4 rounded-2xl border-2  text-center p-10">
         <div style={{ backgroundColor: item.color }} className="absolute h-[84px] w-[84px] flex justify-center items-center rounded-full top-0 left-0 translate-x-[170%] translate-y-[-50%]">
-          <Image src={`/icon2.png`} height={25} width={25} alt=""/>
+          <Image src={`/icon2.png`} height={25} width={25} alt={item.imageAlt || "Feature icon"}/>
         </div>
         <div className="text-2xl">{item.title}</div>
         <p className="text-[#4F4F4F]">{item.description}</p>

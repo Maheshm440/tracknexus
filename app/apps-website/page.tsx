@@ -1,86 +1,108 @@
-import Banner from "@/components/banner";
-import { defaultHomepageFaqs, FAQSection } from "@/components/faq-section";
-import { ImageTextSection } from "@/components/image-text-section";
-import PracticalInsight from "@/components/practical-insight";
-import { TestimonialsSection } from "@/components/testimonials-section";
-import { TestimonialsSectionTwo } from "@/components/testimonials-section-two";
-import VideoBanner from "@/components/video-banner";
+"use client"
 
-const data : {
-    title?: string;
-  subtitle?: string;
-  description?: string ;
-  imageSrc: string;
-  imageAlt: string;
-  imagePosition?: "left" | "right";
-  backgroundColor?: "white" | "gray";
-  titleColor?: string;
-  subtitleColor?: string;
-  className?: string;
-  list?: boolean;
-  version?: "v1" | "v2";
-}[] = [
+import ProductPageLayout from "@/components/product-page-layout"
+import { Globe, Monitor, BarChart3, Shield, Zap, Filter } from "lucide-react"
+
+
+const features = [
   {
     title: "Boost Team Performance",
     description: "Track Nexus boosts team productivity with real-time performance insights and intelligent workload management. Customize dashboards to support seamless collaboration across remote, hybrid, or in-office setups.",
-    imageAlt: "Illustration of three smiling and waving team members."
-    ,
-    imageSrc:"/images/apps-website/2.png"
+    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80",
   },
   {
-    title: "Smart and flexible Work Monitoring",
+    title: "Smart Work Monitoring",
     description: "Track Nexus supports smart hybrid and remote work with productivity tracking, location insights, and attendance monitoring. Improve focus, align goals, and optimize workflows through intelligent work monitoring and data-driven decisions.",
-    imageAlt: "An illustration of a person working on a laptop with a calendar, clock, and gears in the background to symbolize work monitoring."
-    ,
-    imageSrc:"/images/apps-website/3.png"
-    ,
-    imagePosition:"right"
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80",
   },
   {
-    title: "Smart Attendance Made Simple",
-    description: "Track Nexus simplifies attendance with automated tracking, smart scheduling, and real-time visibility. It ensures payroll accuracy and shift management with auto-reminders and seamless reporting.",
-    imageAlt: "An illustration of a person standing next to a large smartphone showing a 'Confirmed Attendance' checkmark."
-    ,
-    imageSrc:"/images/apps-website/4.png"
-  },
-  {
-    title: "Optimize Projects, Time & Teams",
-    description: "Track Nexus streamlines project, task, and time management with real-time tracking, smart scheduling, and automated attendance. It enhances productivity, ensures payroll accuracy, and supports data-driven decisions with live insights.",
-    imageAlt: "An illustration of three people in separate video call windows, representing team collaboration."
-    ,
-    imageSrc:"/images/apps-website/5.png"
-    ,
-    imagePosition:"right"
-  },
-  {
-    title: "Tech Stack with Smart Usage Analytics",
+    title: "Tech Stack Analytics",
     description: "Track Nexus offers real-time insights into app usage, helping you boost efficiency, reduce digital clutter, and cut unnecessary software costs. Identify underused tools, reallocate resources, and optimize workflows with smart usage tracking.",
-    imageAlt: "An illustration of a person analyzing charts and graphs on a large dashboard, representing usage analytics."
-    ,
-    imageSrc:"/images/apps-website/6.png"
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80",
   },
   {
     title: "Intelligent Employee Monitoring",
     description: "Track Nexus offers real-time employee monitoring with activity tracking, screen views, and smart location data to boost focus and accountability. Get full visibility, set alerts for idle or suspicious activity, and streamline oversight for hybrid teams.",
-    imageAlt: "An illustration of several employees working at their desks with monitoring-related icons above their heads."
-    ,
-    imageSrc:"/images/apps-website/7.png"
-    ,
-    imagePosition:"right"
-  }
-];
+    image: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=1000&q=80",
+  },
+]
+
+const benefits = [
+  {
+    icon: Globe,
+    title: "Website Tracking",
+    description: "Monitor which websites employees visit and for how long during work hours.",
+  },
+  {
+    icon: Monitor,
+    title: "App Usage",
+    description: "Track time spent on each application to measure focus and productivity.",
+  },
+  {
+    icon: BarChart3,
+    title: "Usage Analytics",
+    description: "Get detailed insights into tool usage patterns across your organization.",
+  },
+  {
+    icon: Filter,
+    title: "Category Filters",
+    description: "Classify apps and websites as productive, neutral, or unproductive.",
+  },
+  {
+    icon: Shield,
+    title: "Block Distractions",
+    description: "Set policies to block or limit access to unproductive sites.",
+  },
+  {
+    icon: Zap,
+    title: "Real-Time Alerts",
+    description: "Get notified when employees access blocked or flagged content.",
+  },
+]
+
+const stats = [
+  { value: "100%", label: "Visibility" },
+  { value: "Real-time", label: "Tracking" },
+  { value: "AI", label: "Categorization" },
+  { value: "500+", label: "Apps Tracked" },
+]
+
+const faqs = [
+  {
+    question: "What apps and websites are tracked?",
+    answer: "Track Nexus monitors all applications and websites accessed during work hours. You can customize what's tracked and set up categories for productive, neutral, and unproductive activities.",
+  },
+  {
+    question: "Can I block certain websites?",
+    answer: "Yes, you can set policies to block or limit access to specific websites or categories of sites. Employees can be notified when they attempt to access blocked content.",
+  },
+  {
+    question: "How does categorization work?",
+    answer: "Our AI automatically categorizes apps and websites based on their purpose. You can also manually categorize tools specific to your business to ensure accurate productivity tracking.",
+  },
+  {
+    question: "Is personal browsing tracked?",
+    answer: "Tracking is configurable. You can exclude personal time, breaks, or specific hours from monitoring to respect employee privacy while maintaining productivity insights.",
+  },
+]
+
 export default function AppsWebsitePage() {
-    return (
-        <div>
-            <VideoBanner title="Enhance workplace security by capturing verbal cues with audio tracking " description="Elevate workplace oversight with our intelligent audio tracking tool, enabling you to capture critical insights and ensure policy adherence in real time" imageSrc="/images/apps-website/1.png"/>
-            {
-                data.map((x,i) => (
-                    <ImageTextSection key={i} title={x.title} titleColor="text-highlight" description={x.description} imageSrc={x.imageSrc} imageAlt={x.imageAlt} imagePosition={x.imagePosition}/>
-                ))
-            }
-            <PracticalInsight/>
-            <TestimonialsSectionTwo/>
-            <FAQSection faqs={defaultHomepageFaqs}/>
-        </div>
-    )
+  return (
+    <ProductPageLayout
+      badge="App & Website Tracking"
+      title="Track Apps &"
+      titleHighlight="Websites"
+      subtitle="Monitor application and website usage to understand how work time is spent. Optimize productivity with intelligent categorization and real-time insights."
+      heroImage="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1920&q=80"
+      floatingIcons={[Globe, Monitor, BarChart3, Shield]}
+      features={features}
+      benefitsTitle="Complete Digital Activity Tracking"
+      benefitsSubtitle="Understand and optimize how your team uses technology"
+      benefits={benefits}
+      stats={stats}
+      faqs={faqs}
+      ctaTitle="Ready to optimize app usage?"
+      ctaSubtitle="Start your 14-day free trial today. No credit card required."
+    />
+  )
 }

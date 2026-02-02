@@ -1,12 +1,18 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-    title: "Facial Recognition | Track Nexus | Get in Touch with Our Team",
-    description: "Have questions about Track Nexus features, pricing, or support? Reach out to our friendly team for assistance, demos, or partnership inquiries. We're here to help you boost productivity.",
-    keywords: "contact track nexus, support, customer service, demo request, partnership inquiries, time tracking support",
+    title: "Facial Recognition Attendance System | Track Nexus",
+    description: "Contactless clock-in with facial recognition technology. Biometric attendance, identity verification, and secure access control for modern workplaces.",
+    keywords: "facial recognition, biometric attendance, contactless clock-in, face recognition attendance, identity verification",
+    alternates: { canonical: "https://tracknexus.com/facial-recognition" },
+    openGraph: {
+        title: "Facial Recognition Attendance System | Track Nexus",
+        description: "Contactless clock-in with facial recognition technology for secure biometric attendance.",
+        url: "https://tracknexus.com/facial-recognition",
+    },
 }
 
-export default function ContactLayout({
+export default function FacialRecognitionLayout({
     children,
 }: {
     children: React.ReactNode

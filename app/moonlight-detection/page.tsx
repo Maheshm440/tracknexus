@@ -1,93 +1,108 @@
-import Banner from "@/components/banner";
-import { defaultHomepageFaqs, FAQSection } from "@/components/faq-section";
-import { ImageTextSection } from "@/components/image-text-section";
-import PracticalInsight from "@/components/practical-insight";
-import { TestimonialsSection } from "@/components/testimonials-section";
-import { TestimonialsSectionTwo } from "@/components/testimonials-section-two";
-import VideoBanner from "@/components/video-banner";
+"use client"
 
-const data : {
-    title?: string;
-  subtitle?: string;
-  description?: string ;
-  imageSrc: string;
-  imageAlt: string;
-  imagePosition?: "left" | "right";
-  backgroundColor?: "white" | "gray";
-  titleColor?: string;
-  subtitleColor?: string;
-  className?: string;
-  list?: boolean;
-  version?: "v1" | "v2";
-}[] = [
+import ProductPageLayout from "@/components/product-page-layout"
+import { AlertTriangle, Shield, Eye, Clock, Bell, BarChart3 } from "lucide-react"
+
+
+const features = [
   {
     title: "Enhance Productivity Across Teams",
-    description: "Track Nexus drives team efficiency with smart workload management and real-time performance insights. Tailor interactive dashboards to enable smooth collaboration whether your teams work remotely, in-office, or in hybrid environments. Gain visibility into task progress, identify bottlenecks early, and make data-backed decisions. Empower your teams to stay aligned, focused, and performance-driven at every stage.",
-    imageAlt: "A person on a video conference call with numerous participants displayed on a laptop screen."
-    ,
-    imageSrc:"/images/moonlight/2.png",
+    description: "Track Nexus drives team efficiency with smart workload management and real-time performance insights. Tailor interactive dashboards to enable smooth collaboration whether your teams work remotely, in-office, or in hybrid environments. Gain visibility into task progress and identify bottlenecks early.",
+    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=1000&q=80",
   },
   {
-    title: "Intelligent Work Monitoring for Modern Teams",
-    description: "Track Nexus enables efficient hybrid and remote work through advanced productivity tracking, location analytics, and smart attendance monitoring. Boost focus, align team objectives, and streamline workflows with actionable, data-driven insights. Detect work patterns, reduce distractions, and foster accountability across teams. Ensure operational clarity and performance consistency wherever your team works.",
-    imageAlt: "An overhead view of a team meeting with business charts, overlaid with digital network icons."
-    ,
-    imageSrc:"/images/moonlight/3.png",
-    imagePosition:"right"
-  },
-  {
-    title: "Effortless Attendance & Shift Management",
-    description: "Track Nexus streamlines attendance with automation, intelligent scheduling, and real-time tracking. Ensure accurate payroll and smooth shift coordination through timely alerts and comprehensive reports. Eliminate manual errors and save time with fully integrated attendance workflows. Empower HR and managers with instant access to attendance data for better decision-making.",
-    imageAlt: "A manager presenting to his team in front of a whiteboard with the word 'MANAGEMENT' on it."
-    ,
-    imageSrc:"/images/moonlight/4.png",
-    imagePosition:"left"
+    title: "Intelligent Work Monitoring",
+    description: "Track Nexus enables efficient hybrid and remote work through advanced productivity tracking, location analytics, and smart attendance monitoring. Boost focus, align team objectives, and streamline workflows with actionable, data-driven insights.",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80",
   },
   {
     title: "Smart Project & Time Management",
-    description: "Track Nexus simplifies project, task, and time management through real-time tracking, intelligent scheduling, and automated attendance. It boosts team productivity, ensures accurate payroll, and enables smarter decisions with live performance insights. Track milestones effortlessly and keep teams aligned with clear visibility. Reduce delays, improve accountability, and drive projects to success with precision.",
-    imageAlt: "A person writing at a desk with an alarm clock and a tablet nearby, signifying time management."
-    ,
-    imageSrc:"/images/moonlight/5.png",
-    imagePosition:"right"
+    description: "Track Nexus simplifies project, task, and time management through real-time tracking, intelligent scheduling, and automated attendance. It boosts team productivity, ensures accurate payroll, and enables smarter decisions with live performance insights.",
+    image: "https://images.unsplash.com/photo-1611224923853-80b023f02d71?auto=format&fit=crop&w=1000&q=80",
   },
   {
-    title: "Optimize Your Tech Stack and Intelligence",
-    description: "Track Nexus delivers real-time analytics on software and app usage, helping you enhance efficiency, eliminate digital waste, and lower tech expenses. Uncover underutilized tools, reassign licenses, and streamline operations with data-driven clarity. Improve ROI on software investments and support smarter budgeting decisions. Gain full visibility into your digital ecosystem to enable leaner, more focused work environments.",
-    imageAlt: "A developer coding with an HTML tag visible on the screen and other digital interface elements."
-    ,
-    imageSrc:"/images/moonlight/6.png",
-    imagePosition:"left"
+    title: "Smarter Work Oversight",
+    description: "Track Nexus delivers intelligent, real-time employee monitoring through activity tracking, screen insights, and location-aware data. Enhance productivity, ensure accountability, and maintain transparency across remote and hybrid teams.",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80",
+  },
+]
+
+const benefits = [
+  {
+    icon: AlertTriangle,
+    title: "Moonlight Detection",
+    description: "Identify employees engaged in unauthorized side work during hours.",
   },
   {
-    title: "Smarter Work Oversight for Modern Teams",
-    description: "Track Nexus delivers intelligent, real-time employee monitoring through activity tracking, screen insights, and location-aware data. Enhance productivity, ensure accountability, and maintain transparency across remote and hybrid teams. Set custom alerts for inactivity or unusual behavior, and gain centralized visibility into workflows. Empower managers with actionable data to support performance, compliance, and efficiency.",
-    imageAlt: "Two colleagues collaborating and pointing at a diagram on a transparent whiteboard."
-    ,
-    imageSrc:"/images/moonlight/7.png",
-    imagePosition:"right"
-  }
-];
+    icon: Shield,
+    title: "Policy Enforcement",
+    description: "Ensure compliance with company policies and employment contracts.",
+  },
+  {
+    icon: Eye,
+    title: "Activity Monitoring",
+    description: "Track application usage to detect potential dual employment.",
+  },
+  {
+    icon: Clock,
+    title: "Work Hour Analysis",
+    description: "Analyze work patterns to identify unusual activity signatures.",
+  },
+  {
+    icon: Bell,
+    title: "Smart Alerts",
+    description: "Get notified when suspicious patterns are detected.",
+  },
+  {
+    icon: BarChart3,
+    title: "Detailed Reports",
+    description: "Generate compliance reports for HR and management review.",
+  },
+]
+
+const stats = [
+  { value: "AI", label: "Detection" },
+  { value: "Real-time", label: "Monitoring" },
+  { value: "Custom", label: "Policies" },
+  { value: "100%", label: "Compliance" },
+]
+
+const faqs = [
+  {
+    question: "How does moonlighting detection work?",
+    answer: "Track Nexus analyzes work patterns, application usage, and activity signatures to identify signs of unauthorized side work. AI detects anomalies that may indicate dual employment.",
+  },
+  {
+    question: "Is this monitoring transparent to employees?",
+    answer: "Yes, employees are informed about monitoring policies. Transparent tracking builds trust while ensuring compliance with company policies.",
+  },
+  {
+    question: "Can I customize detection rules?",
+    answer: "Absolutely. Configure detection parameters to match your company policies, industry requirements, and specific compliance needs.",
+  },
+  {
+    question: "What happens when moonlighting is detected?",
+    answer: "Alerts are sent to designated managers with detailed reports. You decide the appropriate follow-up action based on your company policies.",
+  },
+]
+
 export default function MoonlightDetectionPage() {
-    return (
-        <div>
-            <VideoBanner title="Detect Dual Employment with Ease" description="Easily identify employees involved in moonlighting. Customize settings to match company policies" imageSrc="/images/moonlight/1.png"/>
-            {
-                data.map((x,i) => (
-                    <ImageTextSection
-                    key={i}
-                    title={x.title}
-                    titleColor="text-highlight"
-                    description={x.description}
-                    imageSrc={x.imageSrc}
-                    imageAlt={x.imageAlt}
-                    imagePosition={x.imagePosition}
-                    />
-                ))
-            }
-            <PracticalInsight/>
-            <TestimonialsSectionTwo/>
-            <FAQSection faqs={defaultHomepageFaqs}/>
-        </div>
-    )
+  return (
+    <ProductPageLayout
+      badge="Compliance"
+      title="Moonlighting"
+      titleHighlight="Detection"
+      subtitle="Detect dual employment with ease. Identify employees involved in unauthorized side work and customize settings to match company policies."
+      heroImage="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1920&q=80"
+      floatingIcons={[AlertTriangle, Shield, Eye, Bell]}
+      features={features}
+      benefitsTitle="Compliance Features"
+      benefitsSubtitle="Everything you need to ensure policy compliance"
+      benefits={benefits}
+      stats={stats}
+      faqs={faqs}
+      ctaTitle="Ready for compliance monitoring?"
+      ctaSubtitle="Start your 14-day free trial today. No credit card required."
+    />
+  )
 }

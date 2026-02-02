@@ -10,6 +10,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { X, Mail, Phone, User, MessageSquare, Building, Users, Star, Zap, Calendar as CalendarIcon, Clock, Send, Check, Loader2 } from "lucide-react"
 import { motion, AnimatePresence } from "framer-motion"
 import { format } from "date-fns"
+import { getVisitorId } from "@/lib/tracking/tracker"
 
 export type FormType = 'demo' | 'pricing' | 'free-trial'
 
@@ -97,47 +98,93 @@ export function ContactPopup({ isOpen, onClose, context = { type: 'demo' } }: Co
     { value: "16:00", label: "4:00 PM" }
   ]
 
-  // Simulate email sending
-  const simulateEmailSending = async (submissionData: any) => {
-    // Add your SendGrid API Calling here
-    // Send email response to: admin@tracknexus.com or your specified email
-    
-    // Simulate email sending delay
-    await new Promise(resolve => setTimeout(resolve, 2000))
-    
-    console.log("Demo form submitted:", submissionData)
-    console.log("Email should be sent to your specified email address")
+  // Submit lead to API
+  const submitLead = async (leadData: Record<string, unknown>) => {
+    const apiUrl = process.env.NEXT_PUBLIC_API_URL || '';
+    const response = await fetch(`${apiUrl}/api/leads`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(leadData),
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to submit lead');
+    }
+
+    return response.json();
   }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    
+
     if (submissionStatus === 'sending') return
-    
+
     setSubmissionStatus('sending')
-    
-    const submissionData = {
-      ...formData,
-      preferredDate: selectedDate ? format(selectedDate, "yyyy-MM-dd") : "",
+
+    // Get visitor ID from tracker (if available)
+    const visitorId = getVisitorId();
+
+    const leadData = {
+      name: formData.name,
+      companyName: formData.companyName,
+      companyEmail: formData.companyEmail,
+      companySize: formData.companySize,
+      mobileNumber: formData.mobileNumber,
+      message: formData.message,
       formType: context.type,
-      submittedAt: new Date().toISOString()
+      selectedPlan: formData.selectedPlan || undefined,
+      preferredDate: selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined,
+      preferredTime: formData.preferredTime || undefined,
+      visitorId: visitorId || undefined,
+      source: typeof window !== 'undefined' ? window.location.pathname : undefined,
     }
 
     try {
-      // Simulate progressive email sending
-      await simulateEmailSending(submissionData)
-      
-      setSubmissionStatus('success')
-      
-      // Auto-close after success
-      setTimeout(() => {
-        handleClose()
-      }, 2000)
-      
+      const result = await submitLead(leadData)
+
+      if (result.success) {
+        setSubmissionStatus('success')
+
+        // Store the lead in localStorage so it appears in the dashboard
+        try {
+          const existingLeads = JSON.parse(localStorage.getItem('tracknexus_leads') || '[]')
+          const newLead = {
+            id: result.leadId,
+            name: formData.name,
+            companyName: formData.companyName,
+            companyEmail: formData.companyEmail,
+            companySize: formData.companySize,
+            mobileNumber: formData.mobileNumber,
+            message: formData.message,
+            formType: context.type,
+            selectedPlan: formData.selectedPlan || undefined,
+            preferredDate: selectedDate ? format(selectedDate, "yyyy-MM-dd") : undefined,
+            preferredTime: formData.preferredTime || undefined,
+            score: result.score || 0, // Use the score calculated by API
+            status: 'NEW',
+            createdAt: new Date().toISOString(),
+            source: typeof window !== 'undefined' ? window.location.pathname : undefined,
+          }
+          const updatedLeads = [newLead, ...existingLeads]
+          localStorage.setItem('tracknexus_leads', JSON.stringify(updatedLeads))
+        } catch (storageError) {
+          console.error('Error storing lead in localStorage:', storageError)
+        }
+
+        // Auto-close after success
+        setTimeout(() => {
+          handleClose()
+        }, 2000)
+      } else {
+        throw new Error(result.error || 'Failed to submit');
+      }
+
     } catch (error) {
-      console.error("Email sending failed:", error)
+      console.error("Lead submission failed:", error)
       setSubmissionStatus('error')
-      
+
       // Reset to idle after showing error
       setTimeout(() => {
         setSubmissionStatus('idle')
@@ -181,286 +228,243 @@ export function ContactPopup({ isOpen, onClose, context = { type: 'demo' } }: Co
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4 z-50"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
+          transition={{ duration: 0.2 }}
           onClick={onClose}
         >
           <motion.div
-            className="bg-white rounded-xl shadow-2xl w-full max-w-md p-6 relative max-h-[90vh] overflow-y-auto"
-            initial={{ scale: 0.9, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            exit={{ scale: 0.9, opacity: 0 }}
+            className="bg-white rounded-2xl shadow-2xl w-full max-w-[360px] relative overflow-hidden"
+            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            animate={{ scale: 1, opacity: 1, y: 0 }}
+            exit={{ scale: 0.9, opacity: 0, y: 20 }}
+            transition={{ type: "spring", stiffness: 300, damping: 25 }}
             onClick={(e) => e.stopPropagation()}
           >
+            {/* Top Gradient Accent */}
+            <div className="h-1 bg-gradient-to-r from-cyan-500 via-blue-500 to-cyan-500" />
+
             {/* Close button */}
             <button
               onClick={handleClose}
-              className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+              className="absolute top-3 right-3 p-1.5 rounded-full bg-gray-100 text-gray-400 hover:text-gray-600 hover:bg-gray-200 transition-all z-10"
               disabled={submissionStatus === 'sending'}
             >
-              <X className="w-6 h-6" />
+              <X className="w-4 h-4" />
             </button>
 
-            {/* Header */}
-            <div className="text-center mb-6">
-              <h2 className="text-2xl font-bold text-gray-900 mb-2">{config.title}</h2>
-              <p className="text-gray-600">{config.subtitle}</p>
-            </div>
+            <div className="p-5">
+              {/* Header */}
+              <div className="text-center mb-4">
+                <div className="w-10 h-10 bg-gradient-to-br from-cyan-500 to-blue-600 rounded-xl flex items-center justify-center mx-auto mb-3 shadow-lg">
+                  <Zap className="w-5 h-5 text-white" />
+                </div>
+                <h2 className="text-lg font-bold text-gray-900">{config.title}</h2>
+                <p className="text-xs text-gray-500 mt-1">{config.subtitle}</p>
+              </div>
 
-            {/* Plan Info (for pricing context) */}
-            {config.showPlanInfo && context.planName && (
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 bg-highlight rounded-full flex items-center justify-center mr-3">
-                      <Star className="w-4 h-4 text-white" />
+              {/* Plan Info (for pricing context) */}
+              {config.showPlanInfo && context.planName && (
+                <div className="bg-gradient-to-r from-cyan-50 to-blue-50 border border-cyan-100 rounded-lg p-3 mb-4">
+                  <div className="flex items-center gap-2">
+                    <div className="w-7 h-7 bg-gradient-to-br from-cyan-500 to-blue-500 rounded-lg flex items-center justify-center">
+                      <Star className="w-3.5 h-3.5 text-white" />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-gray-900">{context.planName}</h3>
-                      <p className="text-sm text-gray-600">
-                        {context.planPrice} ({context.planType} billing)
-                      </p>
+                      <h3 className="text-sm font-semibold text-gray-900">{context.planName}</h3>
+                      <p className="text-xs text-gray-500">{context.planPrice} • {context.planType}</p>
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Free Trial Benefits (for free trial context) */}
-            {/* {context.type === 'free-trial' && (
-              <div className="bg-green-50 border border-green-200 rounded-lg p-4 mb-6">
-                <div className="flex items-center mb-2">
-                  <Zap className="w-5 h-5 text-green-600 mr-2" />
-                  <h3 className="font-semibold text-gray-900">What's Included:</h3>
-                </div>
-                <ul className="text-sm text-gray-600 space-y-1">
-                  <li>• Full access to all features</li>
-                  <li>• Unlimited team members</li>
-                  <li>• Real-time analytics</li>
-                  <li>• 24/7 support</li>
-                </ul>
-              </div>
-            )} */}
-
-            {/* Form */}
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="relative">
-                <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                <Input
-                  type="text"
-                  name="name"
-                  placeholder="Your Name"
-                  value={formData.name}
-                  onChange={handleInputChange}
-                  className="pl-10"
-                  required
-                />
-              </div>
-
-              <div className="relative">
-                <Building className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                <Input
-                  type="text"
-                  name="companyName"
-                  placeholder="Company Name"
-                  value={formData.companyName}
-                  onChange={handleInputChange}
-                  className="pl-10"
-                  required
-                />
-              </div>
-
-              <div className="relative">
-                <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                <Input
-                  type="email"
-                  name="companyEmail"
-                  placeholder="Company Email"
-                  value={formData.companyEmail}
-                  onChange={handleInputChange}
-                  className="pl-10"
-                  required
-                />
-              </div>
-
-              <div className="relative">
-                <Users className="absolute left-3 top-3 w-5 h-5 text-gray-400 z-10" />
-                <Select onValueChange={handleSelectChange('companySize')} required>
-                  <SelectTrigger className="pl-10">
-                    <SelectValue placeholder="Company Size" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="10-50">10 To 50</SelectItem>
-                    <SelectItem value="50-100">50 - 100</SelectItem>
-                    <SelectItem value="100-500">100 - 500</SelectItem>
-                    <SelectItem value="500+">500 Above</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="relative">
-                <Phone className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                <Input
-                  type="tel"
-                  name="mobileNumber"
-                  placeholder="Mobile Number"
-                  value={formData.mobileNumber}
-                  onChange={handleInputChange}
-                  className="pl-10"
-                  required
-                />
-              </div>
-
-              {/* Calendar Fields for Demo Booking */}
-              {config.showCalendar && (
-                <>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Select Date</label>
-                      <Popover>
-                        <PopoverTrigger asChild>
-                          <Button
-                            variant="outline"
-                            className={`w-full pl-3 text-left font-normal ${!selectedDate && "text-muted-foreground"}`}
-                          >
-                            <CalendarIcon className="mr-2 h-4 w-4" />
-                            {selectedDate ? format(selectedDate, "PPP") : "Pick a date"}
-                          </Button>
-                        </PopoverTrigger>
-                        <PopoverContent className="w-auto p-0" align="start">
-                          <Calendar
-                            mode="single"
-                            selected={selectedDate}
-                            onSelect={setSelectedDate}
-                            disabled={(date) => date < new Date() || date.getDay() === 0 || date.getDay() === 6}
-                            initialFocus
-                          />
-                        </PopoverContent>
-                      </Popover>
-                    </div>
-
-                    <div className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">Select Time</label>
-                      <div className="relative">
-                        <Clock className="absolute left-3 top-3 w-4 h-4 text-gray-400 z-10" />
-                        <Select onValueChange={handleSelectChange('preferredTime')} required>
-                          <SelectTrigger className="pl-10">
-                            <SelectValue placeholder="Time" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {timeSlots.map((slot) => (
-                              <SelectItem key={slot.value} value={slot.value}>
-                                {slot.label}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </div>
-                </>
               )}
 
-              <div className="relative">
-                <MessageSquare className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-                <Textarea
-                  name="message"
-                  placeholder={config.messagePlaceholder}
-                  value={formData.message}
-                  onChange={handleInputChange}
-                  className="pl-10 min-h-[100px] resize-none"
-                  required
-                />
-              </div>
+              {/* Form */}
+              <form onSubmit={handleSubmit} className="space-y-3">
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="relative">
+                    <User className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
+                    <Input
+                      type="text"
+                      name="name"
+                      placeholder="Name"
+                      value={formData.name}
+                      onChange={handleInputChange}
+                      className="pl-8 h-9 text-sm border-gray-200 focus:border-cyan-500 focus:ring-cyan-500/20"
+                      required
+                    />
+                  </div>
+                  <div className="relative">
+                    <Building className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
+                    <Input
+                      type="text"
+                      name="companyName"
+                      placeholder="Company"
+                      value={formData.companyName}
+                      onChange={handleInputChange}
+                      className="pl-8 h-9 text-sm border-gray-200 focus:border-cyan-500 focus:ring-cyan-500/20"
+                      required
+                    />
+                  </div>
+                </div>
 
-              <Button
-                type="submit"
-                className="w-full bg-highlight text-white hover:bg-blue-700 py-3 text-lg font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                disabled={submissionStatus === 'sending'}
-              >
-                {submissionStatus === 'sending' ? (
-                  <div className="flex items-center justify-center">
-                    <Loader2 className="w-5 h-5 mr-2 animate-spin" />
-                    Processing...
+                <div className="relative">
+                  <Mail className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
+                  <Input
+                    type="email"
+                    name="companyEmail"
+                    placeholder="Work Email"
+                    value={formData.companyEmail}
+                    onChange={handleInputChange}
+                    className="pl-8 h-9 text-sm border-gray-200 focus:border-cyan-500 focus:ring-cyan-500/20"
+                    required
+                  />
+                </div>
+
+                <div className="grid grid-cols-2 gap-2">
+                  <div className="relative">
+                    <Users className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400 z-10" />
+                    <Select onValueChange={handleSelectChange('companySize')} required>
+                      <SelectTrigger className="pl-8 h-9 text-sm border-gray-200">
+                        <SelectValue placeholder="Team Size" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="10-50">10 - 50</SelectItem>
+                        <SelectItem value="50-100">50 - 100</SelectItem>
+                        <SelectItem value="100-500">100 - 500</SelectItem>
+                        <SelectItem value="500+">500+</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
-                ) : submissionStatus === 'success' ? (
-                  <div className="flex items-center justify-center">
-                    <Check className="w-5 h-5 mr-2" />
-                    Sent Successfully!
+                  <div className="relative">
+                    <Phone className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
+                    <Input
+                      type="tel"
+                      name="mobileNumber"
+                      placeholder="Phone"
+                      value={formData.mobileNumber}
+                      onChange={handleInputChange}
+                      className="pl-8 h-9 text-sm border-gray-200 focus:border-cyan-500 focus:ring-cyan-500/20"
+                      required
+                    />
                   </div>
-                ) : (
-                  <div className="flex items-center justify-center">
-                    <Send className="w-5 h-5 mr-2" />
-                    {config.buttonText}
+                </div>
+
+                {/* Calendar Fields for Demo Booking */}
+                {config.showCalendar && (
+                  <div className="grid grid-cols-2 gap-2">
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <Button
+                          variant="outline"
+                          className={`h-9 text-sm justify-start ${!selectedDate && "text-muted-foreground"}`}
+                        >
+                          <CalendarIcon className="mr-1.5 h-3.5 w-3.5" />
+                          {selectedDate ? format(selectedDate, "MMM d") : "Date"}
+                        </Button>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={selectedDate}
+                          onSelect={setSelectedDate}
+                          disabled={(date) => date < new Date() || date.getDay() === 0 || date.getDay() === 6}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <div className="relative">
+                      <Clock className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-gray-400 z-10" />
+                      <Select onValueChange={handleSelectChange('preferredTime')} required>
+                        <SelectTrigger className="pl-8 h-9 text-sm">
+                          <SelectValue placeholder="Time" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {timeSlots.map((slot) => (
+                            <SelectItem key={slot.value} value={slot.value}>
+                              {slot.label}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </div>
                   </div>
                 )}
-              </Button>
-            </form>
 
-            {/* Simple Loading Message */}
-            {submissionStatus === 'sending' && (
-              <motion.div
-                className="mt-4 p-4 bg-blue-50 border border-blue-200 rounded-lg"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex items-center justify-center space-x-2 text-blue-600">
-                  <Loader2 className="w-5 h-5 animate-spin" />
-                  <span className="font-medium">Sending Email...</span>
+                <div className="relative">
+                  <MessageSquare className="absolute left-2.5 top-2.5 w-4 h-4 text-gray-400" />
+                  <Textarea
+                    name="message"
+                    placeholder={config.messagePlaceholder}
+                    value={formData.message}
+                    onChange={handleInputChange}
+                    className="pl-8 min-h-[70px] text-sm resize-none border-gray-200 focus:border-cyan-500 focus:ring-cyan-500/20"
+                    required
+                  />
                 </div>
-              </motion.div>
-            )}
 
-            {/* Success Message */}
-            {submissionStatus === 'success' && (
-              <motion.div
-                className="mt-4 p-4 bg-green-50 border border-green-200 rounded-lg"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex items-center space-x-2 text-green-700">
-                  <Check className="w-5 h-5" />
-                  <span className="font-medium">Email sent successfully!</span>
-                </div>
-                                  <p className="text-sm text-green-600 mt-1">
-                    We&apos;ll get back to you within 24 hours.
-                  </p>
-              </motion.div>
-            )}
+                <Button
+                  type="submit"
+                  className="w-full h-10 bg-gradient-to-r from-cyan-500 to-blue-600 text-white hover:from-cyan-600 hover:to-blue-700 text-sm font-semibold rounded-lg shadow-md hover:shadow-lg transition-all disabled:opacity-50"
+                  disabled={submissionStatus === 'sending'}
+                >
+                  {submissionStatus === 'sending' ? (
+                    <span className="flex items-center">
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Sending...
+                    </span>
+                  ) : submissionStatus === 'success' ? (
+                    <span className="flex items-center">
+                      <Check className="w-4 h-4 mr-2" />
+                      Sent!
+                    </span>
+                  ) : (
+                    <span className="flex items-center">
+                      <Send className="w-4 h-4 mr-2" />
+                      {config.buttonText}
+                    </span>
+                  )}
+                </Button>
+              </form>
 
-            {/* Error Message */}
-            {submissionStatus === 'error' && (
-              <motion.div
-                className="mt-4 p-4 bg-red-50 border border-red-200 rounded-lg"
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="flex items-center space-x-2 text-red-700">
-                  <X className="w-5 h-5" />
-                  <span className="font-medium">Failed to send email</span>
-                </div>
-                <p className="text-sm text-red-600 mt-1">
-                  Please try again or contact us directly.
+              {/* Status Messages */}
+              {submissionStatus === 'success' && (
+                <motion.div
+                  className="mt-3 p-2.5 bg-green-50 border border-green-200 rounded-lg"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <div className="flex items-center gap-2 text-green-700 text-sm">
+                    <Check className="w-4 h-4" />
+                    <span className="font-medium">Success! We&apos;ll be in touch soon.</span>
+                  </div>
+                </motion.div>
+              )}
+
+              {submissionStatus === 'error' && (
+                <motion.div
+                  className="mt-3 p-2.5 bg-red-50 border border-red-200 rounded-lg"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                >
+                  <div className="flex items-center gap-2 text-red-700 text-sm">
+                    <X className="w-4 h-4" />
+                    <span className="font-medium">Failed. Please try again.</span>
+                  </div>
+                </motion.div>
+              )}
+
+              {/* Footer */}
+              {submissionStatus === 'idle' && (
+                <p className="text-center mt-3 text-[11px] text-gray-400">
+                  {context.type === 'free-trial'
+                    ? "Start instantly • No credit card required"
+                    : "We respond within 24 hours"
+                  }
                 </p>
-              </motion.div>
-            )}
-
-            {/* Footer */}
-            {submissionStatus === 'idle' && (
-              <div className="text-center mt-4 text-sm text-gray-500">
-                {context.type === 'demo' 
-                  ? "We&apos;ll get back to you within 24 hours"
-                  : context.type === 'free-trial' 
-                  ? "Your trial starts immediately after signup"
-                  : "We&apos;ll get back to you within 24 hours"
-                }
-              </div>
-            )}
+              )}
+            </div>
           </motion.div>
         </motion.div>
       )}

@@ -10,8 +10,36 @@ const config: Config = {
   ],
   theme: {
   	extend: {
+  		fontFamily: {
+  			sans: ['Inter', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
+  			serif: ['Georgia', 'Cambria', 'Times New Roman', 'Times', 'serif'],
+  		},
+  		fontSize: {
+  			'hero': ['clamp(2.5rem, 5vw, 3.5rem)', { lineHeight: '1.25', letterSpacing: '-0.01em' }],
+  			'display': ['clamp(2rem, 4vw, 3rem)', { lineHeight: '1.2', letterSpacing: '-0.01em' }],
+  		},
   		colors: {
-  			highlight: '#096EB6',
+  			// Deloitte Color Palette (with Cyan accent)
+  			'deloitte': {
+  				black: '#000000',
+  				white: '#FFFFFF',
+  				green: '#06B6D4',
+  				'green-dark': '#0891B2',
+  				gray: {
+  					50: '#F9FAFB',
+  					100: '#F3F4F6',
+  					200: '#E5E7EB',
+  					300: '#D1D5DB',
+  					400: '#9CA3AF',
+  					500: '#6B7280',
+  					600: '#4B5563',
+  					700: '#374151',
+  					800: '#1F2937',
+  					900: '#111827',
+  				},
+  			},
+  			// Legacy colors (keeping for backwards compatibility)
+  			highlight: '#06B6D4',
   			background: 'hsl(var(--background))',
   			foreground: 'hsl(var(--foreground))',
   			card: {

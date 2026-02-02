@@ -1,30 +1,58 @@
+"use client"
+
+import { OptimizedVideo } from "./optimized-video"
+
 interface VideoBannerProps {
   imageSrc?: string
   videoSrc?: string
+  /** Poster image for the video (shown before video loads) */
+  poster?: string
+  /** WebM version of the video for better compression */
+  webmSrc?: string
   title?: string
   subtitle?: string
   description?: string
   className?: string
+  /** Enable autoplay (default: true for hero background) */
+  autoPlay?: boolean
+  /** Enable lazy loading (default: false for hero) */
+  lazy?: boolean
 }
 
 export default function VideoBanner({
-  videoSrc = "/placeholder-video.mp4",
-  imageSrc = "/placeholder.svg",
+  videoSrc,
+  imageSrc,
+  poster,
+  webmSrc,
   title = "Zero-Cost Employee Monitoring Software",
   subtitle = "Track employee activities securely and transparently.",
   description = "Zero cost. Unlimited users",
   className = "",
+  autoPlay = true,
+  lazy = false,
 }: VideoBannerProps) {
   return (
     <div className={`relative h-[40rem] w-full overflow-hidden ${className}`}>
       {/* Video Background */}
       {videoSrc && (
-        <video className="absolute inset-0 h-full w-full object-cover" autoPlay muted loop playsInline>
-          <source src={videoSrc} type="video/mp4" />
-          Your browser does not support the video tag.
-        </video>
+        <OptimizedVideo
+          src={videoSrc}
+          webmSrc={webmSrc}
+          poster={poster || imageSrc}
+          autoPlay={autoPlay}
+          lazy={lazy}
+          loop={true}
+          muted={true}
+          playsInline={true}
+          showPlayButton={false}
+          className="absolute inset-0 h-full w-full object-cover"
+          containerClassName="absolute inset-0"
+          alt={title || "Video banner background"}
+        />
       )}
-      {imageSrc && (
+
+      {/* Fallback image if no video */}
+      {!videoSrc && imageSrc && (
         <img
           src={imageSrc}
           alt="Banner background"
@@ -34,15 +62,6 @@ export default function VideoBanner({
 
       {/* Dark Overlay */}
       <div className="absolute inset-0 bg-black/60" />
-
-      {/* Decorative Elements */}
-      {/* <div className="absolute inset-0">
-        <div className="absolute top-16 left-8 h-12 w-12 rounded-full bg-red-500/80 blur-sm" />
-        <div className="absolute top-1/3 left-4 h-8 w-8 rounded-full bg-red-500/60 blur-sm" />
-        <div className="absolute bottom-1/3 left-12 h-16 w-16 rounded-full bg-red-500/70 blur-sm" />
-        <div className="absolute top-1/4 right-1/4 h-6 w-6 rounded-full bg-red-400/50 blur-sm" />
-        <div className="absolute bottom-1/4 right-1/3 h-10 w-10 rounded-full bg-red-500/60 blur-sm" />
-      </div> */}
 
       {/* Content */}
       <div className="relative z-10 flex h-full items-center">

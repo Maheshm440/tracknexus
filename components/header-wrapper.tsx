@@ -1,26 +1,15 @@
 "use client"
 
-import { useState } from "react"
+import { usePathname } from "next/navigation"
 import { Header } from "./header"
-import { ContactPopup, FormContext } from "./contact-popup"
 
 export function HeaderWrapper() {
-  const [isContactPopupOpen, setIsContactPopupOpen] = useState(false)
-  const [formContext, setFormContext] = useState<FormContext>({ type: 'demo' })
+  const pathname = usePathname()
 
-  const handleOpenContact = () => {
-    setFormContext({ type: 'demo' })
-    setIsContactPopupOpen(true)
+  // Hide header on dashboard routes - dashboard has its own layout
+  if (pathname?.startsWith('/dashboard')) {
+    return null
   }
 
-  return (
-    <>
-      <Header onGetDemo={handleOpenContact} />
-      <ContactPopup 
-        isOpen={isContactPopupOpen} 
-        onClose={() => setIsContactPopupOpen(false)}
-        context={formContext}
-      />
-    </>
-  )
-} 
+  return <Header />
+}

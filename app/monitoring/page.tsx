@@ -1,122 +1,108 @@
-import { CustomizeControlSection } from "@/components/customize-control-section";
-import { defaultHomepageFaqs, FAQSection } from "@/components/faq-section";
-import { ImageTextSection } from "@/components/image-text-section";
-import { TestimonialsSection } from "@/components/testimonials-section";
-import { TestimonialsSectionTwo } from "@/components/testimonials-section-two";
-import VideoBanner from "@/components/video-banner";
+"use client"
 
-// cards
-const data : {
-    id: number;
-    title: string;
-    subtitle: string;
-    description: string;
-    imageSrc: string;
-    imageAlt: string;
-    imagePosition?: "left" | "right";
-}[] = [
-  {
-    id: 1, // Keeping ID for unique key prop in React
-    title: "Comprehensive Employee Monitoring",
-    subtitle: "Track & Optimize Performance",
-    description: "Track app and website usage, capture screenshots (random or triggered), monitor activity logs, and detect suspicious behavior—all in silent mode. Gain complete visibility into employee workflows to enhance productivity, ensure data security, and support informed decision-making. All data is collected discreetly and securely, providing actionable insights without disrupting employee operations. Customize monitoring parameters to align with organizational policies and compliance requirements. Leverage real-time alerts and detailed reports to proactively address risks and optimize team performance.",
-    imageSrc: "/images/monitoring/2.png", // Placeholder, replace with actual image path if available
-    imageAlt: "Magnifying glass over a target with employee icons"
-    ,
-    imagePosition: "right"
-  },
-  {
-    id: 2,
-    title: "Advanced Employee Monitoring Made Simple",
-    subtitle: "Simplified Control & Insights",
-    description: "Stay in control with real-time employee monitoring, manual screenshot capture, and detailed app and website usage insights. Track productivity throughout the comprehensive reports, monitor time and attendance automatically, and review activities as they happen. Get the data you need to manage performance and optimize workflows efficiently. Set custom alerts for unauthorized activities to safeguard sensitive company information. Easily filter and analyze historical data to identify trends and performance gaps over time. Empower management with visual evidence and actionable metrics to drive accountability and results.",
-    imageSrc: "/images/monitoring/3.png", // Placeholder, replace with actual image path if available
-    imageAlt: "Person looking at multiple computer monitors with data"
-  },
-  {
-    id: 3,
-    title: "Workforce Activity Monitoring",
-    subtitle: "Detailed Activity Tracking",
-    description: "Gain full visibility into your team's daily activities, including active, idle, and break times. Track application and website usage to understand how time is spent across tasks. Easily review, edit, and approve manual time entries for greater accuracy and transparency. Identify unproductive behavior early with detailed activity timelines and usage patterns. Ensure accountability with automatically logged sessions and customizable tracking settings. Support data-driven decisions by analyzing productivity trends across individuals or teams. Enhance operational efficiency by aligning employee activity data with performance goals and business objectives.",
-    imageSrc: "/images/monitoring/4.png", // Placeholder, replace with actual image path if available
-    imageAlt: "Gears with productivity icons inside"
-    ,
-    imagePosition: "right"
-  }
-];
+import ProductPageLayout from "@/components/product-page-layout"
+import { Monitor, Eye, Camera, Activity, Shield, BarChart3 } from "lucide-react"
 
-// image text
-const data2 : {
-    id: number;
-    title: string;
-    subtitle: string;
-    description: string;
-    imageSrc: string;
-    imageAlt: string;
-    imagePosition?: "left" | "right";
-}[] = [
+
+const features = [
   {
-    id: 1, // Keeping ID for unique key prop in React
-    title: "Enhance Focus and Drive Productivity",
-    subtitle: "Actionable Insights", // New subtitle based on content
-    description: "Empower your team with actionable insights from Time Champ. Identify obstacles, track progress, and resolve issues effectively. Strengthen focus and commitment to achieve higher productivity with ease.",
-    imageSrc: "/images/monitoring/5.png", // Placeholder, replace with actual image path if available
-    imageAlt: "Target with arrows hitting the bullseye",
-    imagePosition: "right"
+    title: "Real-Time Screen Monitoring",
+    description: "Get live visibility into employee screens with periodic screenshots and real-time activity feeds. Understand exactly how work hours are spent without invasive surveillance—our transparent approach keeps teams accountable while respecting privacy.",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80",
   },
   {
-    id: 2,
-    title: "Effortless Remote Team Management",
-    subtitle: "Confident Leadership", // New subtitle based on content
-    description: "Lead your remote team with confidence using Time Champ. Stay updated with daily activity reports, track active hours, monitor screenshots, and review detailed logs. Streamline payroll with customizable hourly rates and gain full visibility into your team's performance.",
-    imageSrc: "/images/monitoring/6.png", // Placeholder, replace with actual image path if available
-    imageAlt: "Business person interacting with holographic team members",
+    title: "Application & Website Tracking",
+    description: "Automatically track which applications and websites employees use during work hours. Categorize activities as productive, neutral, or unproductive to get clear insights into work patterns and identify opportunities for improvement.",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80",
   },
   {
-    id: 3,
-    title: "Enhance Attendance Accuracy",
-    subtitle: "Accurate Time Tracking", // New subtitle based on content
-    description: "Accurately track employee attendance through real laptop activity, ensuring timesheets reflect true working hours. Eliminate time theft and buddy punching while maintaining compliance.",
-    imageSrc: "/images/monitoring/7.png", // Placeholder, replace with actual image path if available
-    imageAlt: "Person checking a large clipboard with a clock",
-    imagePosition: "right"
-  }
-];
+    title: "Activity Level Detection",
+    description: "Monitor keyboard and mouse activity to understand engagement levels throughout the day. Identify peak productivity hours, detect idle time, and ensure accurate time tracking based on actual work activity.",
+    image: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    title: "Productivity Analytics",
+    description: "Transform raw monitoring data into actionable insights. Our AI-powered analytics identify productivity trends, highlight top performers, and surface areas where teams can improve their efficiency and focus.",
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1000&q=80",
+  },
+]
+
+const benefits = [
+  {
+    icon: Monitor,
+    title: "Screen Capture",
+    description: "Periodic screenshots provide visual proof of work without constant surveillance.",
+  },
+  {
+    icon: Eye,
+    title: "Live View",
+    description: "See employee screens in real-time when needed for support or verification.",
+  },
+  {
+    icon: Activity,
+    title: "Activity Tracking",
+    description: "Monitor keyboard, mouse, and application activity to measure engagement.",
+  },
+  {
+    icon: Camera,
+    title: "Video Recording",
+    description: "Optional screen recording for compliance-sensitive industries.",
+  },
+  {
+    icon: Shield,
+    title: "Privacy Controls",
+    description: "Configurable monitoring levels and transparent policies for employee trust.",
+  },
+  {
+    icon: BarChart3,
+    title: "Detailed Reports",
+    description: "Comprehensive analytics on productivity, activity, and time utilization.",
+  },
+]
+
+const stats = [
+  { value: "35%", label: "Productivity Boost" },
+  { value: "50%", label: "Less Idle Time" },
+  { value: "100%", label: "Transparency" },
+  { value: "24/7", label: "Monitoring" },
+]
+
+const faqs = [
+  {
+    question: "Is employee monitoring legal?",
+    answer: "Yes, employee monitoring is legal in most jurisdictions when employees are informed and consent is obtained. Track Nexus provides tools for transparent policies and employee acknowledgment.",
+  },
+  {
+    question: "Can employees see what's being monitored?",
+    answer: "Yes, we recommend transparent monitoring. Employees can view their own activity data and understand exactly what information is being collected.",
+  },
+  {
+    question: "How often are screenshots taken?",
+    answer: "Screenshot frequency is fully customizable—from every few minutes to hourly. You can also set different frequencies for different teams or roles.",
+  },
+  {
+    question: "Does monitoring affect computer performance?",
+    answer: "No, Track Nexus is designed to be lightweight and runs silently in the background without impacting system performance or employee workflows.",
+  },
+]
+
 export default function MonitoringPage() {
-    return <div>
-        <VideoBanner title="Real-Time Employee 
-Monitoring" description="Monitor live screens, capture screenshots, and record activity to track team performance in real time. Ensure compliance and make informed decisions with complete digital visibility" imageSrc="/images/monitoring/image-1.png"/>
-    {
-        data.map((x,i)  => (
-            <ImageTextSection
-            key={i}
-            title={x.title}
-            titleColor="text-highlight"
-            subtitle={x.subtitle}
-            description={x.description}
-            imageSrc={x.imageSrc}
-            imageAlt={x.imageAlt}
-            imagePosition={x.imagePosition}
-            />
-        ))
-    }
-
-    <CustomizeControlSection/>
-
-    <section className="bg-black py-10">
-        {data2.map((x,i)  => (
-            <ImageTextSection
-            key={i}
-            title={x.title}
-            subtitle={x.subtitle}
-            description={x.description}
-            imageSrc={x.imageSrc}
-            imageAlt={x.imageAlt}
-            imagePosition={x.imagePosition}
-            />
-        ))}
-    </section>
-    <TestimonialsSectionTwo/>
-    <FAQSection faqs={defaultHomepageFaqs}/>
-    </div>
+  return (
+    <ProductPageLayout
+      badge="Employee Monitoring"
+      title="Smart Employee"
+      titleHighlight="Monitoring"
+      subtitle="Transparent, ethical monitoring that boosts productivity without micromanaging. Get real insights into how work gets done."
+      heroImage="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1920&q=80"
+      floatingIcons={[Monitor, Eye, Activity, Shield]}
+      features={features}
+      benefitsTitle="Comprehensive Monitoring Features"
+      benefitsSubtitle="Everything you need to understand and improve team productivity"
+      benefits={benefits}
+      stats={stats}
+      faqs={faqs}
+      ctaTitle="Ready for transparent monitoring?"
+      ctaSubtitle="Start your 14-day free trial today. No credit card required."
+    />
+  )
 }

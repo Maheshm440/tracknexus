@@ -1,207 +1,108 @@
-import Banner from "@/components/banner";
-import { defaultHomepageFaqs, FAQSection } from "@/components/faq-section";
-import { ImageTextSection } from "@/components/image-text-section";
-import OurAIIntegrations from "@/components/OurAIIntegrations";
-import SectionHeader from "@/components/section-header";
-import { DailyTimeline } from "./daily-timeline";
+"use client"
 
-interface IconListItem {
-  iconSrc: string;
-  iconAlt: string;
-  listTitle: string;
-  listSubtitle: string;
-}
+import ProductPageLayout from "@/components/product-page-layout"
+import { FileText, Clock, Activity, BarChart3, Monitor, Zap } from "lucide-react"
 
-interface FeatureCardProps {
-  id: string;
-  title: string;
-  subtitle?: string;
-  description?: string;
-  imageSrc: string;
-  imageAlt: string;
-  imagePosition?: "left" | "right";
-  iconListItems?: IconListItem[];
-}
 
-const sectionDataWithIconLists: FeatureCardProps[] = [
+const features = [
   {
-    id: "auto-logged-app-website-usage",
     title: "Auto-logged App & Website Usage",
-    imageSrc: "/images/activity-logs/activity-logs-1.jpg", // Placeholder for the laptop image
-    imageAlt: "Laptop showing app usage data",
-    imagePosition: "left",
+    description: "Track Nexus automatically logs time spent on each app to measure focus and productivity. It tracks websites visited and highlights usage patterns with AI-powered insights, giving you complete visibility into how work time is spent.",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    title: "Categorized Activity Tracking",
+    description: "Track Nexus uses AI to automatically label activities as productive, neutral, or unproductive. Quickly understand how time is spent across tools, tasks, and websites—no manual sorting needed. Get instant clarity on productivity patterns.",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    title: "Real-Time Session Tracking",
+    description: "View active sessions as they happen, with real-time visibility into ongoing work. Get immediate data on activity levels, tools in use, and session duration—powered by AI for instant insights into team productivity.",
+    image: "https://images.unsplash.com/photo-1504868584819-f8e8b4b6d7e3?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    title: "Daily Timelines & Reports",
+    description: "Track Nexus maps each user's day into a clear, color-coded timeline based on activity type, status, and focus level. Dive into detailed sessions or get instant high-level summaries—all in one click.",
+    image: "https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1000&q=80",
+  },
+]
 
-    iconListItems: [
-      {
-        iconSrc: "/images/activity-logs/monitor-icon.png", // Placeholder icon for App Tracking
-        iconAlt: "App Tracking Icon",
-        listTitle: "App Tracking",
-        listSubtitle:
-          "Automatically logs time spent on each app to measure focus and productivity.",
-      },
-      {
-        iconSrc: "", // Placeholder icon for Web Monitoring
-        iconAlt: "Web Monitoring Icon",
-        listTitle: "Web Monitoring",
-        listSubtitle:
-          "Tracks websites visited and highlights usage patterns with AI-powered insights.",
-      },
-    ],
+const benefits = [
+  {
+    icon: FileText,
+    title: "Complete History",
+    description: "Access detailed logs of all employee activities, applications, and websites visited.",
   },
   {
-    id: "categorized-activity",
-    title: "Categorized activity (productive, neutral, unproductive)",
-    imageSrc: "/images/activity-logs/activity-logs-2.jpg", // Placeholder for the sticky notes image
-    imageAlt: "People collaborating around a desk with sticky notes",
-    imagePosition: "right",
-    iconListItems: [
-      {
-        iconSrc: "/images/activity-logs/monitor-icon.svg", // Placeholder icon for AI Classification
-        iconAlt: "AI Classification Icon",
-        listTitle: "AI Classification",
-        listSubtitle:
-          "Track Nexus uses AI to automatically label activities as productive, neutral, or unproductive.",
-      },
-      {
-        iconSrc: "/images/activity-logs/monitor-icon.svg", // Placeholder icon for Time Clarity
-        iconAlt: "Time Clarity Icon",
-        listTitle: "Time Clarity",
-        listSubtitle:
-          "Quickly understand how time is spent across tools, tasks, and websites—no manual sorting needed.",
-      },
-    ],
+    icon: Clock,
+    title: "Timeline View",
+    description: "Visualize work patterns with color-coded daily timelines showing activity types.",
   },
   {
-    id: "real-time-session-tracking",
-    title: "Real-time session tracking",
-    imageSrc: "/images/activity-logs/activity-logs-3.jpg", // Placeholder for the desktop image
-    imageAlt: "Desktop showing real-time session tracking",
-    imagePosition: "left",
-    iconListItems: [
-      {
-        iconSrc: "/images/activity-logs/monitor-icon.svg", // Placeholder icon for Live Monitoring
-        iconAlt: "Live Monitoring Icon",
-        listTitle: "Live Monitoring",
-        listSubtitle:
-          "View active sessions as they happen, with real-time visibility into ongoing work.",
-      },
-      {
-        iconSrc: "/images/activity-logs/monitor-icon.svg", // Placeholder icon for Instant Insights
-        iconAlt: "Instant Insights Icon",
-        listTitle: "Instant Insights",
-        listSubtitle:
-          "Get immediate data on activity levels, tools in use, and session duration—powered by AI.",
-      },
-    ],
+    icon: Activity,
+    title: "Activity Categories",
+    description: "AI automatically categorizes activities as productive, neutral, or unproductive.",
   },
   {
-    id: "keyboard-mouse-activity-indicators",
-    title: "Keyboard and mouse activity level indicators",
-    imageSrc: "/images/activity-logs/activity-logs-4.jpg", // Placeholder for the glowing keyboard image
-    imageAlt: "Hands on a glowing keyboard and mouse",
-    imagePosition: "right",
-    iconListItems: [
-      {
-        iconSrc: "/images/activity-logs/monitor-icon.svg", // Placeholder icon for Keyboard Tracking
-        iconAlt: "Keyboard Tracking Icon",
-        listTitle: "Keyboard Tracking",
-        listSubtitle:
-          "Monitors typing activity to measure engagement and focus during work hours.",
-      },
-      {
-        iconSrc: "/images/activity-logs/monitor-icon.svg", // Placeholder icon for Mouse Movement
-        iconAlt: "Mouse Movement Icon",
-        listTitle: "Mouse Movement",
-        listSubtitle:
-          "Tracks mouse movements to indicate activity levels, helping you assess focus and detect idle time accurately.",
-      },
-    ],
+    icon: BarChart3,
+    title: "Trend Analysis",
+    description: "Identify productivity patterns and trends over time with smart analytics.",
   },
-];
+  {
+    icon: Monitor,
+    title: "App & Web Tracking",
+    description: "Track application and website usage to understand work habits.",
+  },
+  {
+    icon: Zap,
+    title: "Real-Time Updates",
+    description: "See live activity as it happens with instant session tracking.",
+  },
+]
 
-const dailyTimelines = [
+const stats = [
+  { value: "100%", label: "Activity Captured" },
+  { value: "Real-time", label: "Updates" },
+  { value: "AI", label: "Categorization" },
+  { value: "30 days", label: "History" },
+]
+
+const faqs = [
   {
-    title: "Report Export",
-    subtitle: "Compliance-Ready Documents",
-    color: "cyan-500",
-    icon: "/monitor.png", // adjust path as per your app
-    reverse: false,
+    question: "What activities are logged?",
+    answer: "Track Nexus logs application usage, website visits, active/idle time, and session durations. All activities are automatically categorized by our AI as productive, neutral, or unproductive.",
   },
   {
-    title: "Performance Trends",
-    subtitle: "Daily, Weekly, Role-based",
-    color: "gray-500",
-    icon: "/monitor.png",
-    reverse: true,
+    question: "How long is activity data stored?",
+    answer: "Activity data retention depends on your plan. Starter plans include 30-day retention, while Premium plans offer unlimited history. You can also export data at any time.",
   },
   {
-    title: "AI Dashboards",
-    subtitle: "Track work, patterns, and performance",
-    color: "yellow-400",
-    icon: "/monitor.png",
-    reverse: false,
+    question: "Can employees view their own activity logs?",
+    answer: "Yes, employees can access their own activity logs and timelines, promoting transparency and self-improvement.",
   },
   {
-    title: "TrackSight",
-    subtitle: "Visualizes productivity patterns.",
-    color: "rose-500",
-    icon: "/monitor.png",
-    reverse: true,
+    question: "How does AI categorization work?",
+    answer: "Our AI analyzes app and website usage patterns to automatically label activities. You can also customize categories based on your business needs.",
   },
-];
+]
+
 export default function ActivityLogsPage() {
   return (
-    <div>
-      <Banner
-        mediaSrc="/images/activity-logs/Office_Laptop.mp4"
-        mediaType="video"
-        heading="AI-Powered Activity Logs by Track Nexus"
-        subheading="Automatically capture, analyze, and visualize every action your team takes—powered by AI for smarter oversight"
-        buttonText="Explore the Demo"
-      />
-      <ImageTextSection
-        imageSrc="/images/activity-logs/logs-head.jpg"
-        imageAlt="Activity Logs"
-        title="What Are Activity Logs?"
-        titleColor="text-highlight"
-        subtitle="Smarter Tracking. Clearer Insights. Powered by AI and Track Nexus"
-        description="Track Nexus uses AI to seamlessly monitor and log employee activity across all digital touchpoints—apps, browsers, tools, and assigned tasks—creating a complete, real-time timeline of the workday. Whether your team works remotely, in-office, or in a hybrid setup, Track Nexus provides unmatched visibility into work patterns, time allocation, and productivity trends. You’ll see when tasks start and finish, how tools are being used, and where time may be slipping—without needing to micromanage. With intelligent insights and detailed logs, you can foster accountability, streamline workflows, and make informed decisions based on actual data, not assumptions."
-      />
-      <section>
-        {sectionDataWithIconLists.map((section) => (
-          <ImageTextSection
-            key={section.id}
-            imageSrc={section.imageSrc}
-            imageAlt={section.imageAlt}
-            title={section.title}
-            titleColor="text-highlight"
-            subtitle={section.subtitle}
-            description={section.description}
-            iconListItems={section.iconListItems}
-            imagePosition={section.imagePosition}
-          />
-        ))}
-      </section>
-      <section className="mb-10">
-        <SectionHeader
-          title="Daily Timelines & Reports"
-          subtitle="Track Nexus maps each user’s day into a clear, color-coded timeline based on activity type, status, and focus level. Dive into detailed sessions or get instant high-level summaries—all in one click"
-        />
-        <div className="container mx-auto grid grid-cols-1 md:grid-cols-1 lg:grid-cols-2 justify-items-center gap-4">
-          {dailyTimelines.map((item, index) => (
-            <DailyTimeline
-              key={index}
-              title={item.title}
-              subtitle={item.subtitle}
-              color={item.color}
-              iconSrc={item.icon}
-              reverse={item.reverse}
-            />
-          ))}
-        </div>
-      </section>
-      <OurAIIntegrations />
-      <FAQSection faqs={defaultHomepageFaqs} />
-    </div>
-  );
+    <ProductPageLayout
+      badge="Activity Tracking"
+      title="Complete Activity"
+      titleHighlight="Logs"
+      subtitle="AI-powered activity logging that captures, analyzes, and visualizes every action your team takes for smarter oversight."
+      heroImage="https://images.unsplash.com/photo-1551434678-e076c223a692?auto=format&fit=crop&w=1920&q=80"
+      floatingIcons={[FileText, Clock, Activity, BarChart3]}
+      features={features}
+      benefitsTitle="Comprehensive Activity Tracking"
+      benefitsSubtitle="Everything you need to understand how work gets done"
+      benefits={benefits}
+      stats={stats}
+      faqs={faqs}
+      ctaTitle="Ready for complete activity visibility?"
+      ctaSubtitle="Start your 14-day free trial today. No credit card required."
+    />
+  )
 }

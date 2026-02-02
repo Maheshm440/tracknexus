@@ -2,29 +2,39 @@
 import { ReactNode } from "react";
 import { motion } from "framer-motion";
 import Image from "next/image";
+import { OptimizedVideo } from "./optimized-video";
 
 interface VideoTextSectionProps {
     title?: string | ReactNode;
     description?: string | ReactNode;
     videoSrc: string;
     videoAlt: string;
+    /** Poster image for the video */
+    poster?: string;
+    /** WebM version of the video */
+    webmSrc?: string;
     videoPosition?: "left" | "right";
     backgroundColor?: "white" | "gray";
     titleColor?: string;
     className?: string;
+    /** Enable lazy loading (default: true for below-fold content) */
+    lazy?: boolean;
+    /** Enable autoplay (default: true for background videos) */
+    autoPlay?: boolean;
   }
-  
+
   const fadeInLeft = {
     initial: { opacity: 0, x: -60 },
     animate: { opacity: 1, x: 0 },
     transition: { duration: 0.6 },
   };
-  
+
   const fadeInRight = {
     initial: { opacity: 0, x: 60 },
     animate: { opacity: 1, x: 0 },
     transition: { duration: 0.6 },
   };
+
 export function VideoTextSection({
     title,
     description,
@@ -32,7 +42,12 @@ export function VideoTextSection({
     backgroundColor = "white",
     titleColor = "text-gray-900",
     className = "",
-    videoSrc
+    videoSrc,
+    videoAlt,
+    poster,
+    webmSrc,
+    lazy = true,
+    autoPlay = true,
   }: VideoTextSectionProps) {
     return (
       <div className={`px-4 lg:px-8 ${className}`}>
@@ -49,15 +64,21 @@ export function VideoTextSection({
               }`}
               {...(videoPosition === "left" ? fadeInLeft : fadeInRight)}
             >
-              <video autoPlay loop muted playsInline className="rounded-2xl">
-                <source
-                  src={videoSrc}
-                  type="video/mp4"
-                />
-                Your browser does not support the video tag.
-              </video>
+              <OptimizedVideo
+                src={videoSrc}
+                webmSrc={webmSrc}
+                poster={poster}
+                autoPlay={autoPlay}
+                lazy={lazy}
+                loop={true}
+                muted={true}
+                playsInline={true}
+                showPlayButton={false}
+                className="rounded-2xl w-full"
+                alt={videoAlt}
+              />
             </motion.div>
-  
+
             {/* Content */}
             <motion.div
               className={`h-full ${
@@ -75,7 +96,7 @@ export function VideoTextSection({
                     <span>Book a demo</span>
                     <Image
                       src="/arrow-right-black.png"
-                      alt="test"
+                      alt="Arrow right icon"
                       width={20}
                       height={20}
                     />

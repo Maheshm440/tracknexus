@@ -1,177 +1,107 @@
+"use client"
 
-import { defaultHomepageFaqs, FAQSection } from "@/components/faq-section";
-import { ImageTextSection } from "@/components/image-text-section";
-import { TestimonialsSection } from "@/components/testimonials-section";
-import { TestimonialsSectionTwo } from "@/components/testimonials-section-two";
-import VideoBanner from "@/components/video-banner";
+import ProductPageLayout from "@/components/product-page-layout"
+import { MapPin, Navigation, Bell, Shield, Clock, Smartphone } from "lucide-react"
 
-const locationTrackingFeatures: {
-    title?: string;
-  subtitle?: string;
-  description?: string ;
-  imageSrc: string;
-  imageAlt: string;
-  imagePosition?: "left" | "right";
-  backgroundColor?: "white" | "gray";
-  titleColor?: string;
-  subtitleColor?: string;
-  className?: string;
-  list?: boolean;
-  version?: "v1" | "v2";
-}[]  = [
+const features = [
   {
     title: "Live Team Location Tracking",
-    description: "Stay connected with your team no matter where they are. Monitor real-time movements with precision and ease. Gain instant visibility into your field staff's location at any moment. Improve safety, accountability, and coordination in one place. Optimize task assignments with live location insights. Perfect for teams on the move—sales, delivery, service, and more. Empower smarter decisions with real-time tracking at your fingertips. Reduce delays and boost productivity with location-based insights. Build trust with clients through timely and transparent updates. Seamlessly integrate with your existing workflows for minimal disruption. Experience greater control and clarity with every movement tracked.",
-    imageSrc: "/images/location-activity/2.png",
-    imageAlt: "Real-time map showing team member locations with tracking indicators",
-    imagePosition:"left"
+    description: "Stay connected with your team no matter where they are. Monitor real-time movements with precision and ease. Gain instant visibility into your field staff's location at any moment. Improve safety, accountability, and coordination in one place.",
+    image: "https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1000&q=80",
   },
   {
-    title: "Past Location Insights for Smarter Planning",
-    description: "Analyze historical movement patterns to optimize future operations. Review completed routes and time spent at locations to improve planning efficiency. Use data-driven insights to make informed decisions about resource allocation and scheduling. Enhance operational strategy with comprehensive location history reports.",
-    imageSrc: "/images/location-activity/3.png",
-    imageAlt: "Historical location data visualization on a timeline map",
-    imagePosition:"right"
+    title: "Historical Location Insights",
+    description: "Analyze historical movement patterns to optimize future operations. Review completed routes and time spent at locations to improve planning efficiency. Use data-driven insights to make informed decisions about resource allocation and scheduling.",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80",
   },
   {
-    title: "Device Compatibility for Easy Tracking",
-    description: "Our tracking software works across smartphones and specialized GPS units. Ensures real-time connectivity whether your team is in the field or office. Mobile apps provide on-the-go flexibility while dedicated GPS devices offer precision. Consistent functionality across all hardware enables smooth transitions between devices. Maintain productivity with the tools that best suit your team's needs.",
-    imageSrc: "/images/location-activity/4.png",
-    imageAlt: "Multiple devices displaying tracking interface",
-    imagePosition:"left"
+    title: "Smart Location Alerts",
+    description: "Receive automated alerts about your team's movements. Instant notifications for late arrivals, early departures, or unusual routes. Set geofence alerts for entry/exit from designated zones. Monitor sensitive areas with precision.",
+    image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=1000&q=80",
   },
   {
-    title: "Smart, Customized Location Alerts",
-    description: "Receive automated alerts about your team's movements. Instant notifications for late arrivals, early departures, or unusual routes. Set geofence alerts for entry/exit from designated zones. Monitor sensitive areas with precision. Reduce manual oversight with intelligent notifications. Customize alerts based on roles, schedules, or locations. Enhance safety and operational efficiency with smart monitoring.",
-    imageSrc: "/images/location-activity/5.png",
-    imageAlt: "Mobile device showing location alert notifications",
-    imagePosition:"right"
-  }
-];
+    title: "Multi-Device Compatibility",
+    description: "Our tracking software works across smartphones and specialized GPS units. Ensures real-time connectivity whether your team is in the field or office. Mobile apps provide on-the-go flexibility while dedicated GPS devices offer precision.",
+    image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&w=1000&q=80",
+  },
+]
 
-const managementFeatures : {
-    title?: string;
-  subtitle?: string;
-  description?: string ;
-  imageSrc: string;
-  imageAlt: string;
-  imagePosition?: "left" | "right";
-  backgroundColor?: "white" | "gray";
-  titleColor?: string;
-  subtitleColor?: string;
-  className?: string;
-  list?: boolean;
-  version?: "v1" | "v2";
-}[]= [
+const benefits = [
   {
-    title: "Manager-Only Access & Control",
-    description: "Allow managers to securely access only their team's data, evaluate performance metrics, and customize productivity labels ensuring focused oversight and effective team management.",
-    imageSrc: "/images/location-activity/6.png",
-    imageAlt: "Manager dashboard interface with team analytics",
+    icon: MapPin,
+    title: "Real-Time Location",
+    description: "See where your team is right now with live GPS tracking.",
   },
   {
-    title: "Dedicated Manager Access",
-    description: "Give managers secure, role-based access to their team's data. They can monitor performance, adjust productivity labels, and make informed decisions ensuring efficient and focused team oversight.",
-    imageSrc: "/images/location-activity/7.png",
-    imageAlt: "Role-based access control settings screen",
+    icon: Navigation,
+    title: "Route History",
+    description: "Review completed routes and optimize future travel paths.",
+  },
+  {
+    icon: Bell,
+    title: "Geofence Alerts",
+    description: "Get notified when employees enter or leave designated areas.",
+  },
+  {
+    icon: Shield,
+    title: "Privacy Controls",
+    description: "Configurable tracking that respects employee privacy.",
+  },
+  {
+    icon: Clock,
+    title: "Time at Location",
+    description: "Track how long employees spend at each client site.",
+  },
+  {
+    icon: Smartphone,
+    title: "Mobile Ready",
+    description: "Track from any device—smartphones, tablets, or GPS units.",
+  },
+]
 
-    imagePosition:"right"
-  },
-  {
-    title: "Seamless API Integration",
-    description: "Easily connect with any internal or third-party software using our robust REST API, enabling smooth data exchange and streamlined workflows across your organization.",
-    imageSrc: "/images/location-activity/8.png",
-    imageAlt: "API integration diagram with connected systems"
-  },
-  {
-    title: "Raw Data Monitoring",
-    description: "Get accurate, real-time insights into employees' computer activity captured down to the second for in-depth analysis and complete transparency.",
-    imageSrc: "/images/location-activity/9.png",
-    imageAlt: "Detailed activity log with timestamp data",
+const stats = [
+  { value: "Real-time", label: "Tracking" },
+  { value: "GPS", label: "Precision" },
+  { value: "Geofence", label: "Alerts" },
+  { value: "24/7", label: "Monitoring" },
+]
 
-    imagePosition:"right"
+const faqs = [
+  {
+    question: "Is employee location tracking legal?",
+    answer: "Yes, when employees are informed and provide consent. Track Nexus includes tools for transparent policies and employee acknowledgment of location tracking.",
   },
   {
-    title: "Real-Time Productivity Alerts",
-    description: "Stay informed with instant alerts triggered by productivity changes or unwanted activities. Monitor behavior in real time to quickly identify and respond to issues as they arise.",
-    imageSrc: "/images/location-activity/10.png",
-    imageAlt: "Notification alert popup on a dashboard",
-
-    imagePosition:"right"
+    question: "Does tracking continue outside work hours?",
+    answer: "No, you can configure tracking to only occur during work hours. Employees can also manually stop tracking when off duty.",
   },
   {
-    title: "Smart Solutions for Employers",
-    description: "Automated reports help you quantify performance, analyze workflows, and cut operational costs by up to 40% with greater accuracy and less effort.",
-    imageSrc: "/images/location-activity/11.png",
-    imageAlt: "Automated report generation with analytics charts"
-  }
-];
-
-const useCase : {
-    title?: string;
-  subtitle?: string;
-  description?: string ;
-  imageSrc: string;
-  imageAlt: string;
-  imagePosition?: "left" | "right";
-  backgroundColor?: "white" | "gray";
-  titleColor?: string;
-  subtitleColor?: string;
-  className?: string;
-  list?: boolean;
-  version?: "v1" | "v2";
-}[] = [
-  {
-    title: "Optimizing Emergency Response with Staff Tracking",
-    description: "Hospitals and healthcare facilities leverage advanced tracking software to monitor the real-time location of medical staff. This technology enhances emergency response capabilities, improves coordination among teams, and ensures efficient, patient-centered care delivery.",
-    imageSrc: "/images/location-activity/12.png",
-    imageAlt: "Hospital floor plan with staff location tracking",
-    imagePosition:"right"
+    question: "How accurate is GPS tracking?",
+    answer: "Track Nexus uses high-precision GPS with accuracy typically within 5-10 meters. Indoor tracking uses Wi-Fi positioning for improved accuracy.",
   },
   {
-    title: "Enhancing Productivity",
-    description: "With remote work on the rise, tracking software plays a key role in enhancing productivity. By monitoring employee activity levels, it promotes accountability and helps ensure consistent performance, regardless of location.",
-    imageSrc: "/images/location-activity/13.png",
-    imageAlt: "Productivity dashboard showing remote work metrics"
+    question: "Can I set up geofence zones?",
+    answer: "Yes, create unlimited geofence zones around client sites, offices, or any location. Receive instant alerts when employees enter or exit these areas.",
   },
-  {
-    title: "Smart Staffing for Exceptional Hospitality",
-    description: "Hotels and event venues utilize workforce management software to efficiently allocate staff, especially during peak hours. This ensures smooth operations and upholds a consistently high standard of guest service.",
-    imageSrc: "/images/location-activity/14.png",
-    imageAlt: "Hotel staff coordination interface",
-    imagePosition:"right"
-  }
-];
+]
 
 export default function LocationActivityPage() {
-    return (
-        <div>
-            <VideoBanner title="Smart employee location monitoring made simple" description="Gain real-time visibility and take control of productivity with precision, while ensuring workplace safety and peace of mind" videoSrc="/vid2.mp4"/>
-            {
-                locationTrackingFeatures.map((x,i) => (
-                    <ImageTextSection key={i} title={x.title} titleColor="text-highlight" description={x.description} imageSrc={x.imageSrc} imageAlt={x.imageAlt} imagePosition={x.imagePosition}/>
-                ))
-            }
-            <div className="container mx-auto flex flex-col text-center gap-4 py-4">
-                <h3 className="text-4xl font-bold">Customize and Control Your Workspace</h3>
-                <p className="text-muted-foreground text-xl">Leverage powerful features to manage team structures, restrict data access, and tailor Time Champ to fit your organization’s unique workflow. Stay organized, secure, and in full contro</p>
-            </div>
-
-            {
-                managementFeatures.map((x,i) => (
-                    <ImageTextSection key={i} title={x.title} titleColor="text-highlight" description={x.description} imageSrc={x.imageSrc} imageAlt={x.imageAlt} imagePosition={x.imagePosition}/>
-                ))
-            }
-
-            <section className="bg-black py-10">
-                    {
-                        useCase.map((x,i) => (
-                            <ImageTextSection key={i} title={x.title} titleColor="text-highlight" description={x.description} imageSrc={x.imageSrc} imageAlt={x.imageAlt} imagePosition={x.imagePosition} />
-                        ))
-                    }
-            </section>
-            <TestimonialsSectionTwo/>
-            <FAQSection faqs={defaultHomepageFaqs}/>
-        </div>
-    )
+  return (
+    <ProductPageLayout
+      badge="Location Tracking"
+      title="GPS Location"
+      titleHighlight="Tracking"
+      subtitle="Smart employee location monitoring made simple. Gain real-time visibility and take control of productivity for field teams and remote workers."
+      heroImage="https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1920&q=80"
+      floatingIcons={[MapPin, Navigation, Bell, Shield]}
+      features={features}
+      benefitsTitle="Complete Location Features"
+      benefitsSubtitle="Everything you need for field team and remote worker tracking"
+      benefits={benefits}
+      stats={stats}
+      faqs={faqs}
+      ctaTitle="Ready for location tracking?"
+      ctaSubtitle="Start your 14-day free trial today. No credit card required."
+    />
+  )
 }

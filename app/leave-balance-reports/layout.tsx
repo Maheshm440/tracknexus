@@ -1,12 +1,18 @@
 import { Metadata } from "next"
 
 export const metadata: Metadata = {
-    title: "Facial Recognition | Track Nexus | Get in Touch with Our Team",
-    description: "Have questions about Track Nexus features, pricing, or support? Reach out to our friendly team for assistance, demos, or partnership inquiries. We're here to help you boost productivity.",
-    keywords: "contact track nexus, support, customer service, demo request, partnership inquiries, time tracking support",
+    title: "Leave Balance & Time-Off Tracking | Track Nexus",
+    description: "Track employee leave balances, PTO, and time-off requests. Automated accruals, approval workflows, and comprehensive absence management.",
+    keywords: "leave tracking, PTO management, time-off tracking, leave balance, absence management, vacation tracking",
+    alternates: { canonical: "https://tracknexus.com/leave-balance-reports" },
+    openGraph: {
+        title: "Leave Balance & Time-Off Tracking | Track Nexus",
+        description: "Track employee leave balances, PTO, and time-off requests with automated workflows.",
+        url: "https://tracknexus.com/leave-balance-reports",
+    },
 }
 
-export default function ContactLayout({
+export default function LeaveBalanceLayout({
     children,
 }: {
     children: React.ReactNode

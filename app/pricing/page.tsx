@@ -3,302 +3,570 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { Check, Star, Zap, Crown, Rocket, ArrowRight } from "lucide-react"
+import dynamic from "next/dynamic"
+import {
+  Check,
+  X,
+  Star,
+  ArrowRight,
+  TrendingUp,
+  Users,
+  Globe,
+  Shield,
+  HelpCircle,
+  Sparkles,
+  BarChart3,
+  Clock,
+} from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { StatsSection } from "@/components/stats-section"
-import { FreeTrialCTA } from "@/components/free-trial-cta"
-import { ContactPopup, FormContext } from "@/components/contact-popup"
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from "@/components/ui/accordion"
+import type { FormContext } from "@/components/contact-popup"
+
+// Lazy load ContactPopup since it's only needed on interaction
+const ContactPopup = dynamic(
+  () => import("@/components/contact-popup").then((m) => m.ContactPopup),
+  { ssr: false }
+)
 
 interface Plan {
-  name: string;
-  subtitle: string;
-  monthlyPrice: number;
-  yearlyPrice: number;
-  icon: any;
-  popular: boolean;
-  features: string[];
-  featuresTitle: string;
-  buttonText: string;
-}
-
-interface PricingCardProps {
-  plan: Plan;
-  index: number;
-  isYearly: boolean;
-  onPlanSelect: (planName: string) => void;
+  name: string
+  subtitle: string
+  actualPrice: number
+  monthlyPrice: number
+  yearlyPrice: number
+  popular: boolean
+  features: string[]
+  description: string
+  buttonText: string
+  color: string
 }
 
 const plans: Plan[] = [
   {
-    name: "Free Plan",
-    subtitle: "Perfect for professionals seeking an advanced desktop monitoring system with AI-powered insights to enhance productivity, security, and performance tracking",
-    monthlyPrice: 499,
-    yearlyPrice: 4490, // ~10% discount
-    icon: Zap,
+    name: "Starter",
+    subtitle: "Time Tracking Basics",
+    actualPrice: 500,
+    monthlyPrice: 250,
+    yearlyPrice: 2500,
     popular: false,
-    featuresTitle: "Features",
+    description: "Track time and boost productivity",
+    color: "cyan",
     features: [
-      "Interactive Mode", "Automatic Attendance", "Single Shift Management", "App Productivity Classifications", "Category Classifications", "Team View Support", "Teams-2 Configuration", "Monthly Attendance Report", "Daily Timesheet Report", "Monthly Timesheet Report", "Time Claim Management", "Offline Tracking", "Auto Login / Logout", "Application Tracking", "Website Tracking", "Productivity Calculator", "Company-Level Time Zone Support", "Summarized Activity Overview",
+      "Basic time tracking",
+      "Daily reports",
+      "App tracking",
+      "7-day data retention",
+      "Email support",
+      "Mobile app access",
     ],
     buttonText: "Get Started",
   },
   {
-    name: "Starter Plan",
-    subtitle: "Designed for small teams that require enhanced collaboration tools and in-depth analytics for productivity optimization and project management",
-    monthlyPrice: 999,
-    yearlyPrice: 8991, // ~25% discount
-    icon: Crown,
-    popular: true,
-    featuresTitle: "Advanced Features",
+    name: "Growth",
+    subtitle: "Team Management",
+    actualPrice: 700,
+    monthlyPrice: 350,
+    yearlyPrice: 3500,
+    popular: false,
+    description: "Advanced features for growing teams",
+    color: "blue",
     features: [
-      "Collaborative Workspace", "Team Attendance Tracking", "Multi-Shift Management", "In-Depth App Usage Stats", "Department Classifications", "Real-Time Team Monitoring", "Teams-5 Configuration", "Weekly Attendance Reports", "Enhanced Daily Timesheet", "Weekly Timesheet Summary", "Expense Management Module", "Cloud-Based Offline Access", "Seamless Login / Logout", "Advanced Application Insights", "Comprehensive Website Analytics", "Productivity Benchmarking", "Global Time Zone Support", "Detailed Activity Insights",
+      "Everything in Starter",
+      "Screenshot monitoring",
+      "Productivity insights",
+      "30-day data retention",
+      "Priority support",
+      "Custom reports",
     ],
-    buttonText: "Start Free Trial",
+    buttonText: "Get Started",
   },
   {
-    name: "Premium Plan",
-    subtitle: "Designed for large organizations requiring extensive monitoring, advanced security features, and dedicated support to enhance team productivity.",
-    monthlyPrice: 1999,
-    yearlyPrice: 17991, // ~25% discount
-    icon: Rocket,
-    popular: false,
-    featuresTitle: "Custom Solutions",
+    name: "Premium with AI",
+    subtitle: "Enterprise Solution",
+    actualPrice: 1000,
+    monthlyPrice: 500,
+    yearlyPrice: 5000,
+    popular: true,
+    description: "Complete solution for large teams",
+    color: "indigo",
     features: [
-      "Premium Collaboration Hub", "Centralized Attendance Systems", "Unlimited Shift Management", "Corporate App Usage Analytics", "Custom Role Classifications", "Integrated Team Performance Metrics", "Unlimited Teams Configuration", "Real-Time Analytics Dashboard", "Automated Daily Timesheet", "Customizable Timesheet Reports", "Comprehensive Time Management Tools", "Premium-Grade Offline Capabilities", "Custom Login Solutions", "Advanced Application Monitoring", "Complete Web Activity Tracking", "Productivity Optimization Tools", "Multi-Region Time Zone Management", "Holistic Activity Reporting",
+      "Everything in Growth",
+      "AI-powered insights",
+      "Advanced analytics",
+      "Unlimited retention",
+      "24/7 dedicated support",
+      "Custom integrations",
     ],
     buttonText: "Contact Sales",
   },
 ]
 
-const PricingCard = ({ plan, index, isYearly, onPlanSelect }: PricingCardProps) => {
-  return (
-    <motion.div
-      className={`relative rounded-2xl p-8 transition-all duration-300 group ${
-        plan.popular 
-          ? 'bg-slate-900 shadow-2xl shadow-blue-500/20' 
-          : 'bg-white shadow-lg'
-      }`}
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay: index * 0.15 }}
-      whileHover={{ y: -8 }}
-    >
-      {/* Glow effect for popular plan */}
-      {plan.popular && (
-        <>
-          <div className="absolute -inset-px rounded-2xl bg-gradient-to-r from-blue-500 to-purple-600 opacity-0 transition-opacity duration-300 group-hover:opacity-100"></div>
-          <div className="absolute inset-0 rounded-2xl bg-slate-900"></div>
-        </>
-      )}
+const comparisonFeatures = [
+  { name: "Number of Users", starter: "10", growth: "50", premium: "Unlimited" },
+  { name: "Time Tracking", starter: true, growth: true, premium: true },
+  { name: "App & Website Tracking", starter: true, growth: true, premium: true },
+  { name: "Screenshot Monitoring", starter: false, growth: true, premium: true },
+  { name: "Productivity Analytics", starter: false, growth: true, premium: true },
+  { name: "AI-Powered Insights", starter: false, growth: false, premium: true },
+  { name: "Custom Reports", starter: false, growth: true, premium: true },
+  { name: "Team Management", starter: false, growth: true, premium: true },
+  { name: "Data Export", starter: false, growth: true, premium: true },
+  { name: "API Access", starter: false, growth: false, premium: true },
+  { name: "Custom Integrations", starter: false, growth: false, premium: true },
+  { name: "Dedicated Account Manager", starter: false, growth: false, premium: true },
+  { name: "Data Retention", starter: "7 days", growth: "30 days", premium: "Unlimited" },
+  { name: "Support", starter: "Email", growth: "Priority", premium: "24/7 Dedicated" },
+]
 
-      <div className="relative z-10">
-        {/* Popular Badge */}
-        {plan.popular && (
-          <div className="absolute -top-4 -right-4 z-10">
-            <div className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-3 py-1 rounded-full text-xs font-semibold flex items-center shadow-md">
-              <Star className="w-3 h-3 mr-1.5 fill-current" />
-              Most Popular
-            </div>
-          </div>
-        )}
+const stats = [
+  { value: "10,000+", label: "Active Users", icon: Users },
+  { value: "500+", label: "Companies", icon: Globe },
+  { value: "99.9%", label: "Uptime", icon: Shield },
+  { value: "4.9/5", label: "Rating", icon: Star },
+]
 
-        {/* Header */}
-        <div className="mb-8">
-          <div
-            className={`w-14 h-14 mb-4 rounded-full flex items-center justify-center ${
-              plan.popular ? "bg-white/10" : "bg-gray-100"
-            }`}
-          >
-            <plan.icon className={`w-7 h-7 ${plan.popular ? "text-white" : "text-highlight"}`} />
-          </div>
-          <h3 className={`text-2xl font-bold mb-2 ${plan.popular ? 'text-white' : 'text-gray-900'}`}>{plan.name}</h3>
-          <p className={`${plan.popular ? 'text-gray-300' : 'text-gray-600'}`}>{plan.subtitle}</p>
-        </div>
+const faqs = [
+  {
+    question: "Can I try TrackNexus before purchasing?",
+    answer: "Yes! You can request a demo and our team will walk you through all features. We also offer flexible plans that you can upgrade or downgrade anytime.",
+  },
+  {
+    question: "How does billing work?",
+    answer: "We offer monthly and yearly billing options. Yearly plans come with up to 25% discount. You can upgrade, downgrade, or cancel at any time.",
+  },
+  {
+    question: "What payment methods do you accept?",
+    answer: "We accept all major credit cards, debit cards, UPI, net banking, and wire transfers for enterprise customers.",
+  },
+  {
+    question: "Can I change my plan later?",
+    answer: "Absolutely! You can upgrade or downgrade your plan at any time. When upgrading, you'll be prorated for the remainder of your billing cycle.",
+  },
+  {
+    question: "Is there a refund policy?",
+    answer: "Yes, we offer a 30-day money-back guarantee. If you're not satisfied with TrackNexus, contact us within 30 days for a full refund.",
+  },
+  {
+    question: "Do you offer discounts for nonprofits or education?",
+    answer: "Yes! We offer special pricing for nonprofits, educational institutions, and startups. Contact our sales team for more details.",
+  },
+]
 
-        {/* Pricing */}
-        <div className="mb-8">
-          <div className="flex items-baseline mb-2">
-            <span className={`text-4xl font-bold ${plan.popular ? 'text-white' : 'text-gray-900'}`}>
-              ₹{isYearly ? Math.floor(plan.yearlyPrice / 12) : plan.monthlyPrice}
-            </span>
-            <span className={`ml-2 ${plan.popular ? 'text-gray-400' : 'text-gray-500'}`}>
-              / per month{isYearly && ' (billed annually)'}
-            </span>
-          </div>
-          {isYearly && (
-            <div className="flex items-center space-x-2">
-              <span className={`text-sm line-through ${plan.popular ? 'text-gray-400' : 'text-gray-500'}`}>
-                ₹{plan.monthlyPrice * 12}/year
-              </span>
-              <span className="text-sm bg-green-100 text-green-800 px-2 py-1 rounded-full font-medium">
-                Save ₹{(plan.monthlyPrice * 12) - plan.yearlyPrice}
-              </span>
-            </div>
-          )}
-        </div>
+const fadeInUp = {
+  initial: { opacity: 0, y: 40 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.6 },
+}
 
-        {/* Divider */}
-        <div className={`h-px my-8 ${plan.popular ? 'bg-gray-700' : 'bg-gray-200'}`}></div>
-        
-        {/* Features */}
-        <h4 className={`text-lg font-semibold mb-4 ${plan.popular ? 'text-white' : 'text-gray-900'}`}>{plan.featuresTitle}</h4>
-        <ul className="space-y-4 mb-8">
-          {plan.features.map((feature: string, featureIndex: number) => (
-            <motion.li 
-              key={featureIndex} 
-              className="flex items-start"
-              initial={{ opacity: 0, x: -20 }}
-              whileInView={{ opacity: 1, x: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5, delay: 0.2 + featureIndex * 0.05 }}
-            >
-              <div className="w-5 h-5 rounded-full bg-green-500/20 flex items-center justify-center mr-3 mt-0.5 flex-shrink-0">
-                <Check className="w-3 h-3 text-green-400" />
-              </div>
-              <span className={`${plan.popular ? 'text-gray-300' : 'text-gray-700'}`}>{feature}</span>
-            </motion.li>
-          ))}
-        </ul>
+const staggerContainer = {
+  initial: {},
+  whileInView: {
+    transition: {
+      staggerChildren: 0.1,
+    },
+  },
+  viewport: { once: true },
+}
 
-        {/* CTA Button */}
-        <Button
-          onClick={() => onPlanSelect(plan.name)}
-          className={`w-full py-3 text-lg font-semibold transition-all duration-300 group/button ${
-            plan.popular
-              ? "bg-gradient-to-r from-blue-500 to-purple-600 hover:shadow-lg hover:shadow-blue-500/40 text-white"
-              : "bg-highlight hover:bg-highlight/90 text-white"
-          }`}
-        >
-          {plan.buttonText}
-          <ArrowRight className="w-5 h-5 ml-2 transition-transform duration-300 group-hover/button:translate-x-1" />
-        </Button>
-      </div>
-    </motion.div>
-  )
+const staggerItem = {
+  initial: { opacity: 0, y: 20 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.5 },
 }
 
 export default function PricingPage() {
-  const [isYearly, setIsYearly] = useState(false)
   const [isContactPopupOpen, setIsContactPopupOpen] = useState(false)
-  const [formContext, setFormContext] = useState<FormContext>({ type: 'pricing' })
+  const [formContext, setFormContext] = useState<FormContext>({ type: "pricing" })
 
   const handlePlanSelect = (planName: string) => {
-    const selectedPlan = plans.find(p => p.name === planName)
-    const price = selectedPlan ? (isYearly ? Math.floor(selectedPlan.yearlyPrice / 12) : selectedPlan.monthlyPrice) : 0
-    
-    setFormContext({ 
-      type: 'pricing', 
+    const selectedPlan = plans.find((p) => p.name === planName)
+    const price = selectedPlan ? selectedPlan.monthlyPrice : 0
+
+    setFormContext({
+      type: "pricing",
       planName: planName,
       planPrice: `₹${price}`,
-      planType: isYearly ? 'yearly' : 'monthly'
+      planType: "monthly",
     })
     setIsContactPopupOpen(true)
   }
 
   return (
     <div className="min-h-screen bg-white">
-      {/* Hero Section */}
-      <section className="relative overflow-hidden bg-black text-white px-4 py-20 lg:px-8 lg:py-32">
+      {/* Hero Section - Deloitte Style */}
+      <section className="relative overflow-hidden bg-deloitte-black text-white px-4 pt-10 pb-28 lg:px-8 lg:pt-14 lg:pb-32">
         {/* Background Image */}
         <div className="absolute inset-0 z-0">
-          <div className="w-full h-full bg-gradient-to-br from-slate-800 via-blue-900 to-slate-900"></div>
           <Image
-            src="/images/pricing/pricing.jpg"
-            alt="Pricing background"
+            src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1920&q=80"
+            alt="Analytics dashboard"
             fill
-            className="object-cover opacity-30"
+            className="object-cover opacity-15"
+            priority
           />
-          {/* Overlay to maintain text readability */}
-          <div className="absolute inset-0 bg-black/60"></div>
+          <div className="absolute inset-0 bg-deloitte-black/90" />
         </div>
 
-        {/* Animated background pattern */}
-        <div className="absolute inset-0 opacity-10 z-10">
-          <div className="absolute top-20 left-10 w-2 h-2 bg-white rounded-full animate-pulse"></div>
-          <div className="absolute top-40 right-20 w-1 h-1 bg-white rounded-full animate-pulse delay-1000"></div>
-          <div className="absolute bottom-20 left-1/4 w-1.5 h-1.5 bg-white rounded-full animate-pulse delay-2000"></div>
+        {/* Floating Animated Elements - CSS animations for better performance */}
+        <div className="absolute inset-0 overflow-hidden z-10">
+          <div className="absolute top-20 left-[10%] w-12 h-12 text-deloitte-green/20 animate-float-1">
+            <TrendingUp className="w-full h-full" />
+          </div>
+          <div className="absolute top-40 right-[15%] w-10 h-10 text-deloitte-green/20 animate-float-2">
+            <BarChart3 className="w-full h-full" />
+          </div>
+          <div className="absolute bottom-32 left-[20%] w-14 h-14 text-deloitte-green/20 animate-float-3">
+            <Sparkles className="w-full h-full" />
+          </div>
+          <div className="absolute top-1/2 right-[25%] w-8 h-8 text-deloitte-green/20 animate-float-4">
+            <Clock className="w-full h-full" />
+          </div>
         </div>
 
-        <div className="relative mx-auto max-w-6xl text-center z-20">
-          <motion.div initial={{ opacity: 0, y: 50 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 1 }}>
-            <h1 className="text-5xl lg:text-7xl font-bold mb-6 tracking-wider">Track Nexus Pricing</h1>
-            <p className="text-lg lg:text-xl text-gray-300 max-w-3xl mx-auto leading-relaxed">
-              Flexible Plans for Every Team Size
+        {/* Hero Content */}
+        <div className="relative mx-auto max-w-4xl text-center z-20">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <h1 className="text-hero font-light mb-6 leading-tight">
+              Simple, Transparent{" "}
+              <span className="text-deloitte-green">
+                Pricing
+              </span>
+            </h1>
+            <p className="text-lg lg:text-xl text-gray-300 max-w-2xl mx-auto leading-relaxed">
+              Choose the perfect plan for your team. Scale up or down anytime.
             </p>
           </motion.div>
         </div>
       </section>
 
       {/* Pricing Cards */}
-      <section className="px-4 py-16 lg:px-8 lg:py-24 bg-gray-50">
-        <div className="mx-auto max-w-7xl">
+      <section className="relative z-10 -mt-16 px-4 lg:px-8 pb-12">
+        <div className="mx-auto max-w-5xl">
           <motion.div
-            className="text-center mb-16"
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+            className="grid grid-cols-1 md:grid-cols-3 gap-4"
+            {...staggerContainer}
           >
-            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Plans That Scale With Your <span className="text-highlight">Success</span>
-            </h2>
-            <p className="text-lg text-gray-600 mb-8">Choose the perfect plan for your team&apos;s needs</p>
-            
-            {/* Billing Toggle */}
-            <motion.div 
-              className="flex items-center justify-center space-x-4 mb-8"
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2 }}
-            >
-              <span className={`font-medium ${!isYearly ? 'text-highlight' : 'text-gray-500'}`}>
-                Monthly
-              </span>
-              <button
-                onClick={() => setIsYearly(!isYearly)}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-highlight focus:ring-offset-2 ${
-                  isYearly ? 'bg-highlight' : 'bg-gray-300'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    isYearly ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-              <span className={`font-medium ${isYearly ? 'text-highlight' : 'text-gray-500'}`}>
-                Yearly
-                <span className="ml-2 text-sm bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                  Save up to 25%
-                </span>
-              </span>
-            </motion.div>
-          </motion.div>
+            {plans.map((plan) => {
+              const colorClasses = {
+                cyan: { price: "text-cyan-600", check: "text-cyan-500", border: "border-cyan-200 hover:border-cyan-400", bg: "bg-cyan-600 hover:bg-cyan-700" },
+                blue: { price: "text-blue-600", check: "text-blue-500", border: "border-blue-200 hover:border-blue-400", bg: "bg-blue-600 hover:bg-blue-700" },
+                indigo: { price: "text-indigo-600", check: "text-indigo-500", border: "border-indigo-300 hover:border-indigo-500", bg: "bg-indigo-600 hover:bg-indigo-700" },
+              }[plan.color] || { price: "text-cyan-600", check: "text-cyan-500", border: "border-gray-200", bg: "bg-cyan-600 hover:bg-cyan-700" };
 
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
-            {plans.map((plan, index) => (
-              <PricingCard 
-                key={plan.name} 
-                plan={plan} 
-                index={index} 
-                isYearly={isYearly} 
-                onPlanSelect={handlePlanSelect}
-              />
-            ))}
-          </div>
+              return (
+                <motion.div
+                  key={plan.name}
+                  className={`relative bg-white rounded-xl shadow-lg border-2 transition-all duration-150 hover:shadow-xl ${
+                    plan.popular ? "border-indigo-400" : colorClasses.border
+                  }`}
+                  {...staggerItem}
+                  whileHover={{ y: -5, transition: { duration: 0.15 } }}
+                >
+                  {/* Popular Badge */}
+                  {plan.popular && (
+                    <div className="absolute -top-4 left-1/2 -translate-x-1/2 z-20">
+                      <div className="bg-indigo-600 text-white px-4 py-1.5 rounded-full text-xs font-bold uppercase tracking-wide shadow-lg">
+                        Most Popular
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Card Content */}
+                  <div className={`p-4 ${plan.popular ? 'pt-8' : ''}`}>
+                    {/* Plan Name & Subtitle */}
+                    <div className="mb-3">
+                      <h3 className="text-lg font-bold text-gray-900 mb-0.5">
+                        {plan.name}
+                      </h3>
+                      <p className="text-xs text-gray-500">
+                        {plan.subtitle}
+                      </p>
+                    </div>
+
+                    {/* Price */}
+                    <div className="mb-3">
+                      <div className="flex items-baseline gap-2">
+                        <span className="text-base text-gray-400 line-through">
+                          ₹{plan.actualPrice}
+                        </span>
+                        <span className={`text-3xl font-bold ${colorClasses.price}`}>
+                          ₹{plan.monthlyPrice}
+                        </span>
+                      </div>
+                      <p className="text-xs text-gray-500 mt-0.5">
+                        per user/month, billed annually
+                      </p>
+                    </div>
+
+                    {/* Description */}
+                    <p className="text-xs text-gray-600 mb-4 pb-3 border-b border-gray-100">
+                      {plan.description}
+                    </p>
+
+                    {/* Features */}
+                    <ul className="space-y-2 mb-4">
+                      {plan.features.map((feature, i) => (
+                        <li key={i} className="flex items-start">
+                          <Check
+                            className={`w-4 h-4 mr-2 flex-shrink-0 ${colorClasses.check}`}
+                            strokeWidth={2.5}
+                          />
+                          <span className="text-xs text-gray-700">
+                            {feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    {/* CTA Button */}
+                    <Button
+                      onClick={() => handlePlanSelect(plan.name)}
+                      className={`w-full py-2.5 text-sm font-semibold rounded-lg transition-all duration-300 text-white shadow-md ${colorClasses.bg}`}
+                    >
+                      {plan.buttonText}
+                      <ArrowRight className="w-4 h-4 ml-2" />
+                    </Button>
+                  </div>
+                </motion.div>
+              );
+            })}
+          </motion.div>
         </div>
       </section>
 
-      {/* Stats Section */}
-      <StatsSection />
-      {/* Free Trial CTA */}
-      <FreeTrialCTA />
+      {/* Feature Comparison Table */}
+      <section className="bg-gray-50 px-4 py-12 lg:px-8 lg:py-16">
+        <div className="mx-auto max-w-6xl">
+          <motion.div className="text-center mb-8" {...fadeInUp}>
+            <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              Compare All Features
+            </h2>
+            <p className="text-lg text-gray-600">
+              Find the perfect plan with our detailed feature comparison
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="bg-white rounded-3xl shadow-xl overflow-hidden border border-gray-100"
+            {...fadeInUp}
+          >
+            <div className="overflow-x-auto">
+              <table className="w-full">
+                <thead>
+                  <tr className="bg-gradient-to-r from-slate-900 to-slate-800">
+                    <th className="text-left py-5 px-6 text-white font-semibold">Features</th>
+                    <th className="text-center py-5 px-6 text-white font-semibold">Starter</th>
+                    <th className="text-center py-5 px-6 text-white font-semibold">Growth</th>
+                    <th className="text-center py-5 px-6 text-white font-semibold">
+                      <div className="flex items-center justify-center gap-2">
+                        Premium with AI
+                        <span className="bg-indigo-500 text-xs px-2 py-0.5 rounded-full">Popular</span>
+                      </div>
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {comparisonFeatures.map((feature, index) => (
+                    <tr
+                      key={index}
+                      className={`border-b border-gray-100 ${
+                        index % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                      }`}
+                    >
+                      <td className="py-4 px-6 text-gray-900 font-medium">{feature.name}</td>
+                      <td className="py-4 px-6 text-center">
+                        {typeof feature.starter === "boolean" ? (
+                          feature.starter ? (
+                            <Check className="w-5 h-5 text-green-500 mx-auto" />
+                          ) : (
+                            <X className="w-5 h-5 text-gray-300 mx-auto" />
+                          )
+                        ) : (
+                          <span className="text-gray-700 font-medium">{feature.starter}</span>
+                        )}
+                      </td>
+                      <td className="py-4 px-6 text-center bg-blue-50/30">
+                        {typeof feature.growth === "boolean" ? (
+                          feature.growth ? (
+                            <Check className="w-5 h-5 text-green-500 mx-auto" />
+                          ) : (
+                            <X className="w-5 h-5 text-gray-300 mx-auto" />
+                          )
+                        ) : (
+                          <span className="text-gray-700 font-medium">{feature.growth}</span>
+                        )}
+                      </td>
+                      <td className="py-4 px-6 text-center bg-indigo-50/30">
+                        {typeof feature.premium === "boolean" ? (
+                          feature.premium ? (
+                            <Check className="w-5 h-5 text-green-500 mx-auto" />
+                          ) : (
+                            <X className="w-5 h-5 text-gray-300 mx-auto" />
+                          )
+                        ) : (
+                          <span className="text-gray-700">{feature.premium}</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Trust Stats Section */}
+      <section className="bg-white px-4 py-10 lg:px-8 lg:py-14">
+        <div className="mx-auto max-w-6xl">
+          <motion.div className="text-center mb-8" {...fadeInUp}>
+            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+              Trusted by Teams Worldwide
+            </h2>
+            <p className="text-gray-600">
+              Join thousands of companies already using TrackNexus
+            </p>
+          </motion.div>
+
+          <motion.div
+            className="grid grid-cols-2 md:grid-cols-4 gap-4"
+            {...staggerContainer}
+          >
+            {stats.map((stat, index) => (
+              <motion.div
+                key={index}
+                className="text-center p-5 rounded-xl bg-gradient-to-br from-gray-50 to-white border border-gray-100"
+                {...staggerItem}
+                whileHover={{ y: -3 }}
+              >
+                <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                  <stat.icon className="w-6 h-6 text-white" />
+                </div>
+                <div className="text-2xl lg:text-3xl font-bold text-gray-900 mb-1">
+                  {stat.value}
+                </div>
+                <div className="text-sm text-gray-600">{stat.label}</div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* Company Logos */}
+          <motion.div
+            className="mt-10 pt-8 border-t border-gray-100"
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
+            viewport={{ once: true }}
+          >
+            <p className="text-center text-gray-500 text-sm mb-6">
+              Powering productivity for innovative companies
+            </p>
+            <div className="flex flex-wrap justify-center items-center gap-6 lg:gap-10">
+              {['TechCorp', 'Infosys', 'Wipro', 'HCL Tech', 'TCS', 'Zoho'].map((company) => (
+                <div
+                  key={company}
+                  className="px-6 py-3 rounded-lg bg-gradient-to-r from-gray-50 to-gray-100 border border-gray-200"
+                >
+                  <span className="text-gray-500 font-semibold text-sm">{company}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* FAQ Section */}
+      <section className="bg-gradient-to-b from-gray-50 to-white px-4 py-10 lg:px-8 lg:py-14">
+        <div className="mx-auto max-w-4xl">
+          <motion.div className="text-center mb-8" {...fadeInUp}>
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 mb-4 bg-blue-50 border border-blue-100 rounded-full">
+              <HelpCircle className="w-4 h-4 text-blue-600" />
+              <span className="text-sm font-medium text-blue-700">Pricing FAQ</span>
+            </div>
+            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-2">
+              Frequently Asked Questions
+            </h2>
+            <p className="text-gray-600">
+              Everything you need to know about our pricing
+            </p>
+          </motion.div>
+
+          <motion.div {...fadeInUp}>
+            <Accordion type="single" collapsible className="space-y-2">
+              {faqs.map((faq, index) => (
+                <AccordionItem
+                  key={index}
+                  value={`item-${index}`}
+                  className="bg-white rounded-xl border border-gray-100 px-5 shadow-sm hover:shadow-md transition-shadow duration-300"
+                >
+                  <AccordionTrigger className="text-left font-semibold text-gray-900 hover:text-blue-600 py-4 text-sm">
+                    {faq.question}
+                  </AccordionTrigger>
+                  <AccordionContent className="text-gray-600 pb-4 text-sm leading-relaxed">
+                    {faq.answer}
+                  </AccordionContent>
+                </AccordionItem>
+              ))}
+            </Accordion>
+          </motion.div>
+        </div>
+      </section>
+
+      {/* Final CTA */}
+      <section className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-4 py-12 lg:px-8 lg:py-16">
+        <div className="mx-auto max-w-4xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-2xl lg:text-4xl font-bold text-white mb-4">
+              Ready to boost your team&apos;s productivity?
+            </h2>
+            <p className="text-lg text-blue-100 mb-6 max-w-2xl mx-auto">
+              Get started with TrackNexus today and transform your team&apos;s productivity.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  onClick={() => handlePlanSelect("Starter Plan")}
+                  className="bg-white text-blue-600 hover:bg-blue-50 px-8 py-4 text-lg font-semibold rounded-xl shadow-xl"
+                >
+                  Get Started
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  onClick={() => handlePlanSelect("Premium Plan")}
+                  className="bg-white/20 border-2 border-white text-white hover:bg-white/30 px-8 py-4 text-lg font-semibold rounded-xl backdrop-blur-sm"
+                >
+                  Talk to Sales
+                </Button>
+              </motion.div>
+            </div>
+            <p className="text-blue-200 mt-6 text-sm">
+              Join 10,000+ users already tracking smarter
+            </p>
+          </motion.div>
+        </div>
+      </section>
 
       {/* Contact Popup */}
-      <ContactPopup 
-        isOpen={isContactPopupOpen} 
-        onClose={() => setIsContactPopupOpen(false)} 
+      <ContactPopup
+        isOpen={isContactPopupOpen}
+        onClose={() => setIsContactPopupOpen(false)}
         context={formContext}
       />
     </div>

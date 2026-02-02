@@ -1,197 +1,108 @@
 "use client"
 
-import { FAQSection } from "@/components/faq-section"
-import ImageContent from "@/components/ImageContent"
-import { TestimonialsSectionTwo } from "@/components/testimonials-section-two"
-import VideoBanner from "@/components/video-banner"
-import { Clock, TrendingUp, AlertTriangle } from "lucide-react";
-import { Building2, User } from "lucide-react"
+import ProductPageLayout from "@/components/product-page-layout"
+import { Calendar, Clock, PieChart, FileText, CheckCircle, BarChart3 } from "lucide-react"
 
-export default function ContactPage() {
-    type FAQ = {
-        id: number
-        question: string
-        answer: string
-    }
-    const customFaqs: FAQ[] = [
-        {
-            id: 1,
-            question: "Is it legal for employers to monitor employee devices?",
-            answer: "Click on the Sign Up button and fill in your details. It's quick and easy.",
-        },
-        {
-            id: 2,
-            question: "What can employee monitoring software track?",
-            answer: "Yes, 24/7 customer support is available via chat and email.",
-        },
-        {
-            id: 3,
-            question: "What’s the most effective way to monitor employees?",
-            answer: "Yes, 24/7 customer support is available via chat and email.",
-        },
-    ]
-    return (
-        <>
-            <VideoBanner
-                imageSrc="/images/leave-balance-reports/1.png"
-                title="Zero-Cost Employee Monitoring Software"
-                description="Track employee activities securely and transparently. Zero cost. Unlimited users"
-                className="mb-16"
-            />
 
-            <section>
-                <ImageContent
-                    imageContent={
-                        <div >
-                            <img src="/images/leave-balance-reports/2.png" alt="" />
-                        </div>
-                    }
-                    features={[
-                        {
-                            icon: <Clock className="w-6 h-6 md:w-7 md:h-7 text-gray-700" />,
-                            title: "Smart Timesheet Automation",
-                            description: "Track work hours effortlessly with automatic time sheets..."
-                        },
-                        {
-                            icon: <TrendingUp className="w-6 h-6 md:w-7 md:h-7 text-gray-700" />,
-                            title: "Real-Time Productivity Insights",
-                            description: "Monitor app and website usage to uncover productivity trends..."
-                        },
-                        {
-                            icon: <AlertTriangle className="w-6 h-6 md:w-7 md:h-7 text-gray-700" />,
-                            title: "Proactive Activity Alerts",
-                            description: "Stay informed with instant alerts on unusual activities..."
-                        }
-                    ]}
-                />
-                <ImageContent
-                    imageSide="right"
-                    imageContent={
-                        <div >
-                            <img src="/images/leave-balance-reports/3.png" alt="" />
-                        </div>
-                    }
-                    features={[
-                        {
-                            icon: <Clock className="w-6 h-6 md:w-7 md:h-7 text-gray-700" />,
-                            title: "Smart Timesheet Automation",
-                            description: "Track work hours effortlessly with automatic time sheets..."
-                        },
-                        {
-                            icon: <TrendingUp className="w-6 h-6 md:w-7 md:h-7 text-gray-700" />,
-                            title: "Real-Time Productivity Insights",
-                            description: "Monitor app and website usage to uncover productivity trends..."
-                        },
-                        {
-                            icon: <AlertTriangle className="w-6 h-6 md:w-7 md:h-7 text-gray-700" />,
-                            title: "Proactive Activity Alerts",
-                            description: "Stay informed with instant alerts on unusual activities..."
-                        }
-                    ]}
-                />
-            </section>
+const features = [
+  {
+    title: "Real-Time Leave Balance Tracking",
+    description: "Track Nexus provides instant visibility into every employee's leave balance. View accrued time, used days, and remaining balances in real-time. Employees can check their own balances while managers get a complete team overview with smart filtering and search capabilities.",
+    image: "https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    title: "Streamlined Leave Requests",
+    description: "Simplify the entire leave request process from submission to approval. Employees submit requests in seconds, managers approve with one click, and everyone stays informed with automatic notifications. Configure custom approval workflows that match your organization's policies.",
+    image: "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    title: "Comprehensive Leave Reports",
+    description: "Generate detailed leave reports with just a few clicks. Analyze leave patterns, track trends over time, and export data for payroll integration. Custom reports help you understand utilization rates and plan resources effectively.",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=1000&q=80",
+  },
+  {
+    title: "Smart Leave Policies",
+    description: "Configure flexible leave policies that match your organization's needs. Set up different leave types, accrual rules, carryover limits, and approval hierarchies. Track Nexus automatically applies the right policies to the right employees.",
+    image: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?auto=format&fit=crop&w=1000&q=80",
+  },
+]
 
-            <section>
-                <div className="w-full my-16">
-                    {/* Hero Section */}
-                    <section className="bg-[#0066B3] text-white py-16 px-4 sm:px-6 lg:px-8">
-                        <div className="max-w-7xl mx-auto">
-                            <div className="">
-                                {/* First Feature Block */}
-                                <div className="flex flex-col lg:flex-row items-center lg:items-center gap-16">
-                                    <div className="flex-shrink-0">
-                                        <div>
-                                            <img src="/images/leave-balance-reports/4.png" alt="" />
-                                        </div>
-                                    </div>
-                                    <div className="text-center lg:text-left">
-                                        <h2 className="text-2xl sm:text-3xl font-bold mb-4">The Power of Time Tracking</h2>
-                                        <p className="text-blue-100 leading-relaxed">
-                                            Time tracking offers valuable insights into how time is spent, helping identify unproductive habits
-                                            and streamline workflows. It enables better goal setting, task prioritization, and smarter resource
-                                            allocation leading to improved focus and overall productivity.
-                                        </p>
-                                    </div>
-                                </div>
+const benefits = [
+  {
+    icon: Calendar,
+    title: "Leave Calendar",
+    description: "View team availability with an integrated leave calendar.",
+  },
+  {
+    icon: Clock,
+    title: "Accrual Tracking",
+    description: "Automatically track leave accruals based on your policies.",
+  },
+  {
+    icon: PieChart,
+    title: "Usage Analytics",
+    description: "Analyze leave patterns and utilization across teams.",
+  },
+  {
+    icon: FileText,
+    title: "Custom Reports",
+    description: "Generate detailed reports for payroll and compliance.",
+  },
+  {
+    icon: CheckCircle,
+    title: "Quick Approvals",
+    description: "One-click approvals with automatic notifications.",
+  },
+  {
+    icon: BarChart3,
+    title: "Trend Analysis",
+    description: "Identify trends and plan resources proactively.",
+  },
+]
 
-                                {/* Second Feature Block */}
-                                <div className="flex flex-col lg:flex-row-reverse items-center lg:items-center gap-16">
-                                    <div className="flex-shrink-0">
-                                        <div>
-                                           <img src="/images/leave-balance-reports/5.png" alt="" />
-                                        </div>
-                                    </div>
-                                    <div className="text-center lg:text-right">
-                                        <h2 className="text-2xl sm:text-3xl font-bold mb-4">Engage with Track Nexus Time Tracker</h2>
-                                        <p className="text-blue-100 leading-relaxed">
-                                            Time tracking offers valuable insights into how time is spent, helping identify unproductive habits
-                                            and streamline workflows. It enables better goal setting, task prioritization, and smarter resource
-                                            allocation leading to improved focus and overall productivity.
-                                        </p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
+const stats = [
+  { value: "Real-time", label: "Balances" },
+  { value: "Auto", label: "Accruals" },
+  { value: "Custom", label: "Policies" },
+  { value: "Instant", label: "Reports" },
+]
 
-                    {/* Features Section */}
-                    <section className="bg-[#F8F3FF] py-16 px-4 sm:px-6 lg:px-8 mt-12">
-                        <div className="max-w-7xl mx-auto">
-                            <div className="grid md:grid-cols-2 gap-8 lg:gap-12">
-                                {/* Company-Managed Devices */}
-                                <div className=" rounded-lg p-6 lg:p-8 shadow-sm">
-                                    <div className="flex items-end gap-4 mb-4">
-                                        <div className="flex-shrink-0">
-                                            <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center">
-                                                <Building2 className="w-6 h-6 text-blue-600" />
-                                            </div>
-                                        </div>
-                                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Company-Managed Devices</h3>
-                                    </div>
-                                    <p className="text-gray-600 leading-relaxed">
-                                        Ideal for office teams using company-provided computers, this setup ensures seamless tracking. Time
-                                        Champ automatically starts when the device is powered on, giving you full control to monitor activity
-                                        continuously, during set hours, or only when connected to a specific network—based on your
-                                        organization&apos;s needs.
-                                    </p>
-                                </div>
+const faqs = [
+  {
+    question: "How does leave balance tracking work?",
+    answer: "Track Nexus automatically calculates leave balances based on your configured accrual policies. Employees see their current balance, and the system updates in real-time as leave is requested, approved, or taken.",
+  },
+  {
+    question: "Can I set up different leave types?",
+    answer: "Yes, configure unlimited leave types such as vacation, sick leave, personal days, and custom categories. Each type can have its own accrual rules, approval workflow, and carryover policies.",
+  },
+  {
+    question: "How do employees request leave?",
+    answer: "Employees can submit leave requests through the web portal or mobile app. They select dates, leave type, and add notes. Managers receive instant notifications and can approve or decline with one click.",
+  },
+  {
+    question: "What reports are available?",
+    answer: "Generate reports on leave balances, utilization rates, trends over time, team calendars, and payroll exports. All reports can be filtered by date range, department, or employee and exported to Excel or PDF.",
+  },
+]
 
-                                {/* Remote Work Devices */}
-                                <div className=" rounded-lg p-6 lg:p-8 shadow-sm">
-                                    <div className="flex items-end gap-4 mb-4">
-                                        <div className="flex-shrink-0">
-                                            <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center">
-                                                <User className="w-6 h-6 text-green-600" />
-                                            </div>
-                                        </div>
-                                        <h3 className="text-xl sm:text-2xl font-bold text-gray-900">Remote Work Devices</h3>
-                                    </div>
-                                    <p className="text-gray-600 leading-relaxed">
-                                        Perfect for remote or hybrid teams, this option gives employees more control over their time tracking.
-                                        Using simple clock in/out buttons, team members can choose when Time Champ begins and ends monitoring,
-                                        offering flexibility while still ensuring accountability.
-                                    </p>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                </div>
-            </section>
-
-            <section>
-                <TestimonialsSectionTwo></TestimonialsSectionTwo>
-            </section>
-
-            <section>
-                <FAQSection
-                    faqs={customFaqs}
-                    title="FAQs"
-                    subtitle="Some frequently asked questions..."
-                    showImage={true}
-                    imageUrl="/images/facial-recognition/faq.png"
-                    imageAlt="Custom FAQ Graphic"
-                />
-            </section>
-        </>
-    )
+export default function LeaveBalanceReportsPage() {
+  return (
+    <ProductPageLayout
+      badge="Leave Management"
+      title="Leave Balance"
+      titleHighlight="& Reports"
+      subtitle="Effortless leave tracking and management. Monitor balances, streamline approvals, and generate comprehensive reports with Track Nexus."
+      heroImage="https://images.unsplash.com/photo-1506784983877-45594efa4cbe?auto=format&fit=crop&w=1920&q=80"
+      floatingIcons={[Calendar, Clock, PieChart, FileText]}
+      features={features}
+      benefitsTitle="Complete Leave Management"
+      benefitsSubtitle="Everything you need to manage time off efficiently"
+      benefits={benefits}
+      stats={stats}
+      faqs={faqs}
+      ctaTitle="Ready to simplify leave management?"
+      ctaSubtitle="Start your 14-day free trial today. No credit card required."
+    />
+  )
 }
