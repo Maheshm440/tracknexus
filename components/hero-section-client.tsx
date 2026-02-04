@@ -97,11 +97,11 @@ export function HeroSectionClient() {
             playsInline
             className="absolute inset-0 w-full h-full object-cover"
           >
-            <source src="/videos/hero-video.mp4" type="video/mp4" />
+            <source src="/videos/14840858_3840_2160_30fps (1).mp4" type="video/mp4" />
           </video>
 
           {/* Gradient overlay for text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/20 via-black/10 to-transparent"></div>
+          <div className="absolute inset-0 bg-gradient-to-r from-black/5 via-black/5 to-transparent"></div>
 
         </div>
 

@@ -279,7 +279,7 @@ export function VideoShowcaseSection() {
                 playsInline
                 className="w-full h-auto"
               >
-                <source src="/videos/hero-video.mp4" type="video/mp4" />
+                <source src="/videos/14840858_3840_2160_30fps (1).mp4" type="video/mp4" />
               </video>
               {/* Play overlay */}
               <div className="absolute inset-0 bg-gradient-to-t from-black/50 to-transparent flex items-center justify-center opacity-0 hover:opacity-100 transition-opacity duration-300">

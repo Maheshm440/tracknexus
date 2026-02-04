@@ -27,7 +27,7 @@ function generateStructuredData() {
     "description": "Discover how Track Nexus connects success through intelligent time tracking and productivity management",
     "thumbnailUrl": "https://tracknexus.com/images/hero-poster.jpg",
     "uploadDate": "2025-01-15T00:00:00Z",
-    "contentUrl": "https://tracknexus.com/videos/hero-video.mp4",
+    "contentUrl": "https://tracknexus.com/videos/14840858_3840_2160_30fps (1).mp4",
     "embedUrl": "https://tracknexus.com",
   };
 
