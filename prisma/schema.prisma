@@ -1,6 +1,3 @@
-// Prisma Schema for TrackNexus CRM
-// Learn more: https://pris.ly/d/prisma-schema
-
 generator client {
   provider      = "prisma-client-js"
   binaryTargets = ["native", "windows"]
@@ -11,207 +8,173 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// User - Authentication and user management
 model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  password  String?  // Optional password (hashed)
-  role      String   @default("user") // admin or user
-  status    String   @default("active") // active or inactive
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  id              String    @id @default(cuid())
+  email           String    @unique
+  name            String
+  password        String?
+  role            String    @default("user")
+  status          String    @default("active")
+  emailVerified   Boolean   @default(false)
+  emailVerifiedAt DateTime?
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
 
   @@index([email])
   @@index([role])
+  @@index([emailVerified])
 }
 
-// Lead - Form submissions from contact/demo forms
+model EmailVerification {
+  id         String    @id @default(cuid())
+  email      String
+  otp        String
+  purpose    String    @default("signup")
+  attempts   Int       @default(0)
+  expiresAt  DateTime
+  verifiedAt DateTime?
+  createdAt  DateTime  @default(now())
+
+  @@index([email, purpose])
+  @@index([expiresAt])
+  @@index([createdAt])
+}
+
 model Lead {
-  id            String    @id @default(cuid())
+  id            String        @id @default(cuid())
   name          String
   companyName   String
   companyEmail  String
   companySize   String
   mobileNumber  String
   message       String
-  formType      String // demo, pricing, free-trial
-  selectedPlan  String? // For pricing forms
-  preferredDate DateTime? // For demo booking
-  preferredTime String? // For demo booking
-
-  // Lead scoring and status
-  score  Int        @default(0)
-  status LeadStatus @default(NEW)
-  source String? // UTM source or referrer
-
-  // Visitor association
-  visitorId String?
-  visitor   Visitor? @relation(fields: [visitorId], references: [id])
-
-  // Relationships
-  followUps    FollowUp[]
-  attributions Attribution[]
-
-  // Timestamps
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  formType      String
+  selectedPlan  String?
+  preferredDate DateTime?
+  preferredTime String?
+  score         Int           @default(0)
+  status        LeadStatus    @default(NEW)
+  source        String?
+  visitorId     String?
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  attributions  Attribution[]
+  followUps     FollowUp[]
+  visitor       Visitor?      @relation(fields: [visitorId], references: [id])
 
   @@index([status, createdAt])
   @@index([companyEmail])
   @@index([createdAt])
 }
 
-enum LeadStatus {
-  NEW
-  CONTACTED
-  QUALIFIED
-  CONVERTED
-  LOST
-}
-
-// Visitor - Anonymous tracked visitors
 model Visitor {
-  id           String   @id @default(cuid())
-  fingerprint  String?  @unique // Browser fingerprint for returning visitors
-  sessionCount Int      @default(1)
-  firstVisit   DateTime @default(now())
-  lastVisit    DateTime @default(now())
-
-  // GeoIP data (privacy-compliant - no precise location)
-  country     String?
-  countryCode String?
-  region      String?
-  city        String?
-  timezone    String?
-
-  // Consent tracking
-  consentGiven     Boolean   @default(false)
+  id               String        @id @default(cuid())
+  fingerprint      String?       @unique
+  sessionCount     Int           @default(1)
+  firstVisit       DateTime      @default(now())
+  lastVisit        DateTime      @default(now())
+  country          String?
+  countryCode      String?
+  region           String?
+  city             String?
+  timezone         String?
+  consentGiven     Boolean       @default(false)
   consentTimestamp DateTime?
-
-  // Aggregated metrics
-  totalPageViews  Int @default(0)
-  totalTimeOnSite Int @default(0) // in seconds
-
-  // Relationships
-  sessions     Session[]
-  leads        Lead[]
-  attributions Attribution[]
-  createdAt    DateTime      @default(now())
+  totalPageViews   Int           @default(0)
+  totalTimeOnSite  Int           @default(0)
+  createdAt        DateTime      @default(now())
+  attributions     Attribution[]
+  leads            Lead[]
+  sessions         Session[]
 
   @@index([lastVisit])
   @@index([country])
   @@index([createdAt])
 }
 
-// Session - Individual visitor sessions
 model Session {
-  id        String  @id @default(cuid())
-  visitorId String
-  visitor   Visitor @relation(fields: [visitorId], references: [id], onDelete: Cascade)
-
-  // Session data
-  startTime DateTime  @default(now())
-  endTime   DateTime?
-  duration  Int? // in seconds
-
-  // Source tracking
-  referrer    String?
-  utmSource   String?
-  utmMedium   String?
-  utmCampaign String?
-  utmTerm     String?
-  utmContent  String?
-
-  // Device info (non-PII)
-  deviceType       String? // desktop, mobile, tablet
+  id               String     @id @default(cuid())
+  visitorId        String
+  startTime        DateTime   @default(now())
+  endTime          DateTime?
+  duration         Int?
+  referrer         String?
+  utmSource        String?
+  utmMedium        String?
+  utmCampaign      String?
+  utmTerm          String?
+  utmContent       String?
+  deviceType       String?
   browser          String?
   browserVersion   String?
   os               String?
   screenResolution String?
-
-  // Page views in this session
-  pageViews PageView[]
+  pageViews        PageView[]
+  visitor          Visitor    @relation(fields: [visitorId], references: [id], onDelete: Cascade)
 
   @@index([visitorId, startTime])
   @@index([startTime])
 }
 
-// PageView - Individual page views
 model PageView {
-  id        String  @id @default(cuid())
-  sessionId String
-  session   Session @relation(fields: [sessionId], references: [id], onDelete: Cascade)
-
+  id          String   @id @default(cuid())
+  sessionId   String
   path        String
   title       String?
   timestamp   DateTime @default(now())
-  timeOnPage  Int? // in seconds
-  scrollDepth Int? // percentage 0-100
+  timeOnPage  Int?
+  scrollDepth Int?
+  session     Session  @relation(fields: [sessionId], references: [id], onDelete: Cascade)
 
   @@index([sessionId])
   @@index([path, timestamp])
   @@index([timestamp])
 }
 
-// DailyAnalytics - Aggregated daily metrics for fast dashboard queries
 model DailyAnalytics {
-  id   String   @id @default(cuid())
-  date DateTime @unique
-
-  // Visitor metrics
-  uniqueVisitors     Int   @default(0)
-  totalSessions      Int   @default(0)
-  totalPageViews     Int   @default(0)
-  avgSessionDuration Float @default(0)
-  bounceRate         Float @default(0)
-
-  // Geographic distribution (JSON)
-  countryBreakdown Json?
-
-  // Top pages (JSON)
-  topPages Json?
-
-  // Lead metrics
-  newLeads    Int @default(0)
-  conversions Int @default(0)
-
-  // Source breakdown (JSON)
-  sourceBreakdown Json?
+  id                 String   @id @default(cuid())
+  date               DateTime @unique
+  uniqueVisitors     Int      @default(0)
+  totalSessions      Int      @default(0)
+  totalPageViews     Int      @default(0)
+  avgSessionDuration Float    @default(0)
+  bounceRate         Float    @default(0)
+  countryBreakdown   Json?
+  topPages           Json?
+  newLeads           Int      @default(0)
+  conversions        Int      @default(0)
+  sourceBreakdown    Json?
 
   @@index([date])
 }
 
-// Attribution - Track lead sources and campaign performance
 model Attribution {
   id          String   @id @default(cuid())
   leadId      String?
   visitorId   String?
-  source      String? // google, facebook, direct, referral
-  medium      String? // cpc, organic, email, social
+  source      String?
+  medium      String?
   campaign    String?
   term        String?
   content     String?
   referrer    String?
   landingPage String?
   createdAt   DateTime @default(now())
-
-  lead    Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
-  visitor Visitor? @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  visitor     Visitor? @relation(fields: [visitorId], references: [id], onDelete: Cascade)
+  lead        Lead?    @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
   @@index([source, medium, campaign])
   @@index([createdAt])
   @@index([leadId])
 }
 
-// BotActivity - Monitor visitor behavior patterns
 model BotActivity {
   id              String   @id @default(cuid())
   fingerprint     String
   ipAddress       String?
   userAgent       String
-  activityType    String // suspicious, bot, human
-  suspicionScore  Int      @default(0) // 0-100
+  activityType    String
+  suspicionScore  Int      @default(0)
   pageViewCount   Int      @default(0)
   sessionDuration Int      @default(0)
   detectedAt      DateTime @default(now())
@@ -220,7 +183,6 @@ model BotActivity {
   @@index([fingerprint])
 }
 
-// FollowUp - Lead follow-up task management
 model FollowUp {
   id          String           @id @default(cuid())
   leadId      String
@@ -234,32 +196,16 @@ model FollowUp {
   completedAt DateTime?
   createdAt   DateTime         @default(now())
   updatedAt   DateTime         @updatedAt
-
-  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  lead        Lead             @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
   @@index([leadId, status])
   @@index([dueDate, status])
 }
 
-enum FollowUpPriority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
-
-enum FollowUpStatus {
-  PENDING
-  IN_PROGRESS
-  COMPLETED
-  CANCELLED
-}
-
-// Campaign - Marketing campaigns
 model Campaign {
   id          String         @id @default(cuid())
   name        String
-  type        String // email, social, ppc, content
+  type        String
   status      CampaignStatus @default(DRAFT)
   budget      Float?
   spent       Float          @default(0)
@@ -274,50 +220,25 @@ model Campaign {
   @@index([status, startDate])
 }
 
-enum CampaignStatus {
-  DRAFT
-  ACTIVE
-  PAUSED
-  COMPLETED
-  CANCELLED
-}
-
-// Ticket - Help desk customer support
 model Ticket {
-  id           String         @id @default(cuid())
-  ticketNumber String         @unique
+  id           String           @id @default(cuid())
+  ticketNumber String           @unique
   subject      String
   description  String
   email        String
-  priority     TicketPriority @default(MEDIUM)
-  status       TicketStatus   @default(OPEN)
+  priority     TicketPriority   @default(MEDIUM)
+  status       TicketStatus     @default(OPEN)
   category     String?
   assignedTo   String?
   createdBy    String?
   resolvedAt   DateTime?
-  createdAt    DateTime       @default(now())
-  updatedAt    DateTime       @updatedAt
-
-  responses TicketResponse[]
+  createdAt    DateTime         @default(now())
+  updatedAt    DateTime         @updatedAt
+  responses    TicketResponse[]
 
   @@index([status, priority])
   @@index([email])
   @@index([ticketNumber])
-}
-
-enum TicketPriority {
-  LOW
-  MEDIUM
-  HIGH
-  URGENT
-}
-
-enum TicketStatus {
-  OPEN
-  IN_PROGRESS
-  WAITING
-  RESOLVED
-  CLOSED
 }
 
 model TicketResponse {
@@ -327,13 +248,11 @@ model TicketResponse {
   isInternal Boolean  @default(false)
   createdBy  String?
   createdAt  DateTime @default(now())
-
-  ticket Ticket @relation(fields: [ticketId], references: [id], onDelete: Cascade)
+  ticket     Ticket   @relation(fields: [ticketId], references: [id], onDelete: Cascade)
 
   @@index([ticketId])
 }
 
-// Client - Client/company management
 model Client {
   id        String       @id @default(cuid())
   name      String
@@ -351,14 +270,6 @@ model Client {
   @@index([email])
 }
 
-enum ClientStatus {
-  ACTIVE
-  INACTIVE
-  PROSPECT
-  CHURNED
-}
-
-// TeamMember - Team members and roles
 model TeamMember {
   id         String           @id @default(cuid())
   name       String
@@ -374,6 +285,58 @@ model TeamMember {
 
   @@index([role, status])
   @@index([email])
+}
+
+enum LeadStatus {
+  NEW
+  CONTACTED
+  QUALIFIED
+  CONVERTED
+  LOST
+}
+
+enum FollowUpPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum FollowUpStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum CampaignStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  COMPLETED
+  CANCELLED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  WAITING
+  RESOLVED
+  CLOSED
+}
+
+enum ClientStatus {
+  ACTIVE
+  INACTIVE
+  PROSPECT
+  CHURNED
 }
 
 enum TeamRole {

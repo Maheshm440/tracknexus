@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import prisma from '@/lib/prisma';
 import { LeadStatus } from '@prisma/client';
+import { sanitizeText, sanitizeEmail } from '@/lib/sanitize';
 
 interface CreateLeadRequest {
   name: string;
@@ -44,49 +45,73 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // SECURITY FIX #13: Sanitize all user inputs
+    const sanitizedData = {
+      name: sanitizeText(name),
+      companyName: sanitizeText(companyName || ''),
+      companyEmail: sanitizeEmail(companyEmail),
+      companySize: sanitizeText(companySize || ''),
+      mobileNumber: sanitizeText(mobileNumber || ''),
+      message: sanitizeText(message),
+      formType: sanitizeText(formType),
+      selectedPlan: selectedPlan ? sanitizeText(selectedPlan) : undefined,
+      preferredTime: preferredTime ? sanitizeText(preferredTime) : undefined,
+      source: source ? sanitizeText(source) : undefined,
+    };
+
     // Calculate lead score
     const score = calculateLeadScore({
-      formType,
-      companySize,
-      hasPhone: Boolean(mobileNumber),
+      formType: sanitizedData.formType,
+      companySize: sanitizedData.companySize,
+      hasPhone: Boolean(sanitizedData.mobileNumber),
       visitorId,
     });
 
-    // Create the lead
-    let lead = null;
+    // SECURITY FIX #14: Proper error handling - return error if database fails
     try {
-      lead = await prisma.lead.create({
+      const lead = await prisma.lead.create({
         data: {
-          name,
-          companyName: companyName || '',
-          companyEmail,
-          companySize: companySize || '',
-          mobileNumber: mobileNumber || '',
-          message,
-          formType,
-          selectedPlan,
+          name: sanitizedData.name,
+          companyName: sanitizedData.companyName,
+          companyEmail: sanitizedData.companyEmail,
+          companySize: sanitizedData.companySize,
+          mobileNumber: sanitizedData.mobileNumber,
+          message: sanitizedData.message,
+          formType: sanitizedData.formType,
+          selectedPlan: sanitizedData.selectedPlan,
           preferredDate: preferredDate ? new Date(preferredDate) : null,
-          preferredTime,
+          preferredTime: sanitizedData.preferredTime,
           visitorId,
-          source,
+          source: sanitizedData.source,
           score,
         },
       });
-    } catch (dbError) {
-      // If database is unavailable, still return success so form doesn't fail
-      console.log('Database unavailable for creating lead, returning success anyway');
-    }
 
-    return NextResponse.json({
-      success: true,
-      leadId: lead?.id || `temp_${Date.now()}`,
-      score: score, // Return the calculated score
-    });
+      return NextResponse.json({
+        success: true,
+        leadId: lead.id,
+        score: score,
+      });
+    } catch (dbError) {
+      // SECURITY FIX #20: Don't log sensitive data
+      console.error('Database error creating lead');
+      return NextResponse.json(
+        {
+          success: false,
+          error: 'Failed to save lead. Please try again.'
+        },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error('Create lead error:', error);
+    // SECURITY FIX #20: Generic error message, no sensitive details
+    console.error('Create lead error');
     return NextResponse.json(
-      { success: true, leadId: `temp_${Date.now()}` },
-      { status: 200 }
+      {
+        success: false,
+        error: 'Invalid request data'
+      },
+      { status: 400 }
     );
   }
 }
@@ -110,17 +135,11 @@ export async function GET(request: NextRequest) {
       note: 'Using client-side localStorage for demo. Check dashboard for data.'
     });
   } catch (error) {
-    console.error('List leads error:', error);
+    console.error('List leads error');
     return NextResponse.json({
-      success: true,
-      data: [],
-      pagination: {
-        page: 1,
-        limit: 20,
-        total: 0,
-        totalPages: 0,
-      },
-    });
+      success: false,
+      error: 'Failed to fetch leads'
+    }, { status: 500 });
   }
 }
 

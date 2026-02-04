@@ -97,25 +97,15 @@ export function FAQSection({
       />
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <motion.div
-          className="text-center mb-16"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-        >
+        <div className="text-center mb-16">
           <h2 className="text-3xl lg:text-5xl font-bold mb-4" style={{ color: '#096EB6' }}>{title}</h2>
           <p className="text-lg text-gray-600">{subtitle}</p>
-        </motion.div>
+        </div>
 
         <div className={`grid grid-cols-1 ${showImage ? 'lg:grid-cols-2' : ''} gap-12 lg:gap-16 items-center`}>
           {/* FAQ Illustration */}
           {showImage && (
-          <motion.div
-            className="relative"
-            initial={{ opacity: 0, x: -60 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-          >
+          <div className="relative">
             <Image
                 src={imageUrl}
                 alt={imageAlt}
@@ -123,23 +113,15 @@ export function FAQSection({
               height={400}
               className="w-full h-auto rounded-2xl"
             />
-          </motion.div>
+          </div>
           )}
 
           {/* FAQ Items */}
-          <motion.div
-            className="space-y-4"
-            initial={{ opacity: 0, x: 60 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ duration: 0.6 }}
-          >
-            {faqs.map((faq, index) => (
-              <motion.div
+          <div className="space-y-4">
+            {faqs.map((faq) => (
+              <div
                 key={faq.id}
                 className="border border-gray-200 rounded-lg overflow-hidden"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, delay: index * 0.1 }}
               >
                 <button
                   onClick={() => toggleFAQ(faq.id)}
@@ -170,9 +152,9 @@ export function FAQSection({
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </div>
     </section>

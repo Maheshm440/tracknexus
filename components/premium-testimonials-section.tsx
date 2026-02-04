@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence, useInView } from "framer-motion";
+// Note: useInView is still used for section visibility
 import {
   Quote,
   Star,
@@ -141,21 +142,12 @@ const companyLogos = [
   },
 ];
 
-// Animated Counter Component
+// Simple Counter Component - No delay for faster rendering
 const AnimatedCounter = ({ value, suffix = "" }: { value: string; suffix?: string }) => {
-  const ref = useRef(null);
-  const isInView = useInView(ref, { once: true });
-
   return (
-    <motion.span
-      ref={ref}
-      initial={{ opacity: 0, scale: 0.5 }}
-      animate={isInView ? { opacity: 1, scale: 1 } : {}}
-      transition={{ type: "spring", stiffness: 100, delay: 0.2 }}
-      className="font-black"
-    >
+    <span className="font-black">
       {value}{suffix}
-    </motion.span>
+    </span>
   );
 };
 
@@ -273,74 +265,26 @@ export function PremiumTestimonialsSection() {
       {/* Background */}
       <div className="absolute inset-0 bg-gradient-to-b from-slate-50 via-white to-cyan-50/30" />
 
-      {/* Animated Background Elements */}
+      {/* Static Background Elements - No infinite animations for better performance */}
       <div className="absolute inset-0 overflow-hidden">
-        <motion.div
-          animate={{
-            x: [0, 100, 0],
-            y: [0, -50, 0],
-          }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-20 -left-20 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{
-            x: [0, -100, 0],
-            y: [0, 50, 0],
-          }}
-          transition={{ duration: 25, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-20 -right-20 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl"
-        />
-
-        {/* Floating Particles - using deterministic positions */}
-        {[...Array(20)].map((_, i) => {
-          // Deterministic positions based on index to avoid hydration mismatch
-          const left = ((i * 17 + 5) % 100);
-          const top = ((i * 23 + 10) % 100);
-          const duration = 3 + (i % 3);
-          const delay = (i % 5) * 0.4;
-
-          return (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-cyan-500/20 rounded-full"
-              style={{
-                left: `${left}%`,
-                top: `${top}%`,
-              }}
-              animate={{
-                y: [0, -30, 0],
-                opacity: [0.2, 0.5, 0.2],
-              }}
-              transition={{
-                duration: duration,
-                repeat: Infinity,
-                delay: delay,
-              }}
-            />
-          );
-        })}
+        <div className="absolute top-20 -left-20 w-96 h-96 bg-cyan-500/5 rounded-full blur-3xl" />
+        <div className="absolute bottom-20 -right-20 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-3xl" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ duration: 0.8 }}
+          transition={{ duration: 0.4 }}
           className="text-center mb-12"
         >
-          <motion.div
-            initial={{ scale: 0 }}
-            animate={isInView ? { scale: 1 } : {}}
-            transition={{ type: "spring", delay: 0.2 }}
-            className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-full mb-6 border border-cyan-500/20"
-          >
+          <div className="inline-flex items-center gap-2 px-5 py-2 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-full mb-6 border border-cyan-500/20">
             <Sparkles className="w-4 h-4 text-cyan-600" />
             <span className="text-sm font-semibold text-cyan-600 uppercase tracking-wider">
               Customer Stories
             </span>
-          </motion.div>
+          </div>
 
         <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
           Trusted by{" "}
@@ -358,9 +302,9 @@ export function PremiumTestimonialsSection() {
 
       {/* Stats Row */}
       <motion.div
-        initial={{ opacity: 0, y: 30 }}
+        initial={{ opacity: 0, y: 15 }}
         animate={isInView ? { opacity: 1, y: 0 } : {}}
-        transition={{ delay: 0.3, duration: 0.8 }}
+        transition={{ duration: 0.4 }}
         className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16"
       >
         {[
@@ -369,10 +313,9 @@ export function PremiumTestimonialsSection() {
           { value: "4.9", label: "Average Rating", icon: Award },
           { value: "150+", label: "Countries", icon: TrendingUp },
         ].map((stat, index) => (
-          <motion.div
+          <div
             key={index}
-            whileHover={{ y: -5, scale: 1.02 }}
-            className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:border-cyan-300 transition-all duration-300"
+            className="bg-white rounded-xl p-6 shadow-lg border border-gray-100 hover:border-cyan-300 hover:-translate-y-1 hover:scale-[1.02] transition-all duration-300"
           >
             <div className="w-12 h-12 mx-auto mb-4 bg-gradient-to-br from-cyan-500/10 to-blue-500/10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform">
               <stat.icon className="w-6 h-6 text-cyan-600" />
@@ -381,7 +324,7 @@ export function PremiumTestimonialsSection() {
               <AnimatedCounter value={stat.value} />
             </p>
             <p className="text-gray-500 text-sm font-medium">{stat.label}</p>
-          </motion.div>
+          </div>
         ))}
       </motion.div>
 
@@ -439,9 +382,9 @@ export function PremiumTestimonialsSection() {
 
       {/* Trust Badges */}
         <motion.div
-          initial={{ opacity: 0, y: 30 }}
+          initial={{ opacity: 0, y: 15 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
-          transition={{ delay: 0.5, duration: 0.8 }}
+          transition={{ duration: 0.4 }}
           className="mb-16"
         >
           <div className="bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900 rounded-xl p-4 lg:p-6 overflow-hidden relative">
@@ -458,17 +401,13 @@ export function PremiumTestimonialsSection() {
 
               <div className="flex flex-wrap justify-center gap-4 lg:gap-6">
                 {trustBadges.map((badge, index) => (
-                  <motion.div
+                  <div
                     key={index}
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={isInView ? { opacity: 1, y: 0 } : {}}
-                    transition={{ delay: 0.6 + index * 0.1 }}
-                    whileHover={{ scale: 1.05, y: -5 }}
-                    className="flex items-center gap-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-5 py-3 hover:bg-white/15 transition-all"
+                    className="flex items-center gap-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-2xl px-5 py-3 hover:bg-white/15 hover:scale-105 hover:-translate-y-1 transition-all"
                   >
                     <badge.icon className="w-5 h-5 text-cyan-400" />
                     <span className="text-white font-medium text-sm">{badge.name}</span>
-                  </motion.div>
+                  </div>
                 ))}
               </div>
             </div>
@@ -479,7 +418,7 @@ export function PremiumTestimonialsSection() {
         <motion.div
           initial={{ opacity: 0 }}
           animate={isInView ? { opacity: 1 } : {}}
-          transition={{ delay: 0.7, duration: 0.8 }}
+          transition={{ duration: 0.4 }}
           className="text-center"
         >
           <p className="text-gray-500 text-sm font-medium uppercase tracking-wider mb-8">

@@ -26,3 +26,8 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 /lib/generated/prisma
+
+# large video files
+public/videos/hero-video.mp4
+public/images/aboutus/banner.mp4
+public/images/time-tracking/time.mp4

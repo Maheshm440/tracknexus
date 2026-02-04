@@ -63,7 +63,10 @@ export default function SignupPage() {
       const data = await response.json();
 
       if (response.ok) {
-        setSuccess('Account created successfully! Redirecting to login...');
+        setSuccess('Account created successfully! Please check your email for the verification code.');
+
+        // Store email for verification page
+        const userEmail = formData.email.toLowerCase();
 
         // Reset form
         setFormData({
@@ -73,9 +76,9 @@ export default function SignupPage() {
           confirmPassword: ''
         });
 
-        // Redirect to login page
+        // Redirect to verification page
         setTimeout(() => {
-          window.location.href = '/login';
+          window.location.href = `/verify-email?email=${encodeURIComponent(userEmail)}`;
         }, 2000);
       } else {
         setError(data.error || 'Failed to create account. Please try again.');

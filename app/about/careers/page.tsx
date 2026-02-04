@@ -174,7 +174,7 @@ export default function CareersPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section with Background Video */}
-      <section className="relative overflow-hidden bg-deloitte-black text-white px-4 py-20 lg:px-8 lg:py-32">
+      <section className="relative overflow-hidden bg-deloitte-black text-white px-4 py-16 lg:px-8 lg:py-24">
         {/* Background Video */}
         <div className="absolute inset-0 overflow-hidden">
           <video
@@ -219,7 +219,7 @@ export default function CareersPage() {
               <span className="text-highlight font-normal">Track Nexus</span>
             </h1>
 
-            <p className="text-lg lg:text-xl text-gray-300 mb-10 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-lg lg:text-xl text-gray-300 mb-8 max-w-3xl mx-auto leading-relaxed">
               Join the team creating Track Nexus, the leading employee monitoring and workforce management system.
               Remote-first, competitive compensation, and meaningful work.
             </p>
@@ -252,7 +252,7 @@ export default function CareersPage() {
       </section>
 
       {/* Stats Section */}
-      <section className="bg-white py-12 border-b border-gray-200">
+      <section className="bg-white py-8 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             className="grid grid-cols-2 md:grid-cols-4 gap-8"
@@ -282,10 +282,10 @@ export default function CareersPage() {
       </section>
 
       {/* Culture Section */}
-      <section className="px-4 py-20 lg:px-8 lg:py-28 bg-gradient-to-b from-white to-gray-50">
+      <section className="px-4 py-12 lg:px-8 lg:py-16 bg-gradient-to-b from-white to-gray-50">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            className="text-center mb-16"
+            className="text-center mb-10"
             {...fadeInUp}
           >
             <h2 className="text-3xl lg:text-5xl font-light text-gray-900 mb-4">
@@ -297,7 +297,7 @@ export default function CareersPage() {
           </motion.div>
 
           <motion.div
-            className="grid md:grid-cols-3 gap-8"
+            className="grid md:grid-cols-3 gap-6"
             variants={staggerContainer}
             initial="initial"
             whileInView="whileInView"
@@ -334,10 +334,10 @@ export default function CareersPage() {
       </section>
 
       {/* Benefits Section */}
-      <section className="bg-white px-4 py-20 lg:px-8 lg:py-28">
+      <section className="bg-white px-4 py-12 lg:px-8 lg:py-16">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            className="text-center mb-16"
+            className="text-center mb-10"
             {...fadeInUp}
           >
             <h2 className="text-3xl lg:text-5xl font-light text-gray-900 mb-4">
@@ -349,7 +349,7 @@ export default function CareersPage() {
           </motion.div>
 
           <motion.div
-            className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+            className="grid md:grid-cols-2 lg:grid-cols-3 gap-6"
             variants={staggerContainer}
             initial="initial"
             whileInView="whileInView"
@@ -380,10 +380,10 @@ export default function CareersPage() {
       </section>
 
       {/* Open Positions Section */}
-      <section id="open-positions" className="bg-gray-50 px-4 py-20 lg:px-8 lg:py-28">
+      <section id="open-positions" className="bg-gray-50 px-4 py-12 lg:px-8 lg:py-16">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            className="text-center mb-16"
+            className="text-center mb-10"
             {...fadeInUp}
           >
             <h2 className="text-3xl lg:text-5xl font-light text-gray-900 mb-4">
@@ -395,7 +395,7 @@ export default function CareersPage() {
           </motion.div>
 
           <motion.div
-            className="space-y-6"
+            className="space-y-4"
             variants={staggerContainer}
             initial="initial"
             whileInView="whileInView"
@@ -460,13 +460,13 @@ export default function CareersPage() {
           </motion.div>
 
           <motion.div
-            className="text-center mt-12"
+            className="text-center mt-8"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6 }}
           >
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 mb-3">
               Don't see the perfect role? We're always looking for talented people.
             </p>
             <Button
@@ -481,10 +481,10 @@ export default function CareersPage() {
       </section>
 
       {/* Hiring Process Section */}
-      <section className="bg-white px-4 py-20 lg:px-8 lg:py-28">
+      <section className="bg-white px-4 py-12 lg:px-8 lg:py-16">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            className="text-center mb-16"
+            className="text-center mb-10"
             {...fadeInUp}
           >
             <h2 className="text-3xl lg:text-5xl font-light text-gray-900 mb-4">
@@ -496,7 +496,7 @@ export default function CareersPage() {
           </motion.div>
 
           <motion.div
-            className="grid md:grid-cols-4 gap-8"
+            className="grid md:grid-cols-4 gap-6"
             variants={staggerContainer}
             initial="initial"
             whileInView="whileInView"
@@ -530,21 +530,21 @@ export default function CareersPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-deloitte-black text-white px-4 py-20 lg:px-8 lg:py-32 relative overflow-hidden">
+      <section className="bg-deloitte-black text-white px-4 py-12 lg:px-8 lg:py-16 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-grid-white/[0.2]" />
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
           <motion.h2
-            className="text-3xl lg:text-5xl font-light mb-6"
+            className="text-3xl lg:text-5xl font-light mb-4"
             {...fadeInUp}
           >
             Ready to Make an{" "}
             <span className="text-highlight font-normal">Impact</span>?
           </motion.h2>
           <motion.p
-            className="text-lg text-gray-300 mb-10 max-w-2xl mx-auto"
+            className="text-lg text-gray-300 mb-6 max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}

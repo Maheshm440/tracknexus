@@ -5,7 +5,8 @@ import "./globals.css"
 import { HeaderWrapper } from "@/components/header-wrapper"
 import { FooterWrapper } from "@/components/footer-wrapper"
 import { MailButtonWrapper } from "@/components/mail-button-wrapper"
-import { organizationSchema, softwareApplicationSchema } from "@/lib/seo/schemas"
+import { ScrollToTop } from "@/components/scroll-to-top"
+import { organizationSchema, softwareApplicationSchema, websiteSchema, speakableSchema } from "@/lib/seo/schemas"
 import { CookieConsentProvider } from "@/components/cookies"
 import { getConsentDefaultScript } from "@/lib/tracking/gtag-consent"
 
@@ -52,6 +53,7 @@ export const metadata: Metadata = {
     images: ["/twitter-image.jpg"],
   },
   verification: {
+    google: 'YOUR_GOOGLE_VERIFICATION_CODE', // TODO: Replace with actual Google Search Console verification code
     other: {
       'msvalidate.01': '5A97D86AD48A3D922BC1B4A53876E0E8',
     },
@@ -82,7 +84,15 @@ export default function RootLayout({
         <link rel="canonical" href="https://tracknexus.com" />
         <link rel="icon" href="/clock-logo.png" />
         <link rel="apple-touch-icon" href="/clock-logo.png" />
+        <link rel="manifest" href="/manifest.json" />
         <meta name="format-detection" content="telephone=no" />
+
+        {/* Hreflang tags for international SEO */}
+        <link rel="alternate" hrefLang="en" href="https://tracknexus.com" />
+        <link rel="alternate" hrefLang="en-US" href="https://tracknexus.com" />
+        <link rel="alternate" hrefLang="en-GB" href="https://tracknexus.com" />
+        <link rel="alternate" hrefLang="en-IN" href="https://tracknexus.com" />
+        <link rel="alternate" hrefLang="x-default" href="https://tracknexus.com" />
 
         {/* JSON-LD Structured Data */}
         <script
@@ -92,6 +102,14 @@ export default function RootLayout({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareApplicationSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(websiteSchema) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(speakableSchema) }}
         />
 
         {/*
@@ -103,9 +121,17 @@ export default function RootLayout({
         />
       </head>
       <body className={`${inter.className} overflow-x-hidden`}>
+        {/* Skip to main content link for accessibility */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-[100] focus:px-4 focus:py-2 focus:bg-cyan-600 focus:text-white focus:rounded-md focus:outline-none focus:ring-2 focus:ring-cyan-400"
+        >
+          Skip to main content
+        </a>
         <CookieConsentProvider>
+          <ScrollToTop />
           <HeaderWrapper />
-          <main>{children}</main>
+          <main id="main-content" role="main" tabIndex={-1}>{children}</main>
           <FooterWrapper />
           <MailButtonWrapper />
           {/* Cookie consent banner is rendered by CookieConsentProvider */}

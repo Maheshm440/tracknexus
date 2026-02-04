@@ -46,13 +46,15 @@ const coreValues = [
     icon: Heart,
     title: "Customer First",
     subtitle: "Your success is our mission",
-    description: "We prioritize customer needs above all else, building solutions that truly solve problems and deliver measurable value. Every decision we make is guided by how it impacts our customers' success.",
-    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&h=600&fit=crop",
+    description: "We prioritize customer needs above all else, building solutions that truly solve problems and deliver measurable value. From product development to customer support, every decision we make is guided by how it impacts our customers' success. We believe that when our customers succeed, we succeed—and this philosophy drives everything we do.",
+    image: "https://images.unsplash.com/photo-1552664730-d307ca884978?w=800&h=600&fit=crop",
     principles: [
-      "Listen actively to customer feedback and act on it",
-      "Deliver exceptional support and service",
-      "Build long-term partnerships, not transactions",
-      "Measure success by customer outcomes"
+      "Listen actively to customer feedback and act on it quickly",
+      "Deliver exceptional 24/7 support with <2 hour response time",
+      "Build long-term partnerships focused on mutual growth",
+      "Measure success by customer outcomes and ROI impact",
+      "Provide transparent pricing with no hidden fees",
+      "Offer comprehensive onboarding and training programs"
     ],
     stats: { metric: "98%", label: "Customer Satisfaction" }
   },
@@ -60,13 +62,15 @@ const coreValues = [
     icon: Lightbulb,
     title: "Innovation & Excellence",
     subtitle: "Pushing boundaries daily",
-    description: "We embrace cutting-edge technology and innovative thinking to stay ahead. Our commitment to excellence drives us to continuously improve our products, processes, and capabilities.",
-    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&h=600&fit=crop",
+    description: "We embrace cutting-edge technology and innovative thinking to stay ahead of industry trends and anticipate customer needs. Our commitment to excellence drives us to continuously improve our products, processes, and capabilities. We invest heavily in R&D and emerging technologies like AI and machine learning to deliver solutions that set industry standards.",
+    image: "https://images.unsplash.com/photo-1677442d019cecc6f63380ff65d995c946b65800?w=800&h=600&fit=crop",
     principles: [
-      "Invest in AI and emerging technologies",
-      "Encourage creative problem-solving",
-      "Maintain highest quality standards",
-      "Never settle for 'good enough'"
+      "Invest 15% of revenue in R&D and emerging technologies",
+      "Encourage creative problem-solving with dedicated innovation time",
+      "Maintain highest quality standards with rigorous testing",
+      "Never ship features without customer validation",
+      "Lead industry standards with thought leadership",
+      "Celebrate learning from failures as much as successes"
     ],
     stats: { metric: "50+", label: "Product Updates/Year" }
   },
@@ -74,13 +78,15 @@ const coreValues = [
     icon: Users,
     title: "Collaboration & Teamwork",
     subtitle: "Together we achieve more",
-    description: "We believe in the power of diverse perspectives and collective intelligence. Our collaborative culture fosters open communication, knowledge sharing, and mutual support across all teams.",
-    image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=800&h=600&fit=crop",
+    description: "We believe in the power of diverse perspectives and collective intelligence. Our collaborative culture fosters open communication, knowledge sharing, and mutual support across all teams. When we work together, we achieve extraordinary results that benefit our customers, our company, and our team members.",
+    image: "https://images.unsplash.com/photo-1557821552-17105176677c?w=800&h=600&fit=crop",
     principles: [
-      "Foster inclusive and diverse teams",
-      "Share knowledge and expertise openly",
-      "Support cross-functional collaboration",
-      "Celebrate team achievements together"
+      "Foster inclusive and diverse teams with equal opportunity",
+      "Share knowledge openly through mentoring and training",
+      "Support cross-functional collaboration with no silos",
+      "Celebrate individual and team achievements equally",
+      "Embrace different work styles and perspectives",
+      "Create psychological safety for honest conversations"
     ],
     stats: { metric: "15+", label: "Countries Represented" }
   },
@@ -88,13 +94,15 @@ const coreValues = [
     icon: Shield,
     title: "Integrity & Trust",
     subtitle: "Doing what's right, always",
-    description: "We operate with unwavering integrity, transparency, and ethical standards. Trust is the foundation of every relationship we build, and we protect it through honest communication and reliable actions.",
-    image: "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=800&h=600&fit=crop",
+    description: "We operate with unwavering integrity, transparency, and ethical standards that go beyond compliance. Trust is the foundation of every relationship we build—with customers, partners, and employees—and we protect it through honest communication, transparent practices, and reliable actions. Our reputation is our most valuable asset.",
+    image: "https://images.unsplash.com/photo-1556761175-b413da4baf72?w=800&h=600&fit=crop",
     principles: [
-      "Be transparent in all communications",
-      "Honor commitments and promises",
-      "Protect customer data rigorously",
-      "Admit mistakes and learn from them"
+      "Be transparent in all communications and decision-making",
+      "Honor commitments and deliver on every promise",
+      "Protect customer data with enterprise-grade security",
+      "Admit mistakes quickly and communicate remediation",
+      "Maintain ethical business practices at all times",
+      "Build trust through consistent, reliable actions"
     ],
     stats: { metric: "100%", label: "Data Security Compliance" }
   },
@@ -102,13 +110,15 @@ const coreValues = [
     icon: Rocket,
     title: "Agility & Growth",
     subtitle: "Adapting to change rapidly",
-    description: "We thrive in dynamic environments by staying agile, embracing change, and continuously learning. Our growth mindset enables us to pivot quickly and seize new opportunities as they emerge.",
-    image: "https://images.unsplash.com/photo-1559136555-9303baea8ebd?w=800&h=600&fit=crop",
+    description: "We thrive in dynamic environments by staying agile, embracing change, and continuously learning. Our growth mindset enables us to pivot quickly and seize new opportunities as they emerge. We combine quick decision-making with strategic thinking to ensure sustainable growth that benefits all stakeholders.",
+    image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=800&h=600&fit=crop",
     principles: [
-      "Respond quickly to market changes",
-      "Encourage continuous learning",
-      "Experiment and iterate rapidly",
-      "Scale efficiently and sustainably"
+      "Respond quickly to market changes with adaptive strategies",
+      "Encourage continuous learning through training and development",
+      "Experiment and iterate rapidly with customer feedback loops",
+      "Scale efficiently without compromising quality or culture",
+      "Stay ahead of market trends through research and innovation",
+      "Empower teams to make decisions and take calculated risks"
     ],
     stats: { metric: "3x", label: "Growth Year-over-Year" }
   },
@@ -116,13 +126,15 @@ const coreValues = [
     icon: Globe,
     title: "Social Responsibility",
     subtitle: "Making a positive impact",
-    description: "We are committed to making a positive impact on society and the environment. Our business practices reflect our dedication to sustainability, diversity, and giving back to communities worldwide.",
-    image: "https://images.unsplash.com/photo-1532629345422-7515f3d16bb6?w=800&h=600&fit=crop",
+    description: "We are committed to making a positive impact on society and the environment. Our business practices reflect our dedication to sustainability, diversity, and giving back to communities worldwide. We believe companies have a responsibility to be forces for good—economically, socially, and environmentally.",
+    image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop",
     principles: [
-      "Reduce environmental footprint",
-      "Support diversity and inclusion initiatives",
-      "Give back to local communities",
-      "Partner with ethical suppliers"
+      "Achieve carbon neutrality by 2025 and net-zero by 2030",
+      "Support diversity and inclusion with 50% diverse hiring goals",
+      "Donate 1% of profits to education programs worldwide",
+      "Partner exclusively with ethical suppliers and vendors",
+      "Provide paid volunteer time for community service",
+      "Ensure equal pay and opportunities for all employees"
     ],
     stats: { metric: "Carbon", label: "Neutral by 2025" }
   },

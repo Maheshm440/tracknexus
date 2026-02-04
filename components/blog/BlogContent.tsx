@@ -55,7 +55,7 @@ const components = {
   img: (props: React.ImgHTMLAttributes<HTMLImageElement>) => (
     <span className="block my-6">
       <Image
-        src={props.src || ''}
+        src={typeof props.src === 'string' ? props.src : ''}
         alt={props.alt || ''}
         width={800}
         height={400}

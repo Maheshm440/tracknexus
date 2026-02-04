@@ -38,36 +38,20 @@ export function ProductCard({ category, index }: ProductCardProps) {
           }} />
         </div>
 
-        {/* Floating Orb - Cyan Theme */}
-        <motion.div
-          className="absolute top-6 right-6 w-32 h-32 bg-deloitte-green/0 group-hover:bg-deloitte-green/10 rounded-full blur-2xl transition-all duration-700"
-          animate={{
-            scale: [1, 1.2, 1],
-            opacity: [0.3, 0.5, 0.3],
-          }}
-          transition={{
-            duration: 4,
-            repeat: Infinity,
-            ease: "easeInOut",
-          }}
-        />
+        {/* Floating Orb - Cyan Theme (static, animated on hover only via CSS) */}
+        <div className="absolute top-6 right-6 w-32 h-32 bg-deloitte-green/0 group-hover:bg-deloitte-green/10 rounded-full blur-2xl transition-all duration-700" />
 
         {/* Content */}
         <div className="relative p-4 lg:p-5 flex flex-col flex-1">
           {/* Header */}
           <div className="flex items-start justify-between mb-3 flex-shrink-0">
-            {/* Icon with Enhanced Hover */}
-            <motion.div
-              whileHover={{ rotate: [0, -5, 5, -5, 0], scale: 1.1 }}
-              transition={{ duration: 0.5 }}
-              className="relative flex-shrink-0"
-              style={{ willChange: 'transform' }}
-            >
+            {/* Icon with Simplified Hover */}
+            <div className="relative flex-shrink-0">
               <div className="absolute inset-0 bg-deloitte-green/20 rounded-xl blur-lg opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-              <div className="relative p-2 rounded-xl bg-gradient-to-br from-deloitte-green to-deloitte-green-dark shadow-lg group-hover:shadow-xl group-hover:shadow-deloitte-green/50 transition-all duration-500">
+              <div className="relative p-2 rounded-xl bg-gradient-to-br from-deloitte-green to-deloitte-green-dark shadow-lg group-hover:shadow-xl group-hover:shadow-deloitte-green/50 group-hover:scale-110 transition-all duration-500">
                 <Icon className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
               </div>
-            </motion.div>
+            </div>
 
             {/* Glassmorphic Badge */}
             <motion.div
@@ -139,32 +123,17 @@ export function ProductCard({ category, index }: ProductCardProps) {
           </div>
         </div>
 
-        {/* Enhanced Shine Effect */}
+        {/* Simplified Shine Effect (CSS only) */}
         <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none">
-          <motion.div
-            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12"
-            initial={{ x: '-200%' }}
-            whileHover={{ x: '200%' }}
-            transition={{ duration: 0.8, ease: "easeInOut" }}
-          />
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -skew-x-12" />
         </div>
 
         {/* Corner Accent */}
         <div className="absolute top-0 right-0 w-32 h-32 bg-gradient-to-br from-deloitte-green/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 rounded-bl-full" />
       </div>
 
-      {/* Animated Bottom Glow - contained within card */}
-      <motion.div
-        className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-deloitte-green/0 group-hover:bg-deloitte-green/30 rounded-full blur-2xl transition-all duration-700"
-        animate={{
-          scaleX: [1, 1.1, 1],
-        }}
-        transition={{
-          duration: 2,
-          repeat: Infinity,
-          ease: "easeInOut",
-        }}
-      />
+      {/* Bottom Glow - static, animated on hover only via CSS */}
+      <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3/4 h-8 bg-deloitte-green/0 group-hover:bg-deloitte-green/30 rounded-full blur-2xl transition-all duration-700" />
     </motion.div>
   );
 }

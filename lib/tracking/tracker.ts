@@ -78,8 +78,8 @@ class VisitorTracker {
       });
 
       if (response.success) {
-        this.visitorId = response.visitorId;
-        this.sessionId = response.sessionId;
+        this.visitorId = (response.visitorId as string) || null;
+        this.sessionId = (response.sessionId as string) || null;
 
         // Store IDs
         if (this.visitorId) {
@@ -172,7 +172,7 @@ class VisitorTracker {
       });
 
       if (response.success) {
-        this.currentPageViewId = response.pageViewId;
+        this.currentPageViewId = (response.pageViewId as string) || null;
       }
     } catch (error) {
       console.error('Failed to track page view:', error);

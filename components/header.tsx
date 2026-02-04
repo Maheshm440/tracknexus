@@ -203,7 +203,15 @@ export function Header() {
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-4">
-          <Link href="/" className="flex items-center hover:opacity-80 transition-opacity">
+          <Link
+            href="/"
+            className="flex items-center hover:opacity-80 transition-opacity"
+            onClick={() => {
+              if (pathname === '/') {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }
+            }}
+          >
             <LogoWithoutDropdown />
           </Link>
         </div>

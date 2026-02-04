@@ -57,7 +57,7 @@ export async function GET(request: NextRequest) {
       const departments = await prisma.teamMember.groupBy({
         by: ['department'],
       });
-      departmentCount = departments.filter(d => d.department).length;
+      departmentCount = departments.filter((d: { department: string | null }) => d.department).length;
     } catch (dbError) {
       // Database is unavailable, return empty data
       console.log('Database unavailable for team members, returning empty data');

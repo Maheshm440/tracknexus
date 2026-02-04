@@ -210,17 +210,20 @@ export default function BotActivityPage() {
       }
 
       // Transform API data to match BotActivity interface
-      const transformedActivities = data.activities.map((activity: any) => ({
-        id: activity.id,
-        botType: (activity.activityType === 'bot' ? 'scanner' : activity.activityType === 'suspicious' ? 'scraper' : 'monitor') || 'other',
-        userAgent: activity.userAgent || 'Unknown',
-        ipAddress: activity.ipAddress || 'N/A',
-        action: activity.activityType === 'bot' ? 'Scan' : activity.activityType === 'suspicious' ? 'Suspicious' : 'Monitor',
-        endpoint: `/activity/${activity.id}`,
-        timestamp: activity.detectedAt || new Date().toISOString(),
-        requestCount: activity.pageViewCount || 0,
-        blocked: activity.suspicionScore > 50,
-      }));
+      const transformedActivities = data.activities.map((activity: any) => {
+        const botType = activity.activityType === 'bot' ? 'scanner' : (activity.activityType === 'suspicious' ? 'scraper' : 'monitor');
+        return {
+          id: activity.id,
+          botType,
+          userAgent: activity.userAgent || 'Unknown',
+          ipAddress: activity.ipAddress || 'N/A',
+          action: activity.activityType === 'bot' ? 'Scan' : activity.activityType === 'suspicious' ? 'Suspicious' : 'Monitor',
+          endpoint: `/activity/${activity.id}`,
+          timestamp: activity.detectedAt || new Date().toISOString(),
+          requestCount: activity.pageViewCount || 0,
+          blocked: activity.suspicionScore > 50,
+        };
+      });
 
       setBotActivities(transformedActivities);
       setPagination({

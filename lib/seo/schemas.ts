@@ -70,6 +70,18 @@ export const websiteSchema = {
   }
 }
 
+// Speakable schema for voice search optimization (Google Assistant, Alexa, etc.)
+export const speakableSchema = {
+  "@context": "https://schema.org",
+  "@type": "WebPage",
+  "name": "Track Nexus - AI-Powered Time Tracking Software",
+  "speakable": {
+    "@type": "SpeakableSpecification",
+    "cssSelector": ["h1", ".speakable-content", "meta[name='description']"]
+  },
+  "url": "https://tracknexus.com"
+}
+
 // Helper function to generate FAQ schema
 export function generateFAQSchema(faqs: { question: string; answer: string }[]) {
   return {
@@ -122,6 +134,55 @@ export function generateProductSchema(product: {
       "priceCurrency": product.priceCurrency || "USD",
       "availability": "https://schema.org/InStock"
     }
+  }
+}
+
+// Helper function to generate BlogPosting schema for blog articles
+export function generateBlogPostingSchema(post: {
+  title: string
+  description: string
+  slug: string
+  publishedDate: string
+  modifiedDate?: string
+  image: string
+  authorName?: string
+  readTime?: number
+}) {
+  return {
+    "@context": "https://schema.org",
+    "@type": "BlogPosting",
+    "headline": post.title,
+    "description": post.description,
+    "url": `https://tracknexus.com/blog/${post.slug}`,
+    "datePublished": post.publishedDate,
+    "dateModified": post.modifiedDate || post.publishedDate,
+    "image": {
+      "@type": "ImageObject",
+      "url": `https://tracknexus.com${post.image}`,
+      "width": 1200,
+      "height": 630
+    },
+    "author": {
+      "@type": "Person",
+      "name": post.authorName || "Track Nexus Editorial Team"
+    },
+    "publisher": {
+      "@type": "Organization",
+      "name": "Track Nexus",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://tracknexus.com/logo.png",
+        "width": 200,
+        "height": 60
+      }
+    },
+    "mainEntityOfPage": {
+      "@type": "WebPage",
+      "@id": `https://tracknexus.com/blog/${post.slug}`
+    },
+    "timeRequired": post.readTime ? `PT${post.readTime}M` : undefined,
+    "inLanguage": "en-US",
+    "articleSection": "Productivity & Time Tracking"
   }
 }
 

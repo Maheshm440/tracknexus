@@ -1,0 +1,61 @@
+{
+  "name": "Track Nexus - AI-Powered Time Tracking Software",
+  "short_name": "Track Nexus",
+  "description": "Track work hours effortlessly and boost team productivity with AI-powered insights. Perfect for remote, hybrid, and in-office teams.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#096EB6",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "/clock-logo.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/clock-logo.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["business", "productivity", "utilities"],
+  "screenshots": [
+    {
+      "src": "/images/hero-poster.jpg",
+      "sizes": "1200x630",
+      "type": "image/jpeg",
+      "form_factor": "wide"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "short_name": "Dashboard",
+      "description": "View your productivity dashboard",
+      "url": "/dashboard",
+      "icons": [
+        {
+          "src": "/clock-logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Pricing",
+      "short_name": "Pricing",
+      "description": "View pricing plans",
+      "url": "/pricing",
+      "icons": [
+        {
+          "src": "/clock-logo.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ],
+  "related_applications": [],
+  "prefer_related_applications": false
+}

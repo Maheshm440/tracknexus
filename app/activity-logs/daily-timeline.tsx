@@ -40,7 +40,7 @@ export const DailyTimeline = ({
   };
 
   const { text, border, bg } =
-    colorClassMap[color] || colorClassMap["gray-500"];
+    colorClassMap[color as keyof typeof colorClassMap] || colorClassMap["gray-500"];
   const flipClass = reverse ? "scale-x-[-1]" : "";
   const textFlipClass = reverse ? "scale-x-[-1]" : "";
 

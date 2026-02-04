@@ -145,9 +145,6 @@ export default function ContactPage() {
   const [formContext, setFormContext] = useState<FormContext>({ type: 'demo' })
   const [isSubmitting, setIsSubmitting] = useState(false)
 
-  // Debug logging
-  console.log('Popup state:', isContactPopupOpen, 'Context:', formContext)
-
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
     setFormData((prev) => ({
@@ -170,12 +167,6 @@ export default function ContactPage() {
   const handleDemoClick = () => {
     console.log('Demo button clicked')
     setFormContext({ type: 'demo' })
-    setIsContactPopupOpen(true)
-  }
-
-  const handleTrialClick = () => {
-    console.log('Trial button clicked')
-    setFormContext({ type: 'free-trial' })
     setIsContactPopupOpen(true)
   }
 
@@ -289,7 +280,7 @@ export default function ContactPage() {
       </section>
 
       {/* Free Trial & Demo CTA Section */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 px-4 py-20 lg:px-8 lg:py-28">
+      <section className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 px-4 py-12 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-7xl">
           <motion.div className="text-center mb-16" {...fadeInUp}>
             <h2 className="text-4xl lg:text-5xl font-light text-gray-900 mb-6">
@@ -300,230 +291,144 @@ export default function ContactPage() {
             </p>
           </motion.div>
 
-          <div className="grid lg:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-2 gap-6 max-w-4xl mx-auto">
             {/* Free Trial Card */}
             <motion.div
-              className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all relative"
+              className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all"
               {...fadeInUp}
-              onHoverStart={() => {
-                console.log('Hovering over trial card')
-                setFormContext({ type: 'free-trial' })
-                setIsContactPopupOpen(true)
-              }}
-              onHoverEnd={() => {
-                setTimeout(() => setIsContactPopupOpen(false), 2000) // Close after 2 seconds
-              }}
             >
-              <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <Sparkles className="w-6 h-6 text-white" />
+              <div className="bg-gradient-to-r from-green-500 to-emerald-600 p-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white">Start Free Trial</h3>
-                </div>
-                <p className="text-white/90 text-lg">
-                  Get instant access to all features. No credit card required.
-                </p>
-              </div>
-              
-              <div className="p-8">
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-green-600"></div>
-                    </div>
-                    <span className="text-gray-700 font-medium">14-day free trial</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-green-600"></div>
-                    </div>
-                    <span className="text-gray-700 font-medium">All premium features</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-green-600"></div>
-                    </div>
-                    <span className="text-gray-700 font-medium">No setup fees</span>
-                  </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-green-100 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-green-600"></div>
-                    </div>
-                    <span className="text-gray-700 font-medium">Cancel anytime</span>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Start Free Trial</h3>
+                    <p className="text-white/80 text-sm">14 days free, no card required</p>
                   </div>
                 </div>
-              
-              {/* Direct Signup Button */}
-              <div className="mt-6">
-                <button
-                  onClick={() => window.location.href = '/signup'}
-                  className="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-white py-4 px-6 rounded-lg font-semibold hover:from-green-600 hover:to-emerald-700 transition-all flex items-center justify-center gap-2"
-                >
-                  <User className="w-5 h-5" />
-                  Create Free Account
-                </button>
               </div>
-              
-              {/* Inline Trial Form */}
-                <div className="space-y-4">
-                  {/* Test Button */}
-                  <button
-                    onClick={() => {
-                      console.log('Button clicked!')
-                      alert('React onClick works! Forms are functional.')
-                    }}
-                    className="w-full bg-red-600 hover:bg-red-700 text-white py-3 text-sm font-bold rounded-lg transition-colors"
-                  >
-                    TEST BUTTON - Click to verify functionality
-                  </button>
-                  
-                  <form onSubmit={async (e) => {
-                    e.preventDefault()
-                    console.log('Form submission started')
-                    try {
-                      const formData = new FormData(e.currentTarget)
-                      const data = Object.fromEntries(formData)
-                      console.log('Trial form data:', data)
-                      alert(`✅ Free Trial Started!\n\nName: ${data.name}\nEmail: ${data.email}\nCompany: ${data.company}\n\nWe will contact you shortly to set up your trial.`)
-                    } catch (error) {
-                      console.error('Form submission error:', error)
-                      alert('❌ Error submitting form. Please try again.')
-                    }
-                  }} className="space-y-4">
+
+              <div className="p-5">
+                <div className="grid grid-cols-2 gap-2 mb-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                    <span className="text-gray-600">All features</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                    <span className="text-gray-600">No setup fees</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                    <span className="text-gray-600">Cancel anytime</span>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-green-500"></div>
+                    <span className="text-gray-600">Full support</span>
+                  </div>
+                </div>
+
+                <form onSubmit={async (e) => {
+                  e.preventDefault()
+                  const formData = new FormData(e.currentTarget)
+                  const data = Object.fromEntries(formData)
+                  alert(`Free Trial Started!\n\nName: ${data.name}\nEmail: ${data.email}\nCompany: ${data.company}\n\nWe will contact you shortly.`)
+                }} className="space-y-3">
                   <input
                     type="text"
                     name="name"
                     placeholder="Full Name"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                   <input
                     type="email"
                     name="email"
-                    placeholder="Email Address"
+                    placeholder="Work Email"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                   <input
                     type="text"
                     name="company"
                     placeholder="Company Name"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   />
                   <button
                     type="submit"
-                    onClick={(e) => {
-                      e.preventDefault()
-                      console.log('Direct button click')
-                      const name = (e.currentTarget.form?.querySelector('input[name="name"]') as HTMLInputElement)?.value
-                      const email = (e.currentTarget.form?.querySelector('input[name="email"]') as HTMLInputElement)?.value
-                      const company = (e.currentTarget.form?.querySelector('input[name="company"]') as HTMLInputElement)?.value
-                      
-                      if (name && email && company) {
-                        alert(`✅ Free Trial Started!\n\nName: ${name}\nEmail: ${email}\nCompany: ${company}\n\nWe will contact you shortly to set up your trial.`)
-                      } else {
-                        alert('❌ Please fill in all fields')
-                      }
-                    }}
-                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-4 text-lg font-bold rounded-xl transition-all duration-300 shadow-lg shadow-green-500/25 hover:shadow-green-500/40 flex items-center justify-center gap-2 cursor-pointer relative z-10"
-                    style={{ position: 'relative', zIndex: 10 }}
+                    className="w-full bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white py-2.5 text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
                   >
                     Start Free Trial
-                    <Send className="w-5 h-5" />
+                    <Send className="w-4 h-4" />
                   </button>
                 </form>
-                </div>
               </div>
             </motion.div>
 
-            {/* Watch Demo Card */}
+            {/* Schedule Demo Card */}
             <motion.div
-              className="bg-white rounded-3xl shadow-xl border border-gray-100 overflow-hidden hover:shadow-2xl transition-all relative"
+              className="bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden hover:shadow-xl transition-all"
               {...fadeInUp}
-              transition={{ delay: 0.2 }}
-              onHoverStart={() => {
-                console.log('Hovering over demo card')
-                setFormContext({ type: 'demo' })
-                setIsContactPopupOpen(true)
-              }}
-              onHoverEnd={() => {
-                setTimeout(() => setIsContactPopupOpen(false), 2000) // Close after 2 seconds
-              }}
+              transition={{ delay: 0.1 }}
             >
-              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-8">
-                <div className="flex items-center gap-3 mb-4">
-                  <div className="w-12 h-12 rounded-xl bg-white/20 backdrop-blur-sm flex items-center justify-center">
-                    <Calendar className="w-6 h-6 text-white" />
+              <div className="bg-gradient-to-r from-blue-500 to-indigo-600 p-5">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+                    <Calendar className="w-5 h-5 text-white" />
                   </div>
-                  <h3 className="text-2xl font-bold text-white">Watch Demo</h3>
+                  <div>
+                    <h3 className="text-lg font-bold text-white">Schedule Demo</h3>
+                    <p className="text-white/80 text-sm">30-min personalized tour</p>
+                  </div>
                 </div>
-                <p className="text-white/90 text-lg">
-                  Schedule a personalized demo with our product experts.
-                </p>
               </div>
-              
-              <div className="p-8">
-                <div className="space-y-4 mb-8">
-                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                    </div>
-                    <span className="text-gray-700 font-medium">30-minute personalized tour</span>
+
+              <div className="p-5">
+                <div className="grid grid-cols-2 gap-2 mb-4 text-sm">
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                    <span className="text-gray-600">Live demo</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                    </div>
-                    <span className="text-gray-700 font-medium">Q&A session included</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                    <span className="text-gray-600">Q&A included</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                    </div>
-                    <span className="text-gray-700 font-medium">Custom setup guidance</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                    <span className="text-gray-600">Setup guidance</span>
                   </div>
-                  <div className="flex items-center gap-3">
-                    <div className="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
-                      <div className="w-2 h-2 rounded-full bg-blue-600"></div>
-                    </div>
-                    <span className="text-gray-700 font-medium">Free consultation</span>
+                  <div className="flex items-center gap-2">
+                    <div className="w-1.5 h-1.5 rounded-full bg-blue-500"></div>
+                    <span className="text-gray-600">Free consult</span>
                   </div>
                 </div>
-                
-                {/* Inline Demo Form */}
+
                 <form onSubmit={async (e) => {
                   e.preventDefault()
                   const formData = new FormData(e.currentTarget)
-                  console.log('Demo form submitted:', Object.fromEntries(formData))
-                  alert('Thank you for scheduling a demo! We will contact you shortly to arrange the demo.')
-                }} className="space-y-4">
+                  const data = Object.fromEntries(formData)
+                  alert(`Demo Scheduled!\n\nName: ${data.name}\nEmail: ${data.email}\nTime: ${data.time}\n\nWe will contact you shortly.`)
+                }} className="space-y-3">
                   <input
                     type="text"
                     name="name"
                     placeholder="Full Name"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
                   <input
                     type="email"
                     name="email"
-                    placeholder="Email Address"
+                    placeholder="Work Email"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                   />
-                  <input
-                    type="tel"
-                    name="phone"
-                    placeholder="Phone Number"
+                  <select
+                    name="time"
                     required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  />
-                  <select 
-                    name="time" 
-                    required
-                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent text-gray-600"
                   >
                     <option value="">Select Preferred Time</option>
                     <option value="morning">Morning (9AM - 12PM)</option>
@@ -532,11 +437,10 @@ export default function ContactPage() {
                   </select>
                   <button
                     type="submit"
-                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-4 text-lg font-bold rounded-xl transition-all duration-300 shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 flex items-center justify-center gap-2 cursor-pointer relative z-10"
-                    style={{ position: 'relative', zIndex: 10 }}
+                    className="w-full bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white py-2.5 text-sm font-semibold rounded-lg transition-all flex items-center justify-center gap-2"
                   >
                     Schedule Demo
-                    <Calendar className="w-5 h-5" />
+                    <Calendar className="w-4 h-4" />
                   </button>
                 </form>
               </div>
@@ -546,31 +450,31 @@ export default function ContactPage() {
       </section>
 
       {/* Contact Form Section */}
-      <section className="bg-gray-50 px-4 py-20 lg:px-8 lg:py-28 mt-16">
-        <div className="mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+      <section className="bg-gray-50 px-4 py-6 lg:px-6 lg:py-8">
+        <div className="mx-auto max-w-4xl">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 lg:gap-6 items-center">
             {/* Left - Contact Form */}
             <motion.div
-              className="bg-white rounded-3xl p-8 lg:p-10 shadow-xl border border-gray-100"
+              className="bg-white rounded-xl p-4 lg:p-5 shadow-md border border-gray-100"
               {...fadeInUp}
             >
-              <div className="mb-8">
-                <h2 className="text-3xl lg:text-4xl font-light text-gray-900 mb-3">
-                  Let&apos;s start a <span className="text-highlight font-normal">conversation</span>
+              <div className="mb-3">
+                <h2 className="text-lg lg:text-xl font-medium text-gray-900 mb-1">
+                  Let&apos;s start a <span className="text-highlight font-medium">conversation</span>
                 </h2>
-                <p className="text-gray-600">
-                  Fill out the form and our team will get back to you within 24 hours.
+                <p className="text-xs text-gray-600">
+                  Fill out the form and we&apos;ll get back to you within 24 hours.
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} className="space-y-5">
+              <form onSubmit={handleSubmit} className="space-y-3">
                 {/* Name Field */}
                 <div>
-                  <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="name" className="block text-xs font-medium text-gray-700 mb-1">
                     Full Name
                   </label>
                   <div className="relative">
-                    <User className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <User className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
                     <input
                       type="text"
                       id="name"
@@ -578,7 +482,7 @@ export default function ContactPage() {
                       value={formData.name}
                       onChange={handleInputChange}
                       placeholder="John Doe"
-                      className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-highlight focus:border-transparent focus:bg-white transition-all duration-200"
+                      className="w-full pl-8 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-md focus:ring-2 focus:ring-highlight focus:border-transparent focus:bg-white transition-all duration-200"
                       required
                     />
                   </div>
@@ -586,11 +490,11 @@ export default function ContactPage() {
 
                 {/* Email Field */}
                 <div>
-                  <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="email" className="block text-xs font-medium text-gray-700 mb-1">
                     Work Email
                   </label>
                   <div className="relative">
-                    <Mail className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Mail className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
                     <input
                       type="email"
                       id="email"
@@ -598,7 +502,7 @@ export default function ContactPage() {
                       value={formData.email}
                       onChange={handleInputChange}
                       placeholder="john@company.com"
-                      className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-highlight focus:border-transparent focus:bg-white transition-all duration-200"
+                      className="w-full pl-8 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-md focus:ring-2 focus:ring-highlight focus:border-transparent focus:bg-white transition-all duration-200"
                       required
                     />
                   </div>
@@ -606,11 +510,11 @@ export default function ContactPage() {
 
                 {/* Company Field */}
                 <div>
-                  <label htmlFor="company" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="company" className="block text-xs font-medium text-gray-700 mb-1">
                     Company Name
                   </label>
                   <div className="relative">
-                    <Building2 className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
+                    <Building2 className="absolute left-2.5 top-1/2 transform -translate-y-1/2 w-3.5 h-3.5 text-gray-400" />
                     <input
                       type="text"
                       id="company"
@@ -618,26 +522,26 @@ export default function ContactPage() {
                       value={formData.company}
                       onChange={handleInputChange}
                       placeholder="Your Company"
-                      className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-highlight focus:border-transparent focus:bg-white transition-all duration-200"
+                      className="w-full pl-8 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-md focus:ring-2 focus:ring-highlight focus:border-transparent focus:bg-white transition-all duration-200"
                     />
                   </div>
                 </div>
 
                 {/* Message Field */}
                 <div>
-                  <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                  <label htmlFor="message" className="block text-xs font-medium text-gray-700 mb-1">
                     Message
                   </label>
                   <div className="relative">
-                    <MessageSquare className="absolute left-4 top-4 w-5 h-5 text-gray-400" />
+                    <MessageSquare className="absolute left-2.5 top-2.5 w-3.5 h-3.5 text-gray-400" />
                     <textarea
                       id="message"
                       name="message"
                       value={formData.message}
                       onChange={handleInputChange}
                       placeholder="Tell us about your needs..."
-                      rows={4}
-                      className="w-full pl-12 pr-4 py-3.5 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all duration-200 resize-none"
+                      rows={2}
+                      className="w-full pl-8 pr-3 py-2 text-sm bg-gray-50 border border-gray-200 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-transparent focus:bg-white transition-all duration-200 resize-none"
                     />
                   </div>
                 </div>
@@ -647,17 +551,17 @@ export default function ContactPage() {
                   <Button
                     type="submit"
                     disabled={isSubmitting}
-                    className="w-full bg-highlight hover:bg-highlight/90 text-white py-4 text-lg font-bold rounded-xl transition-all duration-300 shadow-lg shadow-highlight/25 hover:shadow-highlight/40 flex items-center justify-center gap-2"
+                    className="w-full bg-highlight hover:bg-highlight/90 text-white py-2 text-sm font-semibold rounded-md transition-all duration-300 shadow-md shadow-highlight/25 hover:shadow-highlight/40 flex items-center justify-center gap-2"
                   >
                     {isSubmitting ? (
                       <>
-                        <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+                        <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                         Sending...
                       </>
                     ) : (
                       <>
                         Send Message
-                        <Send className="w-5 h-5" />
+                        <Send className="w-4 h-4" />
                       </>
                     )}
                   </Button>
@@ -667,7 +571,7 @@ export default function ContactPage() {
 
             {/* Right - Image */}
             <motion.div
-              className="relative h-[500px] lg:h-full min-h-[400px] rounded-3xl overflow-hidden"
+              className="relative h-[250px] lg:h-full min-h-[220px] rounded-xl overflow-hidden"
               initial={{ opacity: 0, x: 40 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -683,21 +587,21 @@ export default function ContactPage() {
 
               {/* Floating Card */}
               <motion.div
-                className="absolute bottom-8 left-8 right-8 bg-white/95 backdrop-blur-sm rounded-2xl p-6 shadow-xl"
+                className="absolute bottom-3 left-3 right-3 bg-white/95 backdrop-blur-sm rounded-lg p-2.5 shadow-md"
                 initial={{ opacity: 0, y: 20 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.6, delay: 0.5 }}
               >
-                <div className="flex items-center gap-4">
-                  <div className="flex -space-x-3">
-                    <div className="w-10 h-10 rounded-full bg-highlight flex items-center justify-center text-white font-medium text-sm border-2 border-white">JD</div>
-                    <div className="w-10 h-10 rounded-full bg-highlight flex items-center justify-center text-white font-medium text-sm border-2 border-white">SK</div>
-                    <div className="w-10 h-10 rounded-full bg-highlight flex items-center justify-center text-white font-medium text-sm border-2 border-white">MR</div>
+                <div className="flex items-center gap-2">
+                  <div className="flex -space-x-1.5">
+                    <div className="w-6 h-6 rounded-full bg-highlight flex items-center justify-center text-white font-medium text-[10px] border border-white">JD</div>
+                    <div className="w-6 h-6 rounded-full bg-highlight flex items-center justify-center text-white font-medium text-[10px] border border-white">SK</div>
+                    <div className="w-6 h-6 rounded-full bg-highlight flex items-center justify-center text-white font-medium text-[10px] border border-white">MR</div>
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">Join 500+ companies</p>
-                    <p className="text-sm text-gray-500">Already using Track Nexus</p>
+                    <p className="font-semibold text-gray-900 text-xs">Join 500+ companies</p>
+                    <p className="text-[10px] text-gray-500">Already using Track Nexus</p>
                   </div>
                 </div>
               </motion.div>
@@ -707,7 +611,7 @@ export default function ContactPage() {
       </section>
 
       {/* Office Locations Section */}
-      <section className="bg-white px-4 py-20 lg:px-8 lg:py-28">
+      <section className="bg-white px-4 py-10 lg:px-8 lg:py-14">
         <div className="mx-auto max-w-7xl">
           <motion.div className="text-center mb-14" {...fadeInUp}>
             <h2 className="text-3xl lg:text-4xl font-light text-gray-900 mb-4">
@@ -746,7 +650,7 @@ export default function ContactPage() {
       </section>
 
       {/* FAQ Section */}
-      <section className="bg-gradient-to-b from-gray-50 to-white px-4 py-20 lg:px-8 lg:py-28">
+      <section className="bg-gradient-to-b from-gray-50 to-white px-4 py-10 lg:px-8 lg:py-14">
         <div className="mx-auto max-w-4xl">
           <motion.div className="text-center mb-14" {...fadeInUp}>
             <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 bg-highlight/10 border border-highlight/30 rounded-full">

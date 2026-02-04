@@ -1,103 +1,180 @@
-import { Metadata } from 'next';
-import { getAllPosts, getRecentPosts, getAllTags } from '@/lib/blog/utils';
-import { getAllCategories } from '@/content/blog/categories';
-import { BlogCard, BlogSidebar } from '@/components/blog';
+"use client"
 
-export const metadata: Metadata = {
-  title: 'Blog | TrackNexus - Time Tracking & Productivity Insights',
-  description:
-    'Discover expert insights on time tracking, productivity, remote work, and employee management. Stay updated with the latest tips and best practices.',
-  openGraph: {
-    title: 'Blog | TrackNexus - Time Tracking & Productivity Insights',
-    description:
-      'Discover expert insights on time tracking, productivity, remote work, and employee management.',
-    type: 'website',
-  },
-};
+import { useState, useMemo } from "react"
+import { motion } from "framer-motion"
+import Link from "next/link"
+import Image from "next/image"
+import { Calendar, Clock, ArrowRight, TrendingUp } from "lucide-react"
+import { allBlogPosts } from "@/lib/blog-data"
+
+const categories = ["All", "Productivity", "Time Management", "Privacy"]
 
 export default function BlogPage() {
-  const posts = getAllPosts();
-  const categories = getAllCategories();
-  const recentPosts = getRecentPosts(5);
-  const tags = getAllTags();
+  const [activeCategory, setActiveCategory] = useState("All")
 
-  const featuredPost = posts.find((post) => post.featured) || posts[0];
-  const regularPosts = posts.filter((post) => post.slug !== featuredPost?.slug);
+  const posts = useMemo(
+    () =>
+      Object.values(allBlogPosts).sort(
+        (a, b) =>
+          new Date(b.publishedDate).getTime() -
+          new Date(a.publishedDate).getTime()
+      ),
+    []
+  )
+
+  const filteredPosts = useMemo(() => {
+    if (activeCategory === "All") {
+      return posts
+    }
+    // Map category names for filtering
+    const categoryMap: Record<string, string[]> = {
+      "Productivity": ["Productivity Tools", "Software Solutions", "Automation"],
+      "Time Management": ["Time Tracking", "Team Management"],
+      "Privacy": ["Employee Management", "Enterprise Solutions"],
+    }
+    const matchCategories = categoryMap[activeCategory] || []
+    return posts.filter((p) => matchCategories.includes(p.category))
+  }, [posts, activeCategory])
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      {/* Hero Section - Deloitte Style */}
-      <section className="bg-black text-white py-20 lg:py-28">
-        <div className="container mx-auto px-6 lg:px-8">
-          <div className="max-w-4xl mx-auto">
-            <p className="text-sm font-semibold text-cyan-400 uppercase tracking-wider mb-4">
-              Insights & Resources
-            </p>
-            <h1 className="text-hero font-light mb-6">
-              Discover. Learn. Transform.
+    <div className="min-h-screen bg-white">
+      {/* Hero Section */}
+      <section className="relative bg-gradient-to-b from-gray-50 to-white py-16 lg:py-24">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8">
+          <motion.div
+            className="text-center mb-12"
+            initial={{ opacity: 0, y: 40 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+          >
+            <div className="inline-flex items-center gap-2 px-4 py-2 bg-deloitte-green/10 rounded-full mb-6">
+              <TrendingUp className="w-4 h-4 text-deloitte-green" />
+              <span className="text-sm font-semibold text-deloitte-green uppercase tracking-wide">
+                Track Nexus Blog
+              </span>
+            </div>
+            <h1 className="text-4xl lg:text-5xl font-light text-gray-900 mb-6 leading-tight">
+              Insights for
+              <br />
+              <span className="text-deloitte-green font-normal">smarter workforce management</span>
             </h1>
-            <p className="text-xl text-gray-300 leading-relaxed">
-              Expert insights on time tracking, productivity, and workforce management to help your team succeed.
+            <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+              Expert tips, industry trends, and best practices for modern teams
             </p>
-          </div>
+          </motion.div>
+
+          {/* Categories */}
+          <motion.div
+            className="flex flex-wrap justify-center gap-3 mb-12"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.2 }}
+          >
+            {categories.map((category) => (
+              <button
+                key={category}
+                onClick={() => setActiveCategory(category)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                  activeCategory === category
+                    ? "bg-deloitte-green text-white"
+                    : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                }`}
+              >
+                {category}
+              </button>
+            ))}
+          </motion.div>
         </div>
       </section>
 
-      {/* Content */}
-      <section className="py-12">
-        <div className="container mx-auto px-4">
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Main Content */}
-            <div className="lg:col-span-2">
-              {posts.length === 0 ? (
-                <div className="bg-white rounded-xl p-12 text-center shadow-sm border border-gray-100">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                    Coming Soon
-                  </h2>
-                  <p className="text-gray-600">
-                    We&apos;re working on bringing you great content. Check back soon!
-                  </p>
-                </div>
-              ) : (
-                <div className="space-y-8">
-                  {/* Featured Post */}
-                  {featuredPost && (
-                    <div className="mb-8">
-                      <h2 className="text-sm font-semibold text-highlight uppercase tracking-wide mb-4">
-                        Featured Article
-                      </h2>
-                      <BlogCard post={featuredPost} featured />
-                    </div>
-                  )}
-
-                  {/* Regular Posts Grid */}
-                  {regularPosts.length > 0 && (
-                    <>
-                      <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-                        Latest Articles
-                      </h2>
-                      <div className="grid md:grid-cols-2 gap-6">
-                        {regularPosts.map((post) => (
-                          <BlogCard key={post.slug} post={post} />
-                        ))}
+      {/* Blog Posts Grid */}
+      <section className="py-12 lg:py-16">
+        <div className="max-w-7xl mx-auto px-4 lg:px-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {filteredPosts.map((post, index) => (
+              <motion.article
+                key={post.slug}
+                initial={{ opacity: 0, y: 40 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: index * 0.1 }}
+              >
+                <Link href={`/blog/${post.slug}`}>
+                  <div className="group h-full bg-white rounded-xl border border-gray-200 hover:shadow-xl hover:border-deloitte-green/30 transition-all duration-300 overflow-hidden">
+                    {/* Image */}
+                    <div className="relative h-48 overflow-hidden">
+                      <Image
+                        src={post.heroImage}
+                        alt={post.heroImageAlt}
+                        fill
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        unoptimized
+                      />
+                      <div className="absolute top-4 left-4">
+                        <span className="px-3 py-1 bg-deloitte-green text-white text-xs font-semibold rounded-full">
+                          {post.category}
+                        </span>
                       </div>
-                    </>
-                  )}
-                </div>
-              )}
-            </div>
+                    </div>
 
-            {/* Sidebar */}
-            <div className="lg:col-span-1">
-              <BlogSidebar
-                categories={categories}
-                recentPosts={recentPosts}
-                tags={tags}
-              />
-            </div>
+                    {/* Content */}
+                    <div className="p-6">
+                      <h3 className="text-xl font-semibold text-gray-900 mb-3 group-hover:text-deloitte-green transition-colors line-clamp-2">
+                        {post.title}
+                      </h3>
+                      <p className="text-gray-600 mb-4 line-clamp-3 text-sm leading-relaxed">
+                        {post.introduction}
+                      </p>
+
+                      {/* Meta */}
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-200">
+                        <div className="flex items-center gap-4 text-xs text-gray-500">
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3" />
+                            <span>
+                              {new Date(post.publishedDate).toLocaleDateString("en-US", {
+                                month: "long",
+                                day: "numeric",
+                                year: "numeric",
+                              })}
+                            </span>
+                          </div>
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3" />
+                            <span>{post.readTime} min read</span>
+                          </div>
+                        </div>
+                        <ArrowRight className="w-4 h-4 text-deloitte-green group-hover:translate-x-1 transition-transform duration-300" />
+                      </div>
+                    </div>
+                  </div>
+                </Link>
+              </motion.article>
+            ))}
           </div>
         </div>
       </section>
-    </main>
-  );
+
+      {/* CTA Section */}
+      <section className="bg-gray-50 py-16">
+        <div className="max-w-4xl mx-auto px-4 lg:px-8 text-center">
+          <h2 className="text-3xl font-light text-gray-900 mb-4">
+            Stay updated with our latest insights
+          </h2>
+          <p className="text-lg text-gray-600 mb-8">
+            Subscribe to our newsletter for weekly tips and industry trends
+          </p>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+            <input
+              type="email"
+              placeholder="Enter your email"
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-deloitte-green"
+            />
+            <button className="px-6 py-3 bg-deloitte-green text-white rounded-lg font-semibold hover:bg-deloitte-green-dark transition-colors">
+              Subscribe
+            </button>
+          </div>
+        </div>
+      </section>
+    </div>
+  )
 }

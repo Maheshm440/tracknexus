@@ -193,8 +193,8 @@ export default function VisitorsPage() {
 
     fetchData();
 
-    // Set up auto-refresh every 3 seconds to capture new visitor data
-    const interval = setInterval(fetchData, 3000);
+    // Optimized: Refresh every 30 seconds instead of 3 seconds to reduce overhead
+    const interval = setInterval(fetchData, 30000);
     return () => clearInterval(interval);
   }, [activeTab, currentPage]);
 

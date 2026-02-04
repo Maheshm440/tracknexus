@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { Users, TrendingUp, DollarSign, Activity, Clock, CheckCircle, AlertCircle, Plus } from 'lucide-react';
-import VisitorTracker from '@/components/VisitorTracker';
+import { useState, useEffect, useMemo, lazy, Suspense } from 'react';
+import { Users, TrendingUp, Activity, CheckCircle, AlertCircle } from 'lucide-react';
+
+// Lazy load heavy components
+const VisitorTracker = lazy(() => import('@/components/VisitorTracker'));
 
 interface DashboardData {
   overview: {
@@ -59,47 +60,62 @@ export default function DashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
-      console.log('Loading dashboard data...');
+      // Use requestIdleCallback for non-critical data loading
+      const loadData = () => {
+        // Get real data from localStorage - batched read
+        const usersData = localStorage.getItem('tracknexus_users') || '[]';
+        const activitiesData = localStorage.getItem('tracknexus_activities') || '[]';
+        const leadsData = localStorage.getItem('tracknexus_leads') || '[]';
+        const visitorTrackingData = localStorage.getItem('visitor_tracking') || '[]';
 
-      // Get real data from localStorage
-      const usersData = localStorage.getItem('tracknexus_users') || '[]';
-      const users = JSON.parse(usersData);
+        return {
+          users: JSON.parse(usersData),
+          activities: JSON.parse(activitiesData),
+          leads: JSON.parse(leadsData),
+          visitors: JSON.parse(visitorTrackingData)
+        };
+      };
 
-      const activitiesData = localStorage.getItem('tracknexus_activities') || '[]';
-      const activities = JSON.parse(activitiesData);
+      const { users, activities, leads, visitors } = loadData();
 
-      const leadsData = localStorage.getItem('tracknexus_leads') || '[]';
-      const leads = JSON.parse(leadsData);
-
-      const visitorTrackingData = localStorage.getItem('visitor_tracking') || '[]';
-      const visitors = JSON.parse(visitorTrackingData);
-
-      // Calculate stats from real data
+      // Optimized stats calculation - single pass through leads array
       const totalUsers = users.length;
-      const totalLeads = leads.length;
-      const newLeads = leads.filter((l: any) => l.status === 'NEW').length;
-      const convertedLeads = leads.filter((l: any) => l.status === 'CONVERTED').length;
+      const leadStats = leads.reduce((acc: any, lead: any) => {
+        acc.total++;
+        if (lead.status === 'NEW') acc.new++;
+        else if (lead.status === 'CONVERTED') acc.converted++;
+        else if (lead.status === 'CONTACTED') acc.contacted++;
+        else if (lead.status === 'QUALIFIED') acc.qualified++;
+        return acc;
+      }, { total: 0, new: 0, converted: 0, contacted: 0, qualified: 0 });
+
+      const totalLeads = leadStats.total;
+      const newLeads = leadStats.new;
+      const convertedLeads = leadStats.converted;
       const conversionRate = totalLeads > 0 ? ((convertedLeads / totalLeads) * 100).toFixed(1) : '0.0';
 
-      // Visitor stats
-      const totalVisitors = visitors.length;
+      // Optimized visitor stats - single pass
       const today = new Date().toDateString();
-      const todayVisitors = visitors.filter((v: any) =>
-        new Date(v.timestamp).toDateString() === today
-      ).length;
+      const visitorStats = visitors.reduce((acc: any, v: any) => {
+        acc.total++;
+        if (new Date(v.timestamp).toDateString() === today) {
+          acc.today++;
+        }
+        return acc;
+      }, { total: 0, today: 0 });
 
+      const totalVisitors = visitorStats.total;
+      const todayVisitors = visitorStats.today;
       const totalPageViews = visitors.length;
-      const todayPageViews = visitors.filter((v: any) =>
-        new Date(v.timestamp).toDateString() === today
-      ).length;
+      const todayPageViews = visitorStats.today;
       const avgPagesPerVisit = totalVisitors > 0 ? (totalPageViews / totalVisitors).toFixed(2) : '0.00';
 
-      // Get status counts
+      // Status counts from already calculated data
       const leadsByStatus = [
-        { status: 'NEW', _count: leads.filter((l: any) => l.status === 'NEW').length },
-        { status: 'CONTACTED', _count: leads.filter((l: any) => l.status === 'CONTACTED').length },
-        { status: 'QUALIFIED', _count: leads.filter((l: any) => l.status === 'QUALIFIED').length },
-        { status: 'CONVERTED', _count: leads.filter((l: any) => l.status === 'CONVERTED').length }
+        { status: 'NEW', _count: leadStats.new },
+        { status: 'CONTACTED', _count: leadStats.contacted },
+        { status: 'QUALIFIED', _count: leadStats.qualified },
+        { status: 'CONVERTED', _count: leadStats.converted }
       ];
 
       // Get recent items (last 3)
@@ -163,7 +179,8 @@ export default function DashboardPage() {
     }
   };
 
-  const getStatusColor = (status: string) => {
+  // Memoize status color function to avoid recreating on each render
+  const getStatusColor = useMemo(() => (status: string) => {
     switch (status) {
       case 'NEW': return 'bg-blue-100 text-blue-800';
       case 'CONTACTED': return 'bg-yellow-100 text-yellow-800';
@@ -172,16 +189,7 @@ export default function DashboardPage() {
       case 'LOST': return 'bg-red-100 text-red-800';
       default: return 'bg-gray-100 text-gray-800';
     }
-  };
-
-  const getPriorityColor = (priority: string) => {
-    switch (priority) {
-      case 'HIGH': return 'bg-red-100 text-red-800';
-      case 'MEDIUM': return 'bg-yellow-100 text-yellow-800';
-      case 'LOW': return 'bg-green-100 text-green-800';
-      default: return 'bg-gray-100 text-gray-800';
-    }
-  };
+  }, []);
 
   if (!mounted) return null;
 
@@ -205,10 +213,46 @@ export default function DashboardPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading dashboard data...</p>
+      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+        <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex items-center justify-between h-16">
+              <div className="h-8 w-48 bg-gray-200 animate-pulse rounded"></div>
+            </div>
+          </div>
+        </div>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          {/* Skeleton Stats Cards */}
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 animate-pulse">
+                <div className="flex items-center justify-between mb-3">
+                  <div className="h-3 w-20 bg-gray-200 rounded"></div>
+                  <div className="w-8 h-8 rounded-full bg-gray-200"></div>
+                </div>
+                <div className="h-8 w-16 bg-gray-300 rounded"></div>
+              </div>
+            ))}
+          </div>
+          {/* Skeleton Data Sections */}
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+            {[...Array(3)].map((_, i) => (
+              <div key={i} className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 animate-pulse">
+                <div className="h-4 w-32 bg-gray-200 rounded mb-4"></div>
+                <div className="space-y-3">
+                  {[...Array(3)].map((_, j) => (
+                    <div key={j} className="flex items-start gap-3">
+                      <div className="w-8 h-8 rounded-full bg-gray-200 flex-shrink-0"></div>
+                      <div className="flex-1">
+                        <div className="h-3 w-full bg-gray-200 rounded mb-2"></div>
+                        <div className="h-2 w-24 bg-gray-100 rounded"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     );
@@ -216,8 +260,10 @@ export default function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-      {/* Visitor Tracker - invisible component */}
-      <VisitorTracker page="/dashboard" />
+      {/* Visitor Tracker - invisible component with Suspense */}
+      <Suspense fallback={null}>
+        <VisitorTracker page="/dashboard" />
+      </Suspense>
 
       {/* Header */}
       <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-200">
@@ -234,12 +280,7 @@ export default function DashboardPage() {
         {/* Stats Cards - FlowSense Style */}
         <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
           {/* Total Leads */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1 }}
-            className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all"
-          >
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all">
             <div className="flex items-center justify-between mb-3">
               <p className="text-gray-500 text-xs font-medium">Total Leads</p>
               <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
@@ -247,15 +288,10 @@ export default function DashboardPage() {
               </div>
             </div>
             <p className="text-2xl font-bold text-gray-900">{data.overview.totalLeads}</p>
-          </motion.div>
+          </div>
 
           {/* New Leads */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.2 }}
-            className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all"
-          >
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all">
             <div className="flex items-center justify-between mb-3">
               <p className="text-gray-500 text-xs font-medium">New Leads</p>
               <div className="w-8 h-8 rounded-full bg-cyan-100 flex items-center justify-center">
@@ -263,15 +299,10 @@ export default function DashboardPage() {
               </div>
             </div>
             <p className="text-2xl font-bold text-gray-900">{data.overview.newLeads}</p>
-          </motion.div>
+          </div>
 
           {/* Converted */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 }}
-            className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all"
-          >
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all">
             <div className="flex items-center justify-between mb-3">
               <p className="text-gray-500 text-xs font-medium">Won</p>
               <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
@@ -279,13 +310,10 @@ export default function DashboardPage() {
               </div>
             </div>
             <p className="text-2xl font-bold text-gray-900">{data.overview.convertedLeads}</p>
-          </motion.div>
+          </div>
 
           {/* Conversion Rate */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
+          <div
             className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all"
           >
             <div className="flex items-center justify-between mb-3">
@@ -295,13 +323,10 @@ export default function DashboardPage() {
               </div>
             </div>
             <p className="text-2xl font-bold text-gray-900">{data.overview.conversionRate}%</p>
-          </motion.div>
+          </div>
 
           {/* Total Visitors */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.5 }}
+          <div
             className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all"
           >
             <div className="flex items-center justify-between mb-3">
@@ -311,13 +336,10 @@ export default function DashboardPage() {
               </div>
             </div>
             <p className="text-2xl font-bold text-gray-900">{data.overview.totalVisitors}</p>
-          </motion.div>
+          </div>
 
           {/* Page Views */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
+          <div
             className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all"
           >
             <div className="flex items-center justify-between mb-3">
@@ -327,16 +349,13 @@ export default function DashboardPage() {
               </div>
             </div>
             <p className="text-2xl font-bold text-gray-900">{data.overview.totalPageViews}</p>
-          </motion.div>
+          </div>
         </div>
 
         {/* Data Sections */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Recent Leads */}
-          <motion.div
-            initial={{ opacity: 0, x: -20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.5 }}
+          <div
             className="bg-white rounded-lg shadow-sm border border-gray-100 p-4"
           >
             <div className="flex items-center justify-between mb-4">
@@ -361,13 +380,10 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
 
           {/* Recent Activities */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.6 }}
+          <div
             className="bg-white rounded-lg shadow-sm border border-gray-100 p-4"
           >
             <h2 className="text-sm font-bold text-gray-900 mb-4">Recent Activities</h2>
@@ -396,13 +412,10 @@ export default function DashboardPage() {
                 </div>
               )}
             </div>
-          </motion.div>
+          </div>
 
           {/* Recent Visitors */}
-          <motion.div
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: 0.7 }}
+          <div
             className="bg-white rounded-lg shadow-sm border border-gray-100 p-4"
           >
             <h2 className="text-sm font-bold text-gray-900 mb-4">Recent Visitors</h2>
@@ -426,7 +439,7 @@ export default function DashboardPage() {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </div>
         </div>
       </div>
     </div>

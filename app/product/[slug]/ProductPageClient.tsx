@@ -32,27 +32,34 @@ export default function ProductPageClient({ slug }: ProductPageClientProps) {
 
   const Icon = category.icon;
 
-  // Track active section on scroll
+  // Track active section using Intersection Observer (performance optimized)
   useEffect(() => {
     if (category.features.length > 0) {
       setActiveSection(category.features[0].id);
     }
 
-    const handleScroll = () => {
-      const sections = category.features.map(f => document.getElementById(f.id));
-      const scrollPosition = window.scrollY + 200;
-
-      for (let i = sections.length - 1; i >= 0; i--) {
-        const section = sections[i];
-        if (section && section.offsetTop <= scrollPosition) {
-          setActiveSection(category.features[i].id);
-          break;
+    const observerCallback = (entries: IntersectionObserverEntry[]) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting && entry.intersectionRatio > 0.5) {
+          setActiveSection(entry.target.id);
         }
-      }
+      });
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    const observer = new IntersectionObserver(observerCallback, {
+      rootMargin: '-20% 0px -70% 0px',
+      threshold: [0, 0.5, 1]
+    });
+
+    // Observe all feature sections
+    category.features.forEach(feature => {
+      const element = document.getElementById(feature.id);
+      if (element) {
+        observer.observe(element);
+      }
+    });
+
+    return () => observer.disconnect();
   }, [category.features]);
 
   // Smooth scroll to section
@@ -231,10 +238,10 @@ export default function ProductPageClient({ slug }: ProductPageClientProps) {
                     key={feature.id}
                     id={feature.id}
                     className="scroll-mt-24"
-                    initial={{ opacity: 0, x: isEven ? -20 : 20 }}
-                    whileInView={{ opacity: 1, x: 0 }}
-                    viewport={{ once: true, margin: "-50px" }}
-                    transition={{ duration: 0.5, delay: index * 0.05 }}
+                    initial={{ opacity: 0, y: 10 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true, amount: 0.3 }}
+                    transition={{ duration: 0.3 }}
                   >
                     {/* Modern Feature Card with Gradient Accent */}
                     <div className="group relative bg-white border border-gray-200 rounded-xl hover:border-deloitte-green/40 hover:shadow-xl transition-all duration-300 overflow-hidden">

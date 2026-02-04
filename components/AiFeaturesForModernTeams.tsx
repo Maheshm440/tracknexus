@@ -227,8 +227,8 @@ export default function AiFeaturesForModernTeams({
 
             {/* Features Grid */}
             <div className="grid grid-cols-2 gap-6">
-              {currentData.features.map((feature, index) =>
-                "href" in feature ? (
+              {currentData.features.map((feature: { title: string; description: string; href?: string }, index: number) =>
+                feature.href ? (
                   <Link
                     onClick={onAnyClick}
                     href={`/${feature.href}`}

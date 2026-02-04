@@ -104,7 +104,7 @@ async function getOverviewAnalytics(dateFilter: { gte: Date; lte: Date }) {
     _count: true,
   });
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     success: true,
     data: {
       visitors: {
@@ -127,6 +127,11 @@ async function getOverviewAnalytics(dateFilter: { gte: Date; lte: Date }) {
       },
     },
   });
+
+  // Cache overview data for 2 minutes
+  response.headers.set('Cache-Control', 'private, max-age=120');
+
+  return response;
 }
 
 async function getGeoAnalytics(dateFilter: { gte: Date; lte: Date }) {
@@ -162,7 +167,7 @@ async function getGeoAnalytics(dateFilter: { gte: Date; lte: Date }) {
     take: 20,
   });
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     success: true,
     data: {
       byCountry: visitorsByCountry.map((item) => ({
@@ -177,6 +182,11 @@ async function getGeoAnalytics(dateFilter: { gte: Date; lte: Date }) {
       })),
     },
   });
+
+  // Cache geo data for 5 minutes
+  response.headers.set('Cache-Control', 'private, max-age=300');
+
+  return response;
 }
 
 async function getPageAnalytics(dateFilter: { gte: Date; lte: Date }) {
@@ -197,7 +207,7 @@ async function getPageAnalytics(dateFilter: { gte: Date; lte: Date }) {
     take: 20,
   });
 
-  return NextResponse.json({
+  const response = NextResponse.json({
     success: true,
     data: {
       topPages: topPages.map((item) => ({
@@ -208,54 +218,83 @@ async function getPageAnalytics(dateFilter: { gte: Date; lte: Date }) {
       })),
     },
   });
+
+  // Cache page analytics for 5 minutes
+  response.headers.set('Cache-Control', 'private, max-age=300');
+
+  return response;
 }
 
 async function getTrendAnalytics(dateFilter: { gte: Date; lte: Date }) {
-  // Group by date
-  const days: Date[] = [];
+  // Optimized: Use parallel aggregated queries instead of per-day queries
+  // This reduces 120+ queries to just 4 queries total
+  const [visitorsByDay, sessionsByDay, pageViewsByDay, leadsByDay] = await Promise.all([
+    // Get all visitors grouped by date in a single query
+    prisma.$queryRaw<Array<{ date: string; count: bigint }>>`
+      SELECT DATE(lastVisit) as date, COUNT(*) as count
+      FROM Visitor
+      WHERE lastVisit >= ${dateFilter.gte} AND lastVisit <= ${dateFilter.lte}
+      GROUP BY DATE(lastVisit)
+      ORDER BY date
+    `,
+    // Get all sessions grouped by date
+    prisma.$queryRaw<Array<{ date: string; count: bigint }>>`
+      SELECT DATE(startTime) as date, COUNT(*) as count
+      FROM Session
+      WHERE startTime >= ${dateFilter.gte} AND startTime <= ${dateFilter.lte}
+      GROUP BY DATE(startTime)
+      ORDER BY date
+    `,
+    // Get all page views grouped by date
+    prisma.$queryRaw<Array<{ date: string; count: bigint }>>`
+      SELECT DATE(timestamp) as date, COUNT(*) as count
+      FROM PageView
+      WHERE timestamp >= ${dateFilter.gte} AND timestamp <= ${dateFilter.lte}
+      GROUP BY DATE(timestamp)
+      ORDER BY date
+    `,
+    // Get all leads grouped by date
+    prisma.$queryRaw<Array<{ date: string; count: bigint }>>`
+      SELECT DATE(createdAt) as date, COUNT(*) as count
+      FROM Lead
+      WHERE createdAt >= ${dateFilter.gte} AND createdAt <= ${dateFilter.lte}
+      GROUP BY DATE(createdAt)
+      ORDER BY date
+    `,
+  ]);
+
+  // Create lookup maps for O(1) access
+  const visitorsMap = new Map(visitorsByDay.map(v => [v.date, Number(v.count)]));
+  const sessionsMap = new Map(sessionsByDay.map(s => [s.date, Number(s.count)]));
+  const pageViewsMap = new Map(pageViewsByDay.map(p => [p.date, Number(p.count)]));
+  const leadsMap = new Map(leadsByDay.map(l => [l.date, Number(l.count)]));
+
+  // Generate all dates in range and merge with data
+  const days: string[] = [];
   const current = new Date(dateFilter.gte);
   while (current <= dateFilter.lte) {
-    days.push(new Date(current));
+    days.push(current.toISOString().split('T')[0]);
     current.setDate(current.getDate() + 1);
   }
 
-  // Get daily stats
-  const dailyStats = await Promise.all(
-    days.map(async (day) => {
-      const dayStart = new Date(day);
-      dayStart.setHours(0, 0, 0, 0);
-      const dayEnd = new Date(day);
-      dayEnd.setHours(23, 59, 59, 999);
+  const dailyStats = days.map(date => ({
+    date,
+    visitors: visitorsMap.get(date) || 0,
+    sessions: sessionsMap.get(date) || 0,
+    pageViews: pageViewsMap.get(date) || 0,
+    leads: leadsMap.get(date) || 0,
+  }));
 
-      const [visitors, sessions, pageViews, leads] = await Promise.all([
-        prisma.visitor.count({
-          where: { lastVisit: { gte: dayStart, lte: dayEnd } },
-        }),
-        prisma.session.count({
-          where: { startTime: { gte: dayStart, lte: dayEnd } },
-        }),
-        prisma.pageView.count({
-          where: { timestamp: { gte: dayStart, lte: dayEnd } },
-        }),
-        prisma.lead.count({
-          where: { createdAt: { gte: dayStart, lte: dayEnd } },
-        }),
-      ]);
-
-      return {
-        date: day.toISOString().split('T')[0],
-        visitors,
-        sessions,
-        pageViews,
-        leads,
-      };
-    })
-  );
-
-  return NextResponse.json({
+  // Add cache headers for better performance
+  const response = NextResponse.json({
     success: true,
     data: {
       daily: dailyStats,
     },
   });
+
+  // Cache for 5 minutes since analytics data doesn't need real-time updates
+  response.headers.set('Cache-Control', 'private, max-age=300');
+
+  return response;
 }

@@ -12,7 +12,6 @@ import {
   Globe,
   CheckCircle,
   ArrowRight,
-  Play,
   Sparkles,
   TrendingUp,
   Target,
@@ -64,46 +63,20 @@ export function AIPoweredAnalyticsSection() {
 
   return (
     <section ref={containerRef} className="py-16 lg:py-20 bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 relative overflow-hidden">
-      {/* Animated Background */}
+      {/* Static Background - No animations for better performance */}
       <div className="absolute inset-0">
-        <motion.div
-          animate={{ scale: [1, 1.2, 1], opacity: [0.3, 0.5, 0.3] }}
-          transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/20 rounded-full blur-[120px]"
-        />
-        <motion.div
-          animate={{ scale: [1.2, 1, 1.2], opacity: [0.5, 0.3, 0.5] }}
-          transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-[120px]"
-        />
-
-        {/* Floating particles */}
-        {[...Array(20)].map((_, i) => {
-          const left = ((i * 17 + 5) % 100);
-          const top = ((i * 23 + 10) % 100);
-          const duration = 3 + (i % 3);
-          const delay = (i % 5) * 0.4;
-
-          return (
-            <motion.div
-              key={i}
-              className="absolute w-1 h-1 bg-white/30 rounded-full"
-              style={{ left: `${left}%`, top: `${top}%` }}
-              animate={{ y: [0, -30, 0], opacity: [0.3, 0.8, 0.3] }}
-              transition={{ duration, repeat: Infinity, delay }}
-            />
-          );
-        })}
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-violet-500/20 rounded-full blur-[120px]" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-[120px]" />
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Left Content */}
           <motion.div
-            initial={{ opacity: 0, x: -60 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.4 }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-violet-500/20 to-cyan-500/20 rounded-full mb-6 border border-white/10">
               <Sparkles className="w-4 h-4 text-violet-400" />
@@ -128,10 +101,10 @@ export function AIPoweredAnalyticsSection() {
               {features.map((feature, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, delay: 0.3 + index * 0.1 }}
+                  viewport={{ once: true, margin: "-20px" }}
+                  transition={{ duration: 0.3, delay: index * 0.05 }}
                   className="group flex items-start gap-4 p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-300"
                 >
                   <div className={`w-12 h-12 rounded-xl bg-gradient-to-r ${feature.color} flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-transform duration-300`}>
@@ -148,10 +121,10 @@ export function AIPoweredAnalyticsSection() {
 
           {/* Right - Dashboard Visual */}
           <motion.div
-            initial={{ opacity: 0, x: 60 }}
+            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8, delay: 0.2 }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.4 }}
             className="relative"
           >
             {/* Dashboard Preview Container */}
@@ -186,10 +159,10 @@ export function AIPoweredAnalyticsSection() {
                     ].map((stat, i) => (
                       <motion.div
                         key={i}
-                        initial={{ opacity: 0, y: 20 }}
+                        initial={{ opacity: 0, y: 10 }}
                         whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: 0.6 + i * 0.1 }}
+                        viewport={{ once: true, margin: "-20px" }}
+                        transition={{ duration: 0.3, delay: i * 0.05 }}
                         className="bg-white/5 rounded-xl p-4 text-center border border-white/10"
                       >
                         <div className={`text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r ${stat.color}`}>{stat.value}</div>
@@ -206,8 +179,8 @@ export function AIPoweredAnalyticsSection() {
                           key={i}
                           initial={{ height: 0 }}
                           whileInView={{ height: `${height}%` }}
-                          viewport={{ once: true }}
-                          transition={{ delay: 0.8 + i * 0.05, duration: 0.5 }}
+                          viewport={{ once: true, margin: "-20px" }}
+                          transition={{ delay: i * 0.02, duration: 0.3 }}
                           className="flex-1 bg-gradient-to-t from-cyan-500 to-emerald-500 rounded-t-sm"
                         />
                       ))}
@@ -217,12 +190,8 @@ export function AIPoweredAnalyticsSection() {
               </div>
             </div>
 
-            {/* Floating Elements */}
-            <motion.div
-              animate={{ y: [0, -10, 0] }}
-              transition={{ duration: 3, repeat: Infinity }}
-              className="absolute -top-6 -right-6 bg-white rounded-2xl p-4 shadow-xl"
-            >
+            {/* Static Floating Elements - No infinite animations */}
+            <div className="absolute -top-6 -right-6 bg-white rounded-2xl p-4 shadow-xl">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 flex items-center justify-center">
                   <TrendingUp className="w-5 h-5 text-white" />
@@ -232,13 +201,9 @@ export function AIPoweredAnalyticsSection() {
                   <div className="text-xs text-gray-500">Productivity</div>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
-            <motion.div
-              animate={{ y: [0, 10, 0] }}
-              transition={{ duration: 4, repeat: Infinity }}
-              className="absolute -bottom-6 -left-6 bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl p-4 shadow-xl"
-            >
+            <div className="absolute -bottom-6 -left-6 bg-gradient-to-r from-violet-600 to-purple-600 rounded-2xl p-4 shadow-xl">
               <div className="flex items-center gap-3">
                 <Activity className="w-8 h-8 text-white" />
                 <div>
@@ -246,7 +211,7 @@ export function AIPoweredAnalyticsSection() {
                   <div className="text-xs text-white/70">Real-time sync</div>
                 </div>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>
@@ -312,9 +277,10 @@ export function FeatureShowcaseSection() {
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.3 }}
           className="text-center mb-10"
         >
           <div className="inline-flex items-center gap-2 px-3.5 py-2 bg-emerald-500/10 rounded-full mb-5">
@@ -341,10 +307,10 @@ export function FeatureShowcaseSection() {
             {features.map((feature, index) => (
               <motion.div
                 key={feature.id}
-                initial={{ opacity: 0, x: -40 }}
+                initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1 }}
+                viewport={{ once: true, margin: "-20px" }}
+                transition={{ duration: 0.25, delay: index * 0.03 }}
                 onMouseEnter={() => setActiveFeature(index)}
                 className={`cursor-pointer p-3.5 rounded-lg border-2 transition-all duration-300 ${
                   activeFeature === index
@@ -390,19 +356,23 @@ export function FeatureShowcaseSection() {
             className="relative"
           >
             <div className={`absolute -inset-2 bg-gradient-to-r ${features[activeFeature].gradient} rounded-2xl blur-xl opacity-20`} />
-            <div className="relative rounded-2xl overflow-hidden shadow-xl border border-gray-200">
+            <div className="relative rounded-2xl overflow-hidden shadow-xl border border-gray-200 aspect-[4/3] bg-gradient-to-br from-slate-100 to-slate-200">
               {/* Feature Image */}
-              <Image
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
                 src={features[activeFeature].image}
                 alt={features[activeFeature].title}
-                width={320}
-                height={230}
-                className="w-full h-auto"
+                className="absolute inset-0 w-full h-full object-cover z-10"
+                onError={(e) => {
+                  console.error('Image failed to load:', features[activeFeature].image);
+                  e.currentTarget.style.display = 'none';
+                }}
+                onLoad={() => console.log('Image loaded:', features[activeFeature].image)}
               />
 
               {/* Overlay with Stats */}
-              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-              <div className="absolute bottom-0 left-0 right-0 p-5">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent z-20" />
+              <div className="absolute bottom-0 left-0 right-0 p-5 z-30">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3.5">
                     <motion.div
@@ -462,9 +432,10 @@ export function MultiPlatformSection() {
         <div className="grid lg:grid-cols-2 gap-12 items-center">
           {/* Image Side */}
           <motion.div
-            initial={{ opacity: 0, x: -60 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.4 }}
             className="relative"
           >
             <div className="relative">
@@ -475,38 +446,32 @@ export function MultiPlatformSection() {
                 width={400}
                 height={300}
                 className="rounded-xl shadow-xl"
+                unoptimized
               />
 
-              {/* Floating device cards */}
-              <motion.div
-                animate={{ y: [0, -10, 0] }}
-                transition={{ duration: 4, repeat: Infinity }}
-                className="absolute -top-4 -right-4 bg-white rounded-xl p-3 shadow-lg border border-gray-100"
-              >
+              {/* Static device cards - No infinite animations */}
+              <div className="absolute -top-4 -right-4 bg-white rounded-xl p-3 shadow-lg border border-gray-100">
                 <div className="flex items-center gap-2">
                   <Smartphone className="w-5 h-5 text-cyan-600" />
                   <span className="text-sm font-medium text-gray-700">Mobile App</span>
                 </div>
-              </motion.div>
+              </div>
 
-              <motion.div
-                animate={{ y: [0, 10, 0] }}
-                transition={{ duration: 5, repeat: Infinity }}
-                className="absolute -bottom-4 -left-4 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl p-3 shadow-lg"
-              >
+              <div className="absolute -bottom-4 -left-4 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-xl p-3 shadow-lg">
                 <div className="flex items-center gap-2">
                   <Cloud className="w-5 h-5 text-white" />
                   <span className="text-sm font-medium text-white">Cloud Sync</span>
                 </div>
-              </motion.div>
+              </div>
             </div>
           </motion.div>
 
           {/* Content Side */}
           <motion.div
-            initial={{ opacity: 0, x: 60 }}
+            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.4 }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 rounded-full mb-6">
               <Layers className="w-4 h-4 text-cyan-600" />
@@ -531,12 +496,11 @@ export function MultiPlatformSection() {
               {platforms.map((platform, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
-                  whileHover={{ y: -5 }}
-                  className="bg-white rounded-lg p-3 shadow-md border border-gray-100 hover:border-cyan-300 transition-all"
+                  viewport={{ once: true, margin: "-20px" }}
+                  transition={{ duration: 0.25, delay: index * 0.03 }}
+                  className="bg-white rounded-lg p-3 shadow-md border border-gray-100 hover:border-cyan-300 hover:-translate-y-1 transition-all"
                 >
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-cyan-500 to-emerald-500 flex items-center justify-center mb-3">
                     <platform.icon className="w-5 h-5 text-white" />
@@ -588,9 +552,10 @@ export function SecuritySection() {
         <div className="grid lg:grid-cols-2 gap-16 items-center">
           {/* Content */}
           <motion.div
-            initial={{ opacity: 0, x: -60 }}
+            initial={{ opacity: 0, x: -30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.4 }}
           >
             <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-500/20 rounded-full mb-6 border border-blue-500/30">
               <Shield className="w-4 h-4 text-blue-400" />
@@ -615,10 +580,10 @@ export function SecuritySection() {
               {securityFeatures.map((feature, index) => (
                 <motion.div
                   key={index}
-                  initial={{ opacity: 0, y: 20 }}
+                  initial={{ opacity: 0, y: 10 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: index * 0.1 }}
+                  viewport={{ once: true, margin: "-20px" }}
+                  transition={{ duration: 0.25, delay: index * 0.03 }}
                   className="bg-white/5 backdrop-blur-sm rounded-lg p-4 border border-white/10 hover:border-blue-500/50 transition-all"
                 >
                   <div className="w-10 h-10 rounded-lg bg-gradient-to-r from-blue-500 to-cyan-500 flex items-center justify-center mb-3">
@@ -633,9 +598,10 @@ export function SecuritySection() {
 
           {/* Visual */}
           <motion.div
-            initial={{ opacity: 0, x: 60 }}
+            initial={{ opacity: 0, x: 30 }}
             whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
+            viewport={{ once: true, margin: "-50px" }}
+            transition={{ duration: 0.4 }}
             className="relative"
           >
             <div className="relative rounded-3xl overflow-hidden">
@@ -645,6 +611,7 @@ export function SecuritySection() {
                 width={400}
                 height={300}
                 className="rounded-2xl shadow-xl"
+                unoptimized
               />
 
               {/* Security Badge Overlay */}
@@ -661,17 +628,13 @@ export function SecuritySection() {
               </div>
             </div>
 
-            {/* Floating Trust Badges */}
-            <motion.div
-              animate={{ rotate: [0, 5, -5, 0] }}
-              transition={{ duration: 6, repeat: Infinity }}
-              className="absolute -top-4 -right-4 bg-white rounded-xl p-3 shadow-xl"
-            >
+            {/* Static Trust Badge - No infinite animations */}
+            <div className="absolute -top-4 -right-4 bg-white rounded-xl p-3 shadow-xl">
               <div className="flex items-center gap-2">
                 <Award className="w-6 h-6 text-amber-500" />
                 <span className="font-bold text-gray-900">SOC 2</span>
               </div>
-            </motion.div>
+            </div>
           </motion.div>
         </div>
       </div>
@@ -719,18 +682,12 @@ export function InteractiveStatsSection() {
     <section className="py-12 relative overflow-hidden">
       <div className="absolute inset-0 bg-gradient-to-r from-slate-900 via-blue-900 to-slate-900" />
 
-      {/* Animated Wave Background */}
+      {/* Static Wave Background - No animation for better performance */}
       <div className="absolute inset-0 overflow-hidden">
         <svg className="absolute bottom-0 left-0 w-full" viewBox="0 0 1440 320" preserveAspectRatio="none">
-          <motion.path
+          <path
             fill="rgba(6, 182, 212, 0.1)"
-            animate={{
-              d: [
-                "M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,197.3C960,213,1056,203,1152,176C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z",
-                "M0,192L48,197.3C96,203,192,213,288,192C384,171,480,117,576,122.7C672,128,768,192,864,208C960,224,1056,192,1152,165.3C1248,139,1344,117,1392,106.7L1440,96L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z",
-              ],
-            }}
-            transition={{ duration: 8, repeat: Infinity, repeatType: "reverse" }}
+            d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,197.3C960,213,1056,203,1152,176C1248,149,1344,107,1392,85.3L1440,64L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"
           />
         </svg>
       </div>
@@ -740,12 +697,11 @@ export function InteractiveStatsSection() {
           {stats.map((stat, index) => (
             <motion.div
               key={index}
-              initial={{ opacity: 0, y: 40 }}
+              initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: index * 0.1 }}
-              whileHover={{ y: -10 }}
-              className="text-center group"
+              viewport={{ once: true, margin: "-30px" }}
+              transition={{ duration: 0.3, delay: index * 0.05 }}
+              className="text-center group hover:-translate-y-2 transition-transform"
             >
               <div className={`w-12 h-12 rounded-lg bg-gradient-to-r ${stat.color} flex items-center justify-center mb-3 group-hover:scale-110 transition-transform shadow-lg`}>
                 <stat.icon className="w-6 h-6 text-white" />
@@ -768,19 +724,10 @@ export function InteractiveStatsSection() {
 export function FinalCTASection() {
   return (
     <section className="relative py-16 lg:py-20 overflow-hidden">
-      {/* Gradient Background */}
+      {/* Gradient Background - Static orbs for better performance */}
       <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-blue-900 to-slate-900">
-        {/* Animated Orbs */}
-        <motion.div
-          animate={{ x: [0, 50, 0], y: [0, -30, 0] }}
-          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl"
-        />
-        <motion.div
-          animate={{ x: [0, -50, 0], y: [0, 30, 0] }}
-          transition={{ duration: 20, repeat: Infinity, ease: "easeInOut" }}
-          className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl"
-        />
+        <div className="absolute top-0 left-1/4 w-96 h-96 bg-cyan-500/20 rounded-full blur-3xl" />
+        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-emerald-500/20 rounded-full blur-3xl" />
         {/* Grid Pattern */}
         <div className="absolute inset-0 opacity-10" style={{
           backgroundImage: `radial-gradient(circle at 1px 1px, rgba(255,255,255,0.3) 1px, transparent 0)`,
@@ -790,9 +737,10 @@ export function FinalCTASection() {
 
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 text-center">
         <motion.div
-          initial={{ opacity: 0, y: 40 }}
+          initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-50px" }}
+          transition={{ duration: 0.4 }}
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-8 border border-white/20">
             <Rocket className="w-5 h-5 text-cyan-400" />

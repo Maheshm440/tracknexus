@@ -138,7 +138,16 @@ function LoginContent() {
         }, 500);
       } else {
         const data = await response.json();
-        setError(data.error || 'Login failed. Please try again.');
+
+        // Check if email verification is required
+        if (data.requiresVerification) {
+          setError('Please verify your email before logging in. Redirecting to verification page...');
+          setTimeout(() => {
+            router.push(`/verify-email?email=${encodeURIComponent(data.email)}`);
+          }, 2000);
+        } else {
+          setError(data.error || 'Login failed. Please try again.');
+        }
         setIsLoading(false);
       }
     } catch (err) {

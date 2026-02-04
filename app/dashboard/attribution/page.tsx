@@ -69,7 +69,7 @@ export default function AttributionPage() {
       const visitors = JSON.parse(visitorData);
 
       // Create attributions from leads
-      const attributionsFromLeads = leads.map((lead: any) => ({
+      const attributionsFromLeads: Attribution[] = leads.map((lead: any) => ({
         id: lead.id,
         source: lead.source || 'Direct',
         medium: 'Organic',
@@ -85,17 +85,17 @@ export default function AttributionPage() {
       }));
 
       // Apply filters
-      let filteredAttributions = attributionsFromLeads;
+      let filteredAttributions: Attribution[] = attributionsFromLeads;
 
       if (sourceFilter) {
         filteredAttributions = filteredAttributions.filter(
-          (attr) => attr.source.toLowerCase() === sourceFilter.toLowerCase()
+          (attr: Attribution) => attr.source?.toLowerCase() === sourceFilter.toLowerCase()
         );
       }
 
       if (mediumFilter) {
         filteredAttributions = filteredAttributions.filter(
-          (attr) => attr.medium.toLowerCase() === mediumFilter.toLowerCase()
+          (attr: Attribution) => attr.medium?.toLowerCase() === mediumFilter.toLowerCase()
         );
       }
 
@@ -103,8 +103,8 @@ export default function AttributionPage() {
         const searchLower = search.toLowerCase();
         filteredAttributions = filteredAttributions.filter(
           (attr) =>
-            attr.campaign.toLowerCase().includes(searchLower) ||
-            attr.lead.name.toLowerCase().includes(searchLower)
+            attr.campaign?.toLowerCase().includes(searchLower) ||
+            attr.lead?.name.toLowerCase().includes(searchLower)
         );
       }
 
@@ -117,7 +117,7 @@ export default function AttributionPage() {
       // Calculate stats from all leads (not filtered)
       const totalAttributions = attributionsFromLeads.length;
       const conversions = attributionsFromLeads.filter(
-        (attr) => attr.lead.status === 'CONVERTED'
+        (attr) => attr.lead?.status === 'CONVERTED'
       ).length;
       const conversionRate =
         totalAttributions > 0 ? (conversions / totalAttributions) * 100 : 0;

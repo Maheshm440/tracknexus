@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
+// SECURITY FIX #6: Enhanced middleware with better cookie validation
+// PERFORMANCE: Optimized to reduce blocking operations
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
@@ -9,32 +11,38 @@ export function middleware(request: NextRequest) {
     const authCookie = request.cookies.get('tracknexus_auth');
     const roleCookie = request.cookies.get('tracknexus_role');
 
-    // Check if user is authenticated
-    if (!authCookie) {
-      // Redirect to login page
+    // Fast validation - check cookies immediately without extra processing
+    if (!authCookie?.value?.trim()) {
       const loginUrl = new URL('/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
     }
 
-    // Check if user has admin role
-    const userRole = roleCookie?.value;
+    const userRole = roleCookie?.value?.trim();
 
-    if (userRole !== 'admin') {
-      // Only admins can access dashboard - redirect to access denied page
-      const deniedUrl = new URL('/access-denied', request.url);
-      return NextResponse.redirect(deniedUrl);
+    // Combined validation and redirect
+    if (!userRole || userRole !== 'admin') {
+      const redirectUrl = !userRole ? '/login' : '/access-denied';
+      const targetUrl = new URL(redirectUrl, request.url);
+      if (!userRole) targetUrl.searchParams.set('redirect', pathname);
+      return NextResponse.redirect(targetUrl);
     }
 
-    // Admin access granted - continue to dashboard
-  }
+    // Create response with security headers in one go
+    const response = NextResponse.next();
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('X-XSS-Protection', '1; mode=block');
+    response.headers.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+    response.headers.delete('X-Powered-By');
 
-  // Allow access to login page - users can login with different accounts
-  // No automatic redirect from login page
+    return response;
+  }
 
   return NextResponse.next();
 }
 
 export const config = {
-  matcher: ['/dashboard/:path*', '/login', '/access-denied'],
+  // Optimize matcher to only run on necessary routes
+  matcher: ['/dashboard/:path*'],
 };

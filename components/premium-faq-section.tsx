@@ -77,9 +77,10 @@ const faqData: FAQ[] = [
 const FAQItem = ({ faq, isOpen, onToggle }: { faq: FAQ; isOpen: boolean; onToggle: () => void }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 20 }}
+      initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
+      viewport={{ once: true, margin: "-20px" }}
+      transition={{ duration: 0.2 }}
       className="group"
     >
       <div
@@ -175,9 +176,10 @@ export function PremiumFAQSection() {
       <div className="max-w-4xl mx-auto px-4 space-y-3 relative z-10">
         {/* Header */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
+          viewport={{ once: true, margin: "-30px" }}
+          transition={{ duration: 0.3 }}
           className="text-center mb-6"
         >
           <div className="inline-flex items-center gap-2 px-3 py-1.5 bg-gradient-to-r from-cyan-500/10 to-blue-500/10 rounded-full mb-3 border border-cyan-500/20">
@@ -214,10 +216,10 @@ export function PremiumFAQSection() {
 
         {/* CTA Section */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
+          initial={{ opacity: 0, y: 10 }}
           whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.1 }}
+          viewport={{ once: true, margin: "-30px" }}
+          transition={{ duration: 0.3 }}
           className="relative mt-6"
         >
           <div className="bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 rounded-xl p-6 lg:p-8 overflow-hidden relative">
