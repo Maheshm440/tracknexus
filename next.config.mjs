@@ -60,8 +60,8 @@ const nextConfig = {
     ],
     // PERFORMANCE: Enable optimistic client cache
     optimisticClientCache: true,
-    // PERFORMANCE: Enable CSS chunking for better caching
-    optimizeCss: true,
+    // PERFORMANCE: CSS optimization disabled (causes build issues)
+    // optimizeCss: true,
   },
   // Security headers for better SEO and security
   async headers() {
