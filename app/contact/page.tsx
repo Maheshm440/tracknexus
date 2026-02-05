@@ -331,9 +331,44 @@ export default function ContactPage() {
 
                 <form onSubmit={async (e) => {
                   e.preventDefault()
-                  const formData = new FormData(e.currentTarget)
-                  const data = Object.fromEntries(formData)
-                  alert(`Free Trial Started!\n\nName: ${data.name}\nEmail: ${data.email}\nCompany: ${data.company}\n\nWe will contact you shortly.`)
+                  const form = e.currentTarget
+                  const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement
+                  const originalText = submitBtn.innerHTML
+                  submitBtn.disabled = true
+                  submitBtn.innerHTML = '<span class="flex items-center justify-center gap-2"><div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>Submitting...</span>'
+
+                  const formDataObj = new FormData(form)
+                  const data = Object.fromEntries(formDataObj)
+
+                  try {
+                    const response = await fetch('/api/leads', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        name: data.name,
+                        companyName: data.company,
+                        companyEmail: data.email,
+                        companySize: '10-50',
+                        mobileNumber: '',
+                        message: 'Free Trial Request from Contact Page',
+                        formType: 'free-trial',
+                        source: '/contact'
+                      })
+                    })
+
+                    if (response.ok) {
+                      alert(`Free Trial Started!\n\nName: ${data.name}\nEmail: ${data.email}\nCompany: ${data.company}\n\nWe will contact you shortly.`)
+                      form.reset()
+                    } else {
+                      alert('Failed to submit. Please try again.')
+                    }
+                  } catch (error) {
+                    console.error('Error:', error)
+                    alert('Failed to submit. Please try again.')
+                  } finally {
+                    submitBtn.disabled = false
+                    submitBtn.innerHTML = originalText
+                  }
                 }} className="space-y-3">
                   <input
                     type="text"
@@ -407,9 +442,45 @@ export default function ContactPage() {
 
                 <form onSubmit={async (e) => {
                   e.preventDefault()
-                  const formData = new FormData(e.currentTarget)
-                  const data = Object.fromEntries(formData)
-                  alert(`Demo Scheduled!\n\nName: ${data.name}\nEmail: ${data.email}\nTime: ${data.time}\n\nWe will contact you shortly.`)
+                  const form = e.currentTarget
+                  const submitBtn = form.querySelector('button[type="submit"]') as HTMLButtonElement
+                  const originalText = submitBtn.innerHTML
+                  submitBtn.disabled = true
+                  submitBtn.innerHTML = '<span class="flex items-center justify-center gap-2"><div class="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>Submitting...</span>'
+
+                  const formDataObj = new FormData(form)
+                  const data = Object.fromEntries(formDataObj)
+
+                  try {
+                    const response = await fetch('/api/leads', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        name: data.name,
+                        companyName: '',
+                        companyEmail: data.email,
+                        companySize: '10-50',
+                        mobileNumber: '',
+                        message: `Demo Request - Preferred Time: ${data.time}`,
+                        formType: 'demo',
+                        preferredTime: data.time,
+                        source: '/contact'
+                      })
+                    })
+
+                    if (response.ok) {
+                      alert(`Demo Scheduled!\n\nName: ${data.name}\nEmail: ${data.email}\nTime: ${data.time}\n\nWe will contact you shortly.`)
+                      form.reset()
+                    } else {
+                      alert('Failed to submit. Please try again.')
+                    }
+                  } catch (error) {
+                    console.error('Error:', error)
+                    alert('Failed to submit. Please try again.')
+                  } finally {
+                    submitBtn.disabled = false
+                    submitBtn.innerHTML = originalText
+                  }
                 }} className="space-y-3">
                   <input
                     type="text"

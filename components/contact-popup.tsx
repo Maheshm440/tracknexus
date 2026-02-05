@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
@@ -41,9 +41,28 @@ export function ContactPopup({ isOpen, onClose, context = { type: 'demo' } }: Co
     planType: context.planType || "",
     preferredTime: ""
   })
-  
+
   const [selectedDate, setSelectedDate] = useState<Date>()
   const [submissionStatus, setSubmissionStatus] = useState<SubmissionStatus>('idle')
+
+  // Reset form when modal opens
+  useEffect(() => {
+    if (isOpen) {
+      setFormData({
+        name: "",
+        companyName: "",
+        companyEmail: "",
+        companySize: "",
+        mobileNumber: "",
+        message: "",
+        selectedPlan: context.planName || "",
+        planType: context.planType || "",
+        preferredTime: ""
+      })
+      setSelectedDate(undefined)
+      setSubmissionStatus('idle')
+    }
+  }, [isOpen, context.planName, context.planType])
 
   const getFormConfig = () => {
     switch (context.type) {
@@ -431,14 +450,23 @@ export function ContactPopup({ isOpen, onClose, context = { type: 'demo' } }: Co
               {/* Status Messages */}
               {submissionStatus === 'success' && (
                 <motion.div
-                  className="mt-3 p-2.5 bg-green-50 border border-green-200 rounded-lg"
+                  className="mt-3 space-y-3"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                 >
-                  <div className="flex items-center gap-2 text-green-700 text-sm">
-                    <Check className="w-4 h-4" />
-                    <span className="font-medium">Success! We&apos;ll be in touch soon.</span>
+                  <div className="p-2.5 bg-green-50 border border-green-200 rounded-lg">
+                    <div className="flex items-center gap-2 text-green-700 text-sm">
+                      <Check className="w-4 h-4" />
+                      <span className="font-medium">Success! We&apos;ll be in touch soon.</span>
+                    </div>
                   </div>
+                  <Button
+                    type="button"
+                    onClick={handleClose}
+                    className="w-full h-10 bg-green-600 text-white hover:bg-green-700 text-sm font-semibold rounded-lg transition-all"
+                  >
+                    OK
+                  </Button>
                 </motion.div>
               )}
 
