@@ -3,6 +3,7 @@ import type { NextRequest } from 'next/server';
 
 // SECURITY FIX #6: Enhanced middleware with better cookie validation
 // PERFORMANCE: Optimized to reduce blocking operations
+// MFA: Email + MFA code login (no password)
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 

@@ -17,6 +17,10 @@ model User {
   status          String    @default("active")
   emailVerified   Boolean   @default(false)
   emailVerifiedAt DateTime?
+  // MFA Fields
+  mfaEnabled      Boolean   @default(false)
+  mfaSecret       String?   // Encrypted TOTP secret
+  mfaBackupCodes  String?   // JSON array of hashed backup codes
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
 

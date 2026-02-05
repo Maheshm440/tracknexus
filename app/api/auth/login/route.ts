@@ -4,6 +4,19 @@ import { getUserByEmail, requiresPassword, verifyPassword } from '@/lib/auth-con
 import { rateLimit, getClientIp, RateLimitPresets } from '@/lib/rate-limit';
 import { generateToken } from '@/lib/jwt';
 
+// Helper to check if user has MFA enabled
+async function checkUserMFA(email: string): Promise<{ enabled: boolean }> {
+  try {
+    const user = await prisma.user.findUnique({
+      where: { email: email.toLowerCase() },
+      select: { mfaEnabled: true }
+    });
+    return { enabled: user?.mfaEnabled || false };
+  } catch {
+    return { enabled: false };
+  }
+}
+
 export async function POST(request: NextRequest) {
   try {
     const { email, password } = await request.json();
@@ -62,6 +75,33 @@ export async function POST(request: NextRequest) {
         { error: 'Invalid email or password' },
         { status: 401 }
       );
+    }
+
+    // Check if MFA is enabled for this user
+    const mfaStatus = await checkUserMFA(email);
+
+    if (mfaStatus.enabled) {
+      // MFA is enabled - return MFA required response with pending session
+      const response = NextResponse.json({
+        success: false,
+        requiresMFA: true,
+        message: 'MFA verification required',
+        user: {
+          email: user.email,
+          name: user.name
+        }
+      });
+
+      // Set MFA pending cookie (short-lived, 5 minutes)
+      response.cookies.set('mfa_pending', user.email, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'strict',
+        maxAge: 5 * 60, // 5 minutes to complete MFA
+        path: '/',
+      });
+
+      return response;
     }
 
     // Fetch dashboard data from database
