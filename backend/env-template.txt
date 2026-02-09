@@ -1,0 +1,28 @@
+# TrackNexus Backend Environment Variables
+
+# Database Configuration (PostgreSQL)
+DATABASE_URL="postgresql://username:password@localhost:5432/tracknexus"
+
+# JWT Configuration
+JWT_SECRET="your-super-secret-jwt-key-change-this-in-production-min-32-characters"
+JWT_EXPIRE="7d"
+
+# Server Configuration
+PORT=5000
+NODE_ENV=development
+FRONTEND_URL=http://localhost:3000
+
+# Email Configuration (Optional)
+EMAIL_HOST=smtp.gmail.com
+EMAIL_PORT=587
+EMAIL_USER=your-email@gmail.com
+EMAIL_PASS=your-app-password
+EMAIL_FROM=noreply@tracknexus.com
+
+# File Upload Configuration
+MAX_FILE_SIZE=10485760
+UPLOAD_PATH=./uploads
+
+# Rate Limiting
+RATE_LIMIT_WINDOW=900000
+RATE_LIMIT_MAX=100
