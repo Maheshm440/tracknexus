@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
+import { motion, useInView, Variants } from "framer-motion";
 import { useRef, ReactNode } from "react";
 
 interface StickyScrollSectionProps {
@@ -23,7 +23,7 @@ export function StickyScrollSection({
   });
 
   // Animation variants
-  const variants = {
+  const variants: Record<string, Variants> = {
     fadeUp: {
       hidden: { opacity: 0, y: 50 },
       visible: {
@@ -32,7 +32,7 @@ export function StickyScrollSection({
         transition: {
           duration: 0.8,
           delay: animationDelay,
-          ease: [0.25, 0.4, 0.25, 1],
+          ease: [0.25, 0.4, 0.25, 1] as const,
         },
       },
     },
@@ -55,7 +55,7 @@ export function StickyScrollSection({
         transition: {
           duration: 0.8,
           delay: animationDelay,
-          ease: [0.25, 0.4, 0.25, 1],
+          ease: [0.25, 0.4, 0.25, 1] as const,
         },
       },
     },
@@ -67,7 +67,7 @@ export function StickyScrollSection({
         transition: {
           duration: 0.8,
           delay: animationDelay,
-          ease: [0.25, 0.4, 0.25, 1],
+          ease: [0.25, 0.4, 0.25, 1] as const,
         },
       },
     },
