@@ -91,10 +91,10 @@ function AnimatedCounter({ target, suffix = "", duration = 2000 }: { target: num
 
 export function StatsSection() {
   return (
-    <section className="px-4 py-16 lg:px-8 lg:py-24">
+    <section className="px-4 py-10 lg:px-8 lg:py-14">
       <div className="mx-auto max-w-6xl">
         <motion.div
-          className="relative bg-gray-900 rounded-2xl p-8 lg:p-12 text-white overflow-hidden"
+          className="relative bg-gray-900 rounded-2xl p-6 lg:p-10 text-white overflow-hidden"
           initial={{ opacity: 0, scale: 0.95 }}
           whileInView={{ opacity: 1, scale: 1 }}
           viewport={{ once: true }}
@@ -133,14 +133,14 @@ export function StatsSection() {
 
           <div className="relative z-10">
             {/* Main Heading */}
-            <motion.div className="text-center mb-12" {...fadeInUp}>
-              <h2 className="text-3xl lg:text-4xl font-bold mb-4">Transform Your Time into Value</h2>
+            <motion.div className="text-center mb-8" {...fadeInUp}>
+              <h2 className="text-3xl lg:text-4xl font-bold mb-3">Transform Your Time into Value</h2>
               <p className="text-lg lg:text-xl text-gray-300">Time. Productivity. Monitoring. Tasks.</p>
             </motion.div>
 
             {/* Stats Grid */}
             <motion.div
-              className="grid grid-cols-1 md:grid-cols-3 gap-8 lg:gap-12"
+              className="grid grid-cols-1 md:grid-cols-3 gap-6 lg:gap-10"
               variants={staggerContainer}
               initial="initial"
               whileInView="animate"

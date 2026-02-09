@@ -47,6 +47,7 @@ export async function generateMetadata(
       url: canonical,
       type: "article",
       publishedTime: post.publishedDate,
+      modifiedTime: post.lastModified || post.publishedDate,
       images: [
         {
           url: `${baseUrl}${post.heroImage}`,
@@ -87,6 +88,7 @@ export default async function BlogPostPage(props: BlogPostPageProps) {
     description: post.metaDescription,
     slug: post.slug,
     publishedDate: post.publishedDate,
+    modifiedDate: post.lastModified,
     image: post.heroImage,
     readTime: post.readTime,
   });

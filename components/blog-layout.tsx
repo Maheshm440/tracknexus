@@ -15,9 +15,93 @@ import {
   CheckCircle,
 } from "lucide-react";
 import { BlogPost, getRelatedPosts } from "@/lib/blog-data";
+import { UpdatedBadge } from "./blog/UpdatedBadge";
 
 interface BlogLayoutProps {
   post: BlogPost;
+}
+
+/**
+ * Renders blog content string into properly formatted HTML elements.
+ * Handles paragraphs (separated by \n\n), bullet points (lines starting with •),
+ * and inline bold text (**text**).
+ */
+function renderContent(content: string) {
+  const lines = content.split('\n');
+  const elements: React.ReactNode[] = [];
+  let elementKey = 0;
+
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i].trim();
+
+    // Skip empty lines
+    if (!line) {
+      i++;
+      continue;
+    }
+
+    // Bullet point - collect consecutive bullet lines into a list
+    if (line.startsWith('•')) {
+      const bulletLines: string[] = [];
+      while (i < lines.length && lines[i].trim().startsWith('•')) {
+        bulletLines.push(lines[i].trim().replace(/^•\s*/, ''));
+        i++;
+      }
+
+      elements.push(
+        <ul key={`ul-${elementKey++}`} className="space-y-4 my-6 ml-1">
+          {bulletLines.map((bullet, j) => {
+            // Split bullet into bold title and description if "Title—description" or "Title (...)—description"
+            const emDashMatch = bullet.match(/^(.+?)—(.+)$/);
+
+            return (
+              <li key={j} className="flex items-start gap-3">
+                <span className="w-2 h-2 rounded-full bg-[#86BC25] mt-2.5 flex-shrink-0" />
+                <span className="text-gray-700 leading-relaxed text-[17px]">
+                  {emDashMatch ? (
+                    <>
+                      <strong className="text-gray-900 font-semibold">{emDashMatch[1].trim()}</strong>
+                      <span className="text-gray-400 mx-1">—</span>
+                      {renderInlineFormatting(emDashMatch[2].trim())}
+                    </>
+                  ) : (
+                    renderInlineFormatting(bullet)
+                  )}
+                </span>
+              </li>
+            );
+          })}
+        </ul>
+      );
+      continue;
+    }
+
+    // Regular text line - render as paragraph
+    elements.push(
+      <p key={`p-${elementKey++}`} className="text-gray-700 leading-relaxed text-[17px] mb-5">
+        {renderInlineFormatting(line)}
+      </p>
+    );
+    i++;
+  }
+
+  return elements;
+}
+
+/**
+ * Renders inline formatting like **bold** text
+ */
+function renderInlineFormatting(text: string): React.ReactNode {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g);
+  if (parts.length === 1) return text;
+
+  return parts.map((part, i) => {
+    if (part.startsWith('**') && part.endsWith('**')) {
+      return <strong key={i} className="text-gray-900 font-semibold">{part.slice(2, -2)}</strong>;
+    }
+    return part;
+  });
 }
 
 export function BlogLayout({ post }: BlogLayoutProps) {
@@ -83,6 +167,7 @@ export function BlogLayout({ post }: BlogLayoutProps) {
 
           {/* Category Badge */}
           <motion.div
+            className="flex flex-wrap items-center gap-3"
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.2 }}
@@ -90,6 +175,12 @@ export function BlogLayout({ post }: BlogLayoutProps) {
             <span className="inline-block px-4 py-1.5 bg-deloitte-green/10 text-deloitte-green text-xs font-semibold uppercase tracking-wider rounded-full border border-deloitte-green/20">
               {post.category}
             </span>
+            {post.lastModified && (
+              <UpdatedBadge
+                publishedDate={post.publishedDate}
+                lastModified={post.lastModified}
+              />
+            )}
           </motion.div>
 
           {/* Title */}
@@ -196,14 +287,15 @@ export function BlogLayout({ post }: BlogLayoutProps) {
               viewport={{ once: true, margin: "-50px" }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
             >
-              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-6">
+              {index > 0 && (
+                <div className="border-t border-gray-100 mb-8" />
+              )}
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-6 leading-snug">
                 {section.title}
               </h2>
 
-              <div className="prose prose-lg max-w-none">
-                <p className="text-gray-600 leading-relaxed text-lg">
-                  {section.content}
-                </p>
+              <div className="max-w-none">
+                {renderContent(section.content)}
               </div>
 
               {section.image && (
@@ -219,7 +311,9 @@ export function BlogLayout({ post }: BlogLayoutProps) {
                     alt={section.image.alt}
                     fill
                     className="object-cover"
-                    unoptimized
+                    quality={85}
+                    sizes="(max-width: 768px) 100vw, (max-width: 1024px) 90vw, 800px"
+                    loading="lazy"
                   />
                 </motion.div>
               )}

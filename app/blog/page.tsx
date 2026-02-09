@@ -107,7 +107,9 @@ export default function BlogPage() {
                         alt={post.heroImageAlt}
                         fill
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
-                        unoptimized
+                        quality={80}
+                        sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
+                        loading="lazy"
                       />
                       <div className="absolute top-4 left-4">
                         <span className="px-3 py-1 bg-deloitte-green text-white text-xs font-semibold rounded-full">

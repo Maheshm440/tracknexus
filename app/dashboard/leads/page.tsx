@@ -261,12 +261,14 @@ export default function LeadsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Leads</h1>
-          <p className="text-gray-500 mt-1">
-            Manage and track your leads from website forms
-          </p>
+      <div className="bg-white border-b border-gray-200 -mx-6 px-6">
+        <div className="flex items-center justify-between py-3">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Leads</h1>
+            <p className="text-gray-500 mt-0.5 text-sm">
+              Manage and track your leads from website forms
+            </p>
+          </div>
         </div>
       </div>
 
@@ -293,7 +295,7 @@ export default function LeadsPage() {
               <Users className="w-4 h-4 text-blue-600" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{stats.totalLeads}</p>
+          <p className="text-xl font-semibold text-gray-900">{stats.totalLeads}</p>
         </div>
 
         {/* New Leads */}
@@ -304,7 +306,7 @@ export default function LeadsPage() {
               <Zap className="w-4 h-4 text-cyan-600" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{stats.newLeads}</p>
+          <p className="text-xl font-semibold text-gray-900">{stats.newLeads}</p>
         </div>
 
         {/* Converted Leads */}
@@ -315,7 +317,7 @@ export default function LeadsPage() {
               <TrendingUp className="w-4 h-4 text-green-600" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{stats.convertedLeads}</p>
+          <p className="text-xl font-semibold text-gray-900">{stats.convertedLeads}</p>
         </div>
 
         {/* Conversion Rate */}
@@ -326,7 +328,7 @@ export default function LeadsPage() {
               <Star className="w-4 h-4 text-purple-600" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{stats.conversionRate}%</p>
+          <p className="text-xl font-semibold text-gray-900">{stats.conversionRate}%</p>
         </div>
 
         {/* Average Score */}
@@ -337,7 +339,7 @@ export default function LeadsPage() {
               <Star className="w-4 h-4 text-orange-600" />
             </div>
           </div>
-          <p className="text-2xl font-bold text-gray-900">{stats.avgScore}/100</p>
+          <p className="text-xl font-semibold text-gray-900">{stats.avgScore}/100</p>
         </div>
       </div>
 
@@ -411,12 +413,12 @@ export default function LeadsPage() {
                 <tr key={lead.id} className="hover:bg-gray-50">
                   <td className="py-4 px-4">
                     <div>
-                      <p className="font-medium text-gray-900">{lead.name}</p>
-                      <div className="text-sm text-gray-500 mt-1">
+                      <p className="font-medium text-gray-900 text-sm">{lead.name}</p>
+                      <div className="text-xs text-gray-500 mt-1">
                         {lead.companyEmail}
                       </div>
                       {lead.mobileNumber && (
-                        <div className="flex items-center text-sm text-gray-500 mt-0.5">
+                        <div className="flex items-center text-xs text-gray-500 mt-0.5">
                           <Phone className="w-3.5 h-3.5 mr-1" />
                           {lead.mobileNumber}
                         </div>
@@ -427,8 +429,8 @@ export default function LeadsPage() {
                     <div className="flex items-center">
                       <Building className="w-4 h-4 text-gray-400 mr-2" />
                       <div>
-                        <p className="text-gray-900">{lead.companyName || '-'}</p>
-                        <p className="text-sm text-gray-500">
+                        <p className="text-gray-900 text-sm">{lead.companyName || '-'}</p>
+                        <p className="text-xs text-gray-500">
                           {lead.companySize} employees
                         </p>
                       </div>

@@ -5,7 +5,8 @@ import { usePathname, useRouter } from "next/navigation";
 import { Search, Bell, User, ChevronDown, X, Clock, Settings, LogOut, Mail, Lock, Eye, EyeOff, CheckCircle } from "lucide-react";
 import { MobileNav } from "@/components/mobile-nav";
 import { LogoWithoutDropdown } from "@/components/logo";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import { productCategories } from "@/components/products/ProductsData";
 
 export function Header() {
   const currentPathname = usePathname();
@@ -198,17 +199,111 @@ export function Header() {
     }
   };
 
+  // All searchable pages/sections
+  const allPages = useMemo(() => [
+    // Main pages
+    { type: 'page' as const, title: 'Pricing', description: 'View our flexible pricing plans and find the perfect fit for your team', link: '/pricing', keywords: ['pricing', 'plans', 'cost', 'subscription', 'payment'] },
+    { type: 'page' as const, title: 'Contact Us', description: 'Get in touch with our team for support or inquiries', link: '/contact', keywords: ['contact', 'support', 'help', 'email', 'reach'] },
+
+    // About Us sections
+    { type: 'page' as const, title: 'About Us', description: 'Learn about our company, mission, and vision', link: '/about', keywords: ['about', 'company', 'mission', 'vision', 'who we are'] },
+    { type: 'page' as const, title: 'Our Team', description: 'Meet the experts behind Track Nexus', link: '/about/team', keywords: ['team', 'people', 'staff', 'employees', 'leadership'] },
+    { type: 'page' as const, title: 'Our Values', description: 'The principles that guide everything we do', link: '/about/values', keywords: ['values', 'culture', 'principles', 'ethics', 'integrity'] },
+    { type: 'page' as const, title: 'Careers', description: 'Join our team and make an impact', link: '/about/careers', keywords: ['careers', 'jobs', 'hiring', 'opportunities', 'work with us'] },
+
+    // Solutions
+    { type: 'page' as const, title: 'Remote Teams', description: 'Solutions for distributed workforce management', link: '/solutions/remote-teams', keywords: ['remote', 'distributed', 'work from home', 'virtual teams'] },
+    { type: 'page' as const, title: 'Hybrid Workforce', description: 'Flexible work models for modern teams', link: '/solutions/hybrid-workforce', keywords: ['hybrid', 'flexible', 'office', 'remote mix'] },
+    { type: 'page' as const, title: 'Enterprise Solutions', description: 'Scalable solutions for large organizations', link: '/solutions/enterprise', keywords: ['enterprise', 'large', 'organization', 'corporation'] },
+    { type: 'page' as const, title: 'Startups & SMBs', description: 'Perfect solutions for growing businesses', link: '/solutions/startups', keywords: ['startup', 'smb', 'small business', 'growing'] },
+
+    // Resources
+    { type: 'page' as const, title: 'Blog', description: 'Latest insights and industry trends', link: '/resources/blog', keywords: ['blog', 'articles', 'insights', 'news'] },
+    { type: 'page' as const, title: 'Case Studies', description: 'Real success stories from our customers', link: '/resources/case-studies', keywords: ['case studies', 'success', 'stories', 'testimonials'] },
+    { type: 'page' as const, title: 'Whitepapers', description: 'In-depth research and analysis', link: '/resources/whitepapers', keywords: ['whitepaper', 'research', 'analysis', 'report'] },
+    { type: 'page' as const, title: 'Webinars', description: 'Live sessions and recorded presentations', link: '/resources/webinars', keywords: ['webinar', 'training', 'sessions', 'presentations'] },
+    { type: 'page' as const, title: 'Help Center', description: 'Find answers and get support', link: '/resources/help-center', keywords: ['help', 'support', 'faq', 'documentation', 'guide'] },
+  ], []);
+
+  // Dynamic search results
+  const searchResults = useMemo(() => {
+    if (!searchQuery.trim()) return [];
+
+    const query = searchQuery.toLowerCase();
+    const results: Array<{
+      type: 'product' | 'feature' | 'page';
+      title: string;
+      description: string;
+      link: string;
+      productTitle?: string;
+    }> = [];
+
+    // Search in all pages
+    allPages.forEach((page) => {
+      if (
+        page.title.toLowerCase().includes(query) ||
+        page.description.toLowerCase().includes(query) ||
+        page.keywords.some(keyword => keyword.includes(query))
+      ) {
+        results.push({
+          type: page.type,
+          title: page.title,
+          description: page.description,
+          link: page.link,
+        });
+      }
+    });
+
+    // Search in product categories
+    productCategories.forEach((product) => {
+      // Search in product titles and descriptions
+      if (
+        product.title.toLowerCase().includes(query) ||
+        product.description.toLowerCase().includes(query)
+      ) {
+        results.push({
+          type: 'product',
+          title: product.title,
+          description: product.description,
+          link: `/product/${product.id}`,
+        });
+      }
+
+      // Search in product features
+      product.features.forEach((feature) => {
+        if (
+          feature.title.toLowerCase().includes(query) ||
+          feature.description.toLowerCase().includes(query)
+        ) {
+          results.push({
+            type: 'feature',
+            title: feature.title,
+            description: feature.description,
+            link: `/product/${product.id}#${feature.id}`,
+            productTitle: product.title,
+          });
+        }
+      });
+    });
+
+    return results.slice(0, 8); // Limit to 8 results
+  }, [searchQuery, allPages]);
+
   return (
-    <header className="sticky top-0 z-50 bg-deloitte-black px-6 py-4 lg:px-8">
+    <header className="fixed top-0 left-0 right-0 z-50 bg-deloitte-black px-6 py-4 lg:px-8">
       <div className="mx-auto flex max-w-7xl items-center justify-between">
         {/* Logo */}
         <div className="flex items-center gap-4">
           <Link
             href="/"
             className="flex items-center hover:opacity-80 transition-opacity"
-            onClick={() => {
+            onClick={(e) => {
               if (pathname === '/') {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+              } else {
+                // Force full page refresh when navigating to home from other pages
+                e.preventDefault();
+                window.location.href = '/';
               }
             }}
           >
@@ -305,7 +400,7 @@ export function Header() {
                     <span className="font-medium text-sm">Overview</span>
                     <span className="text-xs text-gray-400 mt-0.5">Who we are</span>
                   </Link>
-                  <Link href="/about#team" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '100ms' }}>
+                  <Link href="/about/team" className="flex flex-col px-6 py-3 text-gray-300 hover:text-white hover:bg-white/10 transition-all opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0" style={{ transitionDelay: '100ms' }}>
                     <span className="font-medium text-sm">Our Team</span>
                     <span className="text-xs text-gray-400 mt-0.5">Meet the experts</span>
                   </Link>
@@ -494,20 +589,50 @@ export function Header() {
 
                 <div className="p-4 max-h-96 overflow-y-auto">
                   {searchQuery ? (
-                    <div className="space-y-3">
-                      <div className="p-3 hover:bg-gray-50 rounded cursor-pointer transition-colors">
-                        <div className="font-medium text-gray-900 text-sm">Productivity Monitoring</div>
-                        <div className="text-xs text-gray-500">Track team performance in real-time</div>
+                    searchResults.length > 0 ? (
+                      <div className="space-y-2">
+                        {searchResults.map((result, index) => (
+                          <div
+                            key={index}
+                            className="p-3 hover:bg-gray-50 rounded cursor-pointer transition-colors border border-transparent hover:border-deloitte-green/20"
+                            onClick={() => {
+                              router.push(result.link);
+                              setIsSearchOpen(false);
+                              setSearchQuery('');
+                            }}
+                          >
+                            <div className="flex items-start gap-2">
+                              <div className="flex-1">
+                                <div className="font-medium text-gray-900 text-sm">{result.title}</div>
+                                {result.productTitle && (
+                                  <div className="text-xs text-deloitte-green mt-0.5">
+                                    in {result.productTitle}
+                                  </div>
+                                )}
+                                <div className="text-xs text-gray-500 mt-1 line-clamp-2">
+                                  {result.description}
+                                </div>
+                              </div>
+                              <div className={`text-xs px-2 py-1 rounded whitespace-nowrap ${
+                                result.type === 'product'
+                                  ? 'bg-blue-100 text-blue-700'
+                                  : result.type === 'feature'
+                                  ? 'bg-green-100 text-green-700'
+                                  : 'bg-purple-100 text-purple-700'
+                              }`}>
+                                {result.type === 'product' ? 'Product' : result.type === 'feature' ? 'Feature' : 'Page'}
+                              </div>
+                            </div>
+                          </div>
+                        ))}
                       </div>
-                      <div className="p-3 hover:bg-gray-50 rounded cursor-pointer transition-colors">
-                        <div className="font-medium text-gray-900 text-sm">AI-Powered Intelligence</div>
-                        <div className="text-xs text-gray-500">Smart insights and recommendations</div>
+                    ) : (
+                      <div className="text-center py-8">
+                        <Search className="w-8 h-8 text-gray-300 mx-auto mb-2" />
+                        <p className="text-sm text-gray-500">No results found for "{searchQuery}"</p>
+                        <p className="text-xs text-gray-400 mt-1">Try searching for products, features, or capabilities</p>
                       </div>
-                      <div className="p-3 hover:bg-gray-50 rounded cursor-pointer transition-colors">
-                        <div className="font-medium text-gray-900 text-sm">Workforce Analytics</div>
-                        <div className="text-xs text-gray-500">Data-driven workforce decisions</div>
-                      </div>
-                    </div>
+                    )
                   ) : (
                     <div className="text-center py-8">
                       <Search className="w-8 h-8 text-gray-300 mx-auto mb-2" />

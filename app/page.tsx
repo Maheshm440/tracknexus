@@ -88,33 +88,41 @@ export default function HomePage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
       />
 
-      <div className="min-h-screen bg-white overflow-x-hidden">
-        {/* Hero Section - Client Component for Interactivity */}
-        <HeroSectionClient />
+      <div className="relative bg-white">
+        {/* Hero Section - Fixed Video Background */}
+        <div className="fixed top-0 left-0 w-full h-screen z-0">
+          <HeroSectionClient />
+        </div>
 
-        {/* AI-Powered Analytics Section */}
-        <AIPoweredAnalyticsSection />
+        {/* Spacer to allow scrolling */}
+        <div className="relative h-screen"></div>
 
-        {/* Premium Feature Showcase */}
-        <FeatureShowcaseSection />
+        {/* Content Sections with Slide-Up Effect */}
+        <div className="relative z-10 bg-white">
+          {/* AI-Powered Analytics Section */}
+          <AIPoweredAnalyticsSection />
 
-        {/* Interactive Stats */}
-        <InteractiveStatsSection />
+          {/* Premium Feature Showcase */}
+          <FeatureShowcaseSection />
 
-        {/* Multi-Platform Section */}
-        <MultiPlatformSection />
+          {/* Interactive Stats */}
+          <InteractiveStatsSection />
 
-        {/* Security Section */}
-        <SecuritySection />
+          {/* Multi-Platform Section */}
+          <MultiPlatformSection />
 
-        {/* Premium Testimonials & Trust Section */}
-        <PremiumTestimonialsSection />
+          {/* Security Section */}
+          <SecuritySection />
 
-        {/* Premium Final CTA with Video Background */}
-        <FinalCTASection />
+          {/* Premium Testimonials & Trust Section */}
+          <PremiumTestimonialsSection />
 
-        {/* Premium FAQ Section */}
-        <PremiumFAQSection />
+          {/* Premium Final CTA with Video Background */}
+          <FinalCTASection />
+
+          {/* Premium FAQ Section */}
+          <PremiumFAQSection />
+        </div>
       </div>
     </>
   );

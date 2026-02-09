@@ -10,6 +10,7 @@ import { productCategories } from "@/components/products/ProductsData"
 export function MobileNav() {
   const [isOpen, setIsOpen] = useState(false)
   const [isProductsOpen, setIsProductsOpen] = useState(false)
+  const [isAboutOpen, setIsAboutOpen] = useState(false)
 
   return (
     <>
@@ -85,13 +86,74 @@ export function MobileNav() {
                 </AnimatePresence>
               </div>
 
-              <Link
-                href="/about"
-                className="text-gray-700 hover:text-highlight font-medium py-2"
-                onClick={() => setIsOpen(false)}
-              >
-                About Us
-              </Link>
+              {/* About Us with expandable submenu */}
+              <div>
+                <button
+                  onClick={() => setIsAboutOpen(!isAboutOpen)}
+                  className="flex items-center justify-between w-full text-gray-700 hover:text-highlight font-medium py-2"
+                >
+                  <span>About Us</span>
+                  <ChevronDown
+                    className={`w-4 h-4 transition-transform duration-200 ${
+                      isAboutOpen ? "rotate-180" : ""
+                    }`}
+                  />
+                </button>
+                <AnimatePresence>
+                  {isAboutOpen && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: "auto" }}
+                      exit={{ opacity: 0, height: 0 }}
+                      className="overflow-hidden"
+                    >
+                      <div className="pl-4 py-2 space-y-1 border-l-2 border-gray-100 ml-2">
+                        <Link
+                          href="/about"
+                          className="block text-sm text-gray-600 hover:text-highlight py-2 transition-colors"
+                          onClick={() => {
+                            setIsOpen(false)
+                            setIsAboutOpen(false)
+                          }}
+                        >
+                          Overview
+                        </Link>
+                        <Link
+                          href="/about/team"
+                          className="block text-sm text-gray-600 hover:text-highlight py-2 transition-colors"
+                          onClick={() => {
+                            setIsOpen(false)
+                            setIsAboutOpen(false)
+                          }}
+                        >
+                          Our Team
+                        </Link>
+                        <Link
+                          href="/about/values"
+                          className="block text-sm text-gray-600 hover:text-highlight py-2 transition-colors"
+                          onClick={() => {
+                            setIsOpen(false)
+                            setIsAboutOpen(false)
+                          }}
+                        >
+                          Our Values
+                        </Link>
+                        <Link
+                          href="/about/careers"
+                          className="block text-sm text-gray-600 hover:text-highlight py-2 transition-colors"
+                          onClick={() => {
+                            setIsOpen(false)
+                            setIsAboutOpen(false)
+                          }}
+                        >
+                          Careers
+                        </Link>
+                      </div>
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+
               <Link
                 href="/pricing"
                 className="text-gray-700 hover:text-highlight font-medium py-2"

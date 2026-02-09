@@ -213,15 +213,13 @@ export default function DashboardPage() {
 
   if (!data) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
-        <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-16">
-              <div className="h-8 w-48 bg-gray-200 animate-pulse rounded"></div>
-            </div>
+      <div>
+        <div className="bg-white border-b border-gray-200 -mx-6 px-6">
+          <div className="flex items-center justify-between h-14">
+            <div className="h-8 w-48 bg-gray-200 animate-pulse rounded"></div>
           </div>
         </div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="py-4">
           {/* Skeleton Stats Cards */}
           <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
             {[...Array(6)].map((_, i) => (
@@ -259,96 +257,92 @@ export default function DashboardPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50">
+    <div>
       {/* Visitor Tracker - invisible component with Suspense */}
       <Suspense fallback={null}>
         <VisitorTracker page="/dashboard" />
       </Suspense>
 
       {/* Header */}
-      <div className="sticky top-0 z-20 bg-white/80 backdrop-blur-md border-b border-gray-200">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-16">
-            <div className="flex items-center gap-3">
-              <h1 className="text-2xl font-bold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Welcome back, Admin</h1>
-            </div>
-          </div>
+      <div className="bg-white border-b border-gray-200 -mx-6 px-6">
+        <div className="flex items-center justify-between h-14">
+          <h1 className="text-xl font-semibold bg-gradient-to-r from-slate-900 to-slate-700 bg-clip-text text-transparent">Welcome back, Admin</h1>
         </div>
       </div>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+      <div className="py-4">
         {/* Stats Cards - FlowSense Style */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-8">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 mb-4">
           {/* Total Leads */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-gray-500 text-xs font-medium">Total Leads</p>
-              <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-3.5 hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-gray-600 text-[11px] font-semibold uppercase tracking-wide">Total Leads</p>
+              <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center">
                 <Users className="w-4 h-4 text-blue-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{data.overview.totalLeads}</p>
+            <p className="text-xl font-semibold text-gray-900">{data.overview.totalLeads}</p>
           </div>
 
           {/* New Leads */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-gray-500 text-xs font-medium">New Leads</p>
-              <div className="w-8 h-8 rounded-full bg-cyan-100 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-3.5 hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-gray-600 text-[11px] font-semibold uppercase tracking-wide">New Leads</p>
+              <div className="w-9 h-9 rounded-full bg-cyan-100 flex items-center justify-center">
                 <TrendingUp className="w-4 h-4 text-cyan-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{data.overview.newLeads}</p>
+            <p className="text-xl font-semibold text-gray-900">{data.overview.newLeads}</p>
           </div>
 
           {/* Converted */}
-          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all">
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-gray-500 text-xs font-medium">Won</p>
-              <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-3.5 hover:shadow-md transition-all">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-gray-600 text-[11px] font-semibold uppercase tracking-wide">Won</p>
+              <div className="w-9 h-9 rounded-full bg-green-100 flex items-center justify-center">
                 <CheckCircle className="w-4 h-4 text-green-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{data.overview.convertedLeads}</p>
+            <p className="text-xl font-semibold text-gray-900">{data.overview.convertedLeads}</p>
           </div>
 
           {/* Conversion Rate */}
           <div
-            className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all"
+            className="bg-white rounded-lg shadow-sm border border-gray-100 p-3.5 hover:shadow-md transition-all"
           >
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-gray-500 text-xs font-medium">Conversion</p>
-              <div className="w-8 h-8 rounded-full bg-orange-100 flex items-center justify-center">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-gray-600 text-[11px] font-semibold uppercase tracking-wide">Conversion</p>
+              <div className="w-9 h-9 rounded-full bg-orange-100 flex items-center justify-center">
                 <Activity className="w-4 h-4 text-orange-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{data.overview.conversionRate}%</p>
+            <p className="text-xl font-semibold text-gray-900">{data.overview.conversionRate}%</p>
           </div>
 
           {/* Total Visitors */}
           <div
-            className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all"
+            className="bg-white rounded-lg shadow-sm border border-gray-100 p-3.5 hover:shadow-md transition-all"
           >
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-gray-500 text-xs font-medium">Visitors</p>
-              <div className="w-8 h-8 rounded-full bg-purple-100 flex items-center justify-center">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-gray-600 text-[11px] font-semibold uppercase tracking-wide">Visitors</p>
+              <div className="w-9 h-9 rounded-full bg-purple-100 flex items-center justify-center">
                 <Users className="w-4 h-4 text-purple-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{data.overview.totalVisitors}</p>
+            <p className="text-xl font-semibold text-gray-900">{data.overview.totalVisitors}</p>
           </div>
 
           {/* Page Views */}
           <div
-            className="bg-white rounded-lg shadow-sm border border-gray-100 p-4 hover:shadow-md transition-all"
+            className="bg-white rounded-lg shadow-sm border border-gray-100 p-3.5 hover:shadow-md transition-all"
           >
-            <div className="flex items-center justify-between mb-3">
-              <p className="text-gray-500 text-xs font-medium">Page Views</p>
-              <div className="w-8 h-8 rounded-full bg-pink-100 flex items-center justify-center">
+            <div className="flex items-center justify-between mb-2">
+              <p className="text-gray-600 text-[11px] font-semibold uppercase tracking-wide">Page Views</p>
+              <div className="w-9 h-9 rounded-full bg-pink-100 flex items-center justify-center">
                 <Activity className="w-4 h-4 text-pink-600" />
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{data.overview.totalPageViews}</p>
+            <p className="text-xl font-semibold text-gray-900">{data.overview.totalPageViews}</p>
           </div>
         </div>
 
@@ -356,25 +350,27 @@ export default function DashboardPage() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
           {/* Recent Leads */}
           <div
-            className="bg-white rounded-lg shadow-sm border border-gray-100 p-4"
+            className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
           >
-            <div className="flex items-center justify-between mb-4">
-              <h2 className="text-sm font-bold text-gray-900">Recent Leads</h2>
-              <a href="/dashboard/leads" className="text-blue-600 hover:text-blue-700 text-xs font-semibold">View all →</a>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
+              <h2 className="text-base font-bold text-gray-900">Recent Leads</h2>
+              <a href="/dashboard/leads" className="text-blue-600 hover:text-blue-700 text-xs font-semibold flex items-center gap-1">
+                View all →
+              </a>
             </div>
-            <div className="space-y-3">
+            <div className="p-4 space-y-2">
               {data.recentLeads.map((lead) => (
-                <div key={lead.id} className="flex items-start gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors border border-transparent hover:border-gray-100">
-                  <div className="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
+                <div key={lead.id} className="flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors">
+                  <div className="w-9 h-9 rounded-full bg-blue-100 flex items-center justify-center flex-shrink-0">
                     <Users className="w-4 h-4 text-blue-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 text-sm truncate">{lead.name}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className={`px-2 py-0.5 text-[10px] font-medium rounded-full ${getStatusColor(lead.status)}`}>
+                    <p className="font-semibold text-gray-900 text-sm truncate">{lead.name}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full ${getStatusColor(lead.status)}`}>
                         {lead.status}
                       </span>
-                      <span className="text-[10px] text-gray-400">{new Date(lead.createdAt).toLocaleDateString()}</span>
+                      <span className="text-[10px] text-gray-500">{new Date(lead.createdAt).toLocaleDateString()}</span>
                     </div>
                   </div>
                 </div>
@@ -384,22 +380,24 @@ export default function DashboardPage() {
 
           {/* Recent Activities */}
           <div
-            className="bg-white rounded-lg shadow-sm border border-gray-100 p-4"
+            className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
           >
-            <h2 className="text-sm font-bold text-gray-900 mb-4">Recent Activities</h2>
-            <div className="space-y-3">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
+              <h2 className="text-base font-bold text-gray-900">Recent Activities</h2>
+            </div>
+            <div className="p-4 space-y-2">
               {data.recentActivities && data.recentActivities.length > 0 ? (
                 data.recentActivities.map((activity) => (
-                  <div key={activity.id} className="flex items-start gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors border border-transparent hover:border-gray-100">
-                    <div className="w-8 h-8 rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 flex items-center justify-center flex-shrink-0">
+                  <div key={activity.id} className="flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors">
+                    <div className="w-9 h-9 rounded-full bg-gradient-to-br from-cyan-100 to-blue-100 flex items-center justify-center flex-shrink-0">
                       <Activity className="w-4 h-4 text-cyan-600" />
                     </div>
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900 text-xs">{activity.description}</p>
-                      <div className="flex items-center gap-2 mt-1">
-                        <p className="text-[10px] text-gray-500">{activity.userRef.name}</p>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-medium text-gray-900 text-sm leading-tight">{activity.description}</p>
+                      <div className="flex items-center gap-1.5 mt-0.5">
+                        <p className="text-[10px] text-gray-600 font-medium">{activity.userRef.name}</p>
                         <span className="text-[10px] text-gray-300">•</span>
-                        <p className="text-[10px] text-gray-400">
+                        <p className="text-[10px] text-gray-500">
                           {new Date(activity.timestamp).toLocaleDateString()}
                         </p>
                       </div>
@@ -407,8 +405,8 @@ export default function DashboardPage() {
                   </div>
                 ))
               ) : (
-                <div className="text-center py-6">
-                  <p className="text-gray-500 text-xs">No activities yet</p>
+                <div className="text-center py-8">
+                  <p className="text-gray-500 text-sm">No activities yet</p>
                 </div>
               )}
             </div>
@@ -416,22 +414,24 @@ export default function DashboardPage() {
 
           {/* Recent Visitors */}
           <div
-            className="bg-white rounded-lg shadow-sm border border-gray-100 p-4"
+            className="bg-white rounded-lg shadow-sm border border-gray-100 overflow-hidden"
           >
-            <h2 className="text-sm font-bold text-gray-900 mb-4">Recent Visitors</h2>
-            <div className="space-y-3">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 bg-gray-50">
+              <h2 className="text-base font-bold text-gray-900">Recent Visitors</h2>
+            </div>
+            <div className="p-4 space-y-2">
               {data.recentVisitors.map((visitor) => (
-                <div key={visitor.id} className="flex items-start gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors border border-transparent hover:border-gray-100">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center flex-shrink-0">
+                <div key={visitor.id} className="flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors">
+                  <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center flex-shrink-0">
                     <Users className="w-4 h-4 text-purple-600" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-gray-900 text-xs truncate">{visitor.ipAddress}</p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <span className="px-2 py-0.5 text-[10px] bg-purple-100 text-purple-700 rounded-full font-medium">
+                    <p className="font-semibold text-gray-900 text-sm truncate">{visitor.ipAddress}</p>
+                    <div className="flex items-center gap-2 mt-0.5">
+                      <span className="px-2 py-0.5 text-[10px] bg-purple-100 text-purple-700 rounded-full font-semibold">
                         {visitor.visitCount} visits
                       </span>
-                      <p className="text-[10px] text-gray-400">
+                      <p className="text-[10px] text-gray-500">
                         {new Date(visitor.lastVisit).toLocaleDateString()}
                       </p>
                     </div>

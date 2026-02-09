@@ -3,6 +3,7 @@ export interface Author {
   name: string;
   bio: string;
   avatar: string;
+  avatarAlt: string;
   role: string;
   social?: {
     twitter?: string;
@@ -24,6 +25,7 @@ export interface BlogPost {
   content: string;
   coverImage: string;
   date: string;
+  lastModified?: string;
   author: Author;
   category: Category;
   tags: string[];
@@ -36,6 +38,7 @@ export interface BlogPostFrontmatter {
   excerpt: string;
   coverImage: string;
   date: string;
+  lastModified?: string;
   authorId: string;
   categorySlug: string;
   tags: string[];

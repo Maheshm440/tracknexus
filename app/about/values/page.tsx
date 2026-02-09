@@ -1,3 +1,7 @@
+
+
+
+
 "use client"
 
 import Image from "next/image"
@@ -63,7 +67,7 @@ const coreValues = [
     title: "Innovation & Excellence",
     subtitle: "Pushing boundaries daily",
     description: "We embrace cutting-edge technology and innovative thinking to stay ahead of industry trends and anticipate customer needs. Our commitment to excellence drives us to continuously improve our products, processes, and capabilities. We invest heavily in R&D and emerging technologies like AI and machine learning to deliver solutions that set industry standards.",
-    image: "https://images.unsplash.com/photo-1677442d019cecc6f63380ff65d995c946b65800?w=800&h=600&fit=crop",
+    image: "https://images.unsplash.com/photo-1451187580459-43490279c0fa?q=80&w=800&h=600&fit=crop",
     principles: [
       "Invest 15% of revenue in R&D and emerging technologies",
       "Encourage creative problem-solving with dedicated innovation time",
@@ -146,7 +150,7 @@ export default function ValuesPage() {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Hero Section */}
-      <section className="relative overflow-hidden bg-deloitte-black text-white px-4 py-20 lg:px-8 lg:py-32">
+      <section className="relative overflow-hidden bg-deloitte-black text-white px-4 py-12 lg:px-8 lg:py-16">
         {/* Background Video */}
         <div className="absolute inset-0 overflow-hidden">
           <video
@@ -223,7 +227,7 @@ export default function ValuesPage() {
       </section>
 
       {/* Values Overview Stats */}
-      <section className="bg-white py-12 border-b border-gray-200">
+      <section className="bg-white py-8 border-b border-gray-200">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             className="grid grid-cols-2 md:grid-cols-4 gap-8"
@@ -253,10 +257,10 @@ export default function ValuesPage() {
       </section>
 
       {/* Core Values Section */}
-      <section className="px-4 py-20 lg:px-8 lg:py-28">
+      <section className="px-4 py-12 lg:px-8 lg:py-16">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            className="text-center mb-16"
+            className="text-center mb-12"
             {...fadeInUp}
           >
             <h2 className="text-3xl lg:text-5xl font-light text-gray-900 mb-4">
@@ -289,7 +293,7 @@ export default function ValuesPage() {
                 >
                   <div className={`flex flex-col ${isEven ? "lg:flex-row" : "lg:flex-row-reverse"}`}>
                     {/* Image Section */}
-                    <div className="relative lg:w-1/2 h-64 lg:h-auto">
+                    <div className="relative lg:w-1/2 h-64 lg:h-96">
                       <Image
                         src={value.image}
                         alt={value.title}
@@ -345,10 +349,10 @@ export default function ValuesPage() {
       </section>
 
       {/* Video Showcase Section */}
-      <section className="bg-gradient-to-b from-gray-50 to-white px-4 py-20 lg:px-8 lg:py-28 border-t border-gray-200">
+      <section className="bg-gradient-to-b from-gray-50 to-white px-4 py-12 lg:px-8 lg:py-16 border-t border-gray-200">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            className="text-center mb-16"
+            className="text-center mb-12"
             {...fadeInUp}
           >
             <h2 className="text-3xl lg:text-5xl font-light text-gray-900 mb-4">
@@ -361,7 +365,7 @@ export default function ValuesPage() {
 
           {/* Main Featured Video */}
           <motion.div
-            className="mb-12"
+            className="mb-10"
             initial={{ opacity: 0, y: 30 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -466,10 +470,10 @@ export default function ValuesPage() {
       </section>
 
       {/* Values in Action Section */}
-      <section className="bg-white px-4 py-20 lg:px-8 lg:py-28 border-t border-gray-200">
+      <section className="bg-white px-4 py-12 lg:px-8 lg:py-16 border-t border-gray-200">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            className="text-center mb-16"
+            className="text-center mb-12"
             {...fadeInUp}
           >
             <h2 className="text-3xl lg:text-5xl font-light text-gray-900 mb-4">
@@ -617,10 +621,10 @@ export default function ValuesPage() {
       </section>
 
       {/* Customer Testimonial Videos */}
-      <section className="bg-gradient-to-b from-white to-gray-50 px-4 py-20 lg:px-8 lg:py-28">
+      <section className="bg-gradient-to-b from-white to-gray-50 px-4 py-12 lg:px-8 lg:py-16">
         <div className="max-w-7xl mx-auto">
           <motion.div
-            className="text-center mb-16"
+            className="text-center mb-12"
             {...fadeInUp}
           >
             <h2 className="text-3xl lg:text-5xl font-light text-gray-900 mb-4">
@@ -744,21 +748,21 @@ export default function ValuesPage() {
       </section>
 
       {/* CTA Section */}
-      <section className="bg-deloitte-black text-white px-4 py-20 lg:px-8 lg:py-32 relative overflow-hidden">
+      <section className="bg-deloitte-black text-white px-4 py-12 lg:px-8 lg:py-16 relative overflow-hidden">
         <div className="absolute inset-0 opacity-10">
           <div className="absolute inset-0 bg-grid-white/[0.2]" />
         </div>
 
         <div className="relative max-w-4xl mx-auto text-center">
           <motion.h2
-            className="text-3xl lg:text-5xl font-light mb-6"
+            className="text-3xl lg:text-5xl font-light mb-4"
             {...fadeInUp}
           >
             Share Our Values?{" "}
             <span className="text-highlight font-normal">Join Our Team</span>
           </motion.h2>
           <motion.p
-            className="text-lg text-gray-300 mb-10 max-w-2xl mx-auto"
+            className="text-lg text-gray-300 mb-8 max-w-2xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}

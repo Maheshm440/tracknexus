@@ -131,7 +131,7 @@ export default function RootLayout({
         <CookieConsentProvider>
           <ScrollToTop />
           <HeaderWrapper />
-          <main id="main-content" role="main" tabIndex={-1}>{children}</main>
+          <main id="main-content" role="main" tabIndex={-1} className="pt-[64px]">{children}</main>
           <FooterWrapper />
           <MailButtonWrapper />
           {/* Cookie consent banner is rendered by CookieConsentProvider */}

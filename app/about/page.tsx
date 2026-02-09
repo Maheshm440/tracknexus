@@ -230,7 +230,7 @@ export default function AboutPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero Section - Deloitte Style */}
-      <section className="relative bg-deloitte-black text-white px-4 py-24 lg:px-8 lg:py-32 overflow-hidden">
+      <section className="relative bg-deloitte-black text-white px-4 py-12 lg:px-8 lg:py-16 overflow-hidden">
         {/* Decorative elements */}
         <div className="absolute inset-0 overflow-hidden">
           <motion.div
@@ -272,9 +272,9 @@ export default function AboutPage() {
       </section>
 
       {/* Our Story Section */}
-      <section className="bg-white px-4 py-20 lg:px-8 lg:py-28">
+      <section className="bg-white px-4 py-12 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-7xl">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-14 items-center">
             {/* Left Content */}
             <motion.div className="space-y-6" {...fadeInLeft}>
               <p className="text-sm tracking-widest text-highlight uppercase font-medium">
@@ -338,10 +338,10 @@ export default function AboutPage() {
       </section>
 
       {/* Mission & Values Section */}
-      <section className="bg-gray-50 px-4 py-20 lg:px-8 lg:py-28">
+      <section className="bg-gray-50 px-4 py-12 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-7xl">
           {/* Mission Statement */}
-          <motion.div className="text-center mb-16 lg:mb-20" {...fadeInUp}>
+          <motion.div className="text-center mb-10 lg:mb-12" {...fadeInUp}>
             <p className="text-sm tracking-widest text-highlight uppercase font-medium mb-4">
               Our Mission
             </p>
@@ -385,9 +385,9 @@ export default function AboutPage() {
       </section>
 
       {/* Timeline Section */}
-      <section className="bg-white px-4 py-20 lg:px-8 lg:py-28">
+      <section className="bg-white px-4 py-12 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-4xl">
-          <motion.div className="text-center mb-16" {...fadeInUp}>
+          <motion.div className="text-center mb-10" {...fadeInUp}>
             <p className="text-sm tracking-widest text-highlight uppercase font-medium mb-4">
               Our Journey
             </p>
@@ -435,9 +435,9 @@ export default function AboutPage() {
       </section>
 
       {/* Team Members Section */}
-      <section id="team" className="bg-gray-50 px-4 py-20 lg:px-8 lg:py-28">
+      <section id="team" className="bg-gray-50 px-4 py-12 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-7xl">
-          <motion.div className="text-center mb-12" {...fadeInUp}>
+          <motion.div className="text-center mb-8" {...fadeInUp}>
             <p className="text-sm tracking-widest text-highlight uppercase font-medium mb-4">
               Our Team
             </p>
@@ -451,7 +451,7 @@ export default function AboutPage() {
 
           {/* Team Stats */}
           <motion.div
-            className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-16 max-w-5xl mx-auto"
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10 max-w-5xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -477,13 +477,13 @@ export default function AboutPage() {
 
           {/* Leadership Team Heading */}
           <motion.div
-            className="text-center mb-12"
+            className="text-center mb-6"
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.3 }}
           >
-            <h3 className="text-2xl font-bold text-gray-900 mb-3">Leadership Team</h3>
+            <h3 className="text-2xl font-bold text-gray-900 mb-1">Leadership Team</h3>
             <p className="text-gray-600 max-w-xl mx-auto">
               Experienced leaders driving innovation, growth, and customer success across every aspect of our business.
             </p>
@@ -566,9 +566,9 @@ export default function AboutPage() {
       </section>
 
       {/* Testimonials Section */}
-      <section className="bg-white px-4 py-20 lg:px-8 lg:py-28">
+      <section className="bg-white px-4 py-12 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-7xl">
-          <motion.div className="text-center mb-16" {...fadeInUp}>
+          <motion.div className="text-center mb-10" {...fadeInUp}>
             <p className="text-sm tracking-widest text-highlight uppercase font-medium mb-4">
               Testimonials
             </p>
@@ -616,10 +616,10 @@ export default function AboutPage() {
       </section>
 
       {/* Partner Logos Section */}
-      <section className="bg-gray-50 py-12">
+      <section className="bg-gray-50 py-8">
         <div className="mx-auto max-w-7xl px-4">
           <motion.p
-            className="text-sm tracking-widest text-highlight uppercase font-medium text-center mb-8"
+            className="text-sm tracking-widest text-highlight uppercase font-medium text-center mb-6"
             {...fadeInUp}
           >
             Trusted by Industry Leaders

@@ -89,7 +89,7 @@ export function FAQSection({
   }, [faqs])
 
   return (
-    <section className="bg-white px-4 py-16 lg:px-8 lg:py-24">
+    <section className="bg-gradient-to-b from-gray-50 to-white px-4 py-12 lg:px-8 lg:py-16">
       {/* FAQ Schema for SEO */}
       <script
         type="application/ld+json"
@@ -97,9 +97,11 @@ export function FAQSection({
       />
       <div className="mx-auto max-w-7xl">
         {/* Header */}
-        <div className="text-center mb-16">
-          <h2 className="text-3xl lg:text-5xl font-bold mb-4" style={{ color: '#096EB6' }}>{title}</h2>
-          <p className="text-lg text-gray-600">{subtitle}</p>
+        <div className="text-center mb-10">
+          <p className="text-sm tracking-widest text-highlight uppercase font-medium mb-3">
+            {title}
+          </p>
+          <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-2">{subtitle}</h2>
         </div>
 
         <div className={`grid grid-cols-1 ${showImage ? 'lg:grid-cols-2' : ''} gap-12 lg:gap-16 items-center`}>
@@ -117,25 +119,45 @@ export function FAQSection({
           )}
 
           {/* FAQ Items */}
-          <div className="space-y-4">
-            {faqs.map((faq) => (
-              <div
+          <div className="space-y-3">
+            {faqs.map((faq, index) => (
+              <motion.div
                 key={faq.id}
-                className="border border-gray-200 rounded-lg overflow-hidden"
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.4, delay: index * 0.05 }}
+                className={`bg-white border border-gray-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all duration-300 ${
+                  openFAQ === faq.id ? 'border-highlight/30 shadow-md' : ''
+                }`}
               >
                 <button
                   onClick={() => toggleFAQ(faq.id)}
-                  className="w-full px-6 py-4 text-left text-white font-medium flex justify-between items-center transition-colors"
-                  style={{ backgroundColor: '#096EB6' }}
-                  onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#085a94'}
-                  onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#096EB6'}
+                  className={`w-full px-6 py-5 text-left font-semibold flex justify-between items-center transition-all duration-300 ${
+                    openFAQ === faq.id
+                      ? 'bg-gradient-to-r from-highlight/5 to-highlight/10 text-gray-900'
+                      : 'text-gray-800 hover:bg-gray-50'
+                  }`}
                   aria-expanded={openFAQ === faq.id}
                 >
-                  <span className="text-sm lg:text-base">
-                    {faq.id}. {faq.question}
+                  <span className="text-sm lg:text-base pr-4 flex items-start gap-3">
+                    <span className={`flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
+                      openFAQ === faq.id
+                        ? 'bg-highlight text-white'
+                        : 'bg-gray-100 text-gray-600'
+                    }`}>
+                      {faq.id}
+                    </span>
+                    <span className="flex-1">{faq.question}</span>
                   </span>
-                  <motion.div animate={{ rotate: openFAQ === faq.id ? 180 : 0 }} transition={{ duration: 0.3 }}>
-                    <ChevronDown className="w-5 h-5 flex-shrink-0 ml-2" />
+                  <motion.div
+                    animate={{ rotate: openFAQ === faq.id ? 180 : 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="flex-shrink-0"
+                  >
+                    <ChevronDown className={`w-5 h-5 transition-colors ${
+                      openFAQ === faq.id ? 'text-highlight' : 'text-gray-400'
+                    }`} />
                   </motion.div>
                 </button>
 
@@ -145,14 +167,16 @@ export function FAQSection({
                       initial={{ height: 0, opacity: 0 }}
                       animate={{ height: "auto", opacity: 1 }}
                       exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.3 }}
+                      transition={{ duration: 0.3, ease: "easeInOut" }}
                       className="overflow-hidden"
                     >
-                      <div className="px-6 py-4 bg-gray-50 text-gray-700 leading-relaxed">{faq.answer}</div>
+                      <div className="px-6 py-5 bg-gradient-to-br from-gray-50 to-white text-gray-700 leading-relaxed border-t border-gray-100">
+                        <p className="pl-9">{faq.answer}</p>
+                      </div>
                     </motion.div>
                   )}
                 </AnimatePresence>
-              </div>
+              </motion.div>
             ))}
           </div>
         </div>

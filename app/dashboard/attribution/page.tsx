@@ -207,12 +207,14 @@ export default function AttributionPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Attribution</h1>
-          <p className="text-gray-500 mt-1">
-            Track lead sources and campaign performance
-          </p>
+      <div className="bg-white border-b border-gray-200 -mx-6 px-6">
+        <div className="flex items-center justify-between py-3">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Attribution</h1>
+            <p className="text-gray-500 mt-0.5 text-sm">
+              Track lead sources and campaign performance
+            </p>
+          </div>
         </div>
       </div>
 
@@ -236,7 +238,7 @@ export default function AttributionPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Total Leads Attributed</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
+                <p className="text-xl font-semibold text-gray-900 mt-1">
                   {stats.totalAttributions}
                 </p>
               </div>
@@ -247,7 +249,7 @@ export default function AttributionPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Conversions</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
+                <p className="text-xl font-semibold text-gray-900 mt-1">
                   {stats.conversions}
                 </p>
               </div>
@@ -258,7 +260,7 @@ export default function AttributionPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Conversion Rate</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
+                <p className="text-xl font-semibold text-gray-900 mt-1">
                   {stats.conversionRate.toFixed(2)}%
                 </p>
               </div>
@@ -269,7 +271,7 @@ export default function AttributionPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-500">Top Source</p>
-                <p className="text-2xl font-bold text-gray-900 mt-1">
+                <p className="text-xl font-semibold text-gray-900 mt-1">
                   {stats.topSources[0]?.source || 'N/A'}
                 </p>
               </div>

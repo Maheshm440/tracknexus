@@ -16,6 +16,8 @@ import {
   TrendingUp,
   Users,
   AlertCircle,
+  Plus,
+  UserPlus,
 } from 'lucide-react';
 import { format, parseISO } from 'date-fns';
 
@@ -84,10 +86,19 @@ export default function HelpDeskPage() {
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'open' | 'progress' | 'resolved'>('all');
   const [newResponse, setNewResponse] = useState('');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [creating, setCreating] = useState(false);
+  const [newTicket, setNewTicket] = useState({
+    subject: '',
+    description: '',
+    email: '',
+    priority: 'MEDIUM' as string,
+    category: '',
+  });
   const [stats, setStats] = useState({
     open: 0,
     inProgress: 0,
-    avgResolutionTime: '2d',
+    avgResolutionTime: '-',
     resolvedToday: 0,
   });
 
@@ -139,12 +150,23 @@ export default function HelpDeskPage() {
         new Date(t.resolvedAt).toDateString() === new Date().toDateString()
     ).length;
 
-    setStats({
-      open,
-      inProgress,
-      avgResolutionTime: '2d',
-      resolvedToday,
-    });
+    // Calculate real avg resolution time
+    const resolvedTickets = ticketList.filter((t) => t.resolvedAt);
+    let avgResolutionTime = '-';
+    if (resolvedTickets.length > 0) {
+      const totalMs = resolvedTickets.reduce((sum, t) => {
+        const created = new Date(t.createdAt).getTime();
+        const resolved = new Date(t.resolvedAt!).getTime();
+        return sum + (resolved - created);
+      }, 0);
+      const avgMs = totalMs / resolvedTickets.length;
+      const avgHours = avgMs / (1000 * 60 * 60);
+      if (avgHours < 1) avgResolutionTime = `${Math.round(avgMs / (1000 * 60))}m`;
+      else if (avgHours < 24) avgResolutionTime = `${Math.round(avgHours)}h`;
+      else avgResolutionTime = `${Math.round(avgHours / 24)}d`;
+    }
+
+    setStats({ open, inProgress, avgResolutionTime, resolvedToday });
   };
 
   useEffect(() => {
@@ -242,6 +264,50 @@ export default function HelpDeskPage() {
     }
   };
 
+  const handleCreateTicket = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newTicket.subject || !newTicket.description || !newTicket.email) return;
+
+    try {
+      setCreating(true);
+      const res = await fetch('/api/tickets', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newTicket),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setShowCreateModal(false);
+        setNewTicket({ subject: '', description: '', email: '', priority: 'MEDIUM', category: '' });
+        fetchTickets();
+      } else {
+        alert(data.error || 'Failed to create ticket');
+      }
+    } catch (err) {
+      console.error('Failed to create ticket:', err);
+      alert('Failed to create ticket. Please try again.');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const assignTicket = async (ticketId: string, assignee: string) => {
+    try {
+      const res = await fetch(`/api/tickets/${ticketId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ assignedTo: assignee }),
+      });
+      const data = await res.json();
+      if (data.success && selectedTicket?.id === ticketId) {
+        setSelectedTicket(data.data);
+      }
+      fetchTickets();
+    } catch (err) {
+      console.error('Failed to assign ticket:', err);
+    }
+  };
+
   if (loading && tickets.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -253,12 +319,21 @@ export default function HelpDeskPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Help Desk</h1>
-          <p className="text-gray-500 mt-1">
-            Manage customer support tickets
-          </p>
+      <div className="bg-white border-b border-gray-200 -mx-6 px-6">
+        <div className="flex items-center justify-between py-3">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Help Desk</h1>
+            <p className="text-gray-500 mt-0.5 text-sm">
+              Manage customer support tickets
+            </p>
+          </div>
+          <button
+            onClick={() => setShowCreateModal(true)}
+            className="flex items-center gap-2 px-4 py-2 bg-highlight text-white rounded-lg hover:bg-opacity-90 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            New Ticket
+          </button>
         </div>
       </div>
 
@@ -329,6 +404,87 @@ export default function HelpDeskPage() {
           </div>
         </div>
       </div>
+
+      {/* Selected Ticket Card - Display Above Tabs */}
+      {selectedTicket && (
+        <div className="bg-white rounded-xl shadow-md border border-highlight/20 p-6 mb-6">
+          <div className="flex items-start justify-between mb-4">
+            <div>
+              <div className="flex items-center gap-3 mb-1">
+                <span className="font-mono text-sm font-medium text-gray-500">
+                  {selectedTicket.ticketNumber}
+                </span>
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    priorityColors[selectedTicket.priority]
+                  }`}
+                >
+                  {selectedTicket.priority}
+                </span>
+                <span
+                  className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
+                    statusColors[selectedTicket.status]
+                  }`}
+                >
+                  {selectedTicket.status}
+                </span>
+              </div>
+              <h3 className="text-lg font-bold text-gray-900">{selectedTicket.subject}</h3>
+            </div>
+            <button
+              onClick={() => setSelectedTicket(null)}
+              className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+            >
+              <X className="w-5 h-5 text-gray-500" />
+            </button>
+          </div>
+
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6 pb-6 border-b">
+            <div>
+              <p className="text-xs text-gray-500 font-medium uppercase mb-1">Email</p>
+              <p className="text-sm font-medium text-gray-900">{selectedTicket.email}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 font-medium uppercase mb-1">Category</p>
+              <p className="text-sm font-medium text-gray-900">{selectedTicket.category || '-'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 font-medium uppercase mb-1">Assigned To</p>
+              <p className="text-sm font-medium text-gray-900">{selectedTicket.assignedTo || 'Unassigned'}</p>
+            </div>
+            <div>
+              <p className="text-xs text-gray-500 font-medium uppercase mb-1">Responses</p>
+              <p className="text-sm font-bold text-highlight">{selectedTicket._count?.responses || 0}</p>
+            </div>
+          </div>
+
+          {selectedTicket.description && (
+            <div className="mb-6 pb-6 border-b">
+              <p className="text-xs text-gray-500 font-medium uppercase mb-2">Description</p>
+              <p className="text-sm text-gray-900">{selectedTicket.description}</p>
+            </div>
+          )}
+
+          <div className="flex gap-2">
+            <button
+              onClick={() => {
+                const currentStatusIndex = statusOptions.indexOf(selectedTicket.status);
+                const nextStatus = statusOptions[(currentStatusIndex + 1) % statusOptions.length];
+                updateTicketStatus(selectedTicket.id, nextStatus);
+              }}
+              className="flex-1 px-4 py-2 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg hover:bg-blue-100 transition-colors"
+            >
+              Change Status
+            </button>
+            <button
+              onClick={() => deleteTicket(selectedTicket.id)}
+              className="flex-1 px-4 py-2 bg-red-50 text-red-700 text-sm font-medium rounded-lg hover:bg-red-100 transition-colors"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="bg-white rounded-xl shadow-sm border border-gray-100">
@@ -421,7 +577,7 @@ export default function HelpDeskPage() {
             </thead>
             <tbody className="divide-y divide-gray-100">
               {tickets.map((ticket) => (
-                <tr key={ticket.id} className="hover:bg-gray-50">
+                <tr key={ticket.id} className="hover:bg-gray-50 cursor-pointer transition-colors" onClick={() => setSelectedTicket(ticket)}>
                   <td className="py-4 px-4">
                     <span className="font-mono text-sm font-medium text-gray-900">
                       {ticket.ticketNumber}
@@ -456,7 +612,7 @@ export default function HelpDeskPage() {
                       {ticket.status}
                     </span>
                   </td>
-                  <td className="py-4 px-4 text-right">
+                  <td className="py-4 px-4 text-right" onClick={(e) => e.stopPropagation()}>
                     <div className="relative">
                       <button
                         onClick={() =>
@@ -467,9 +623,12 @@ export default function HelpDeskPage() {
                         <MoreVertical className="w-4 h-4 text-gray-500" />
                       </button>
                       {showDropdown === ticket.id && (
-                        <div className="absolute right-0 mt-1 w-48 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-10">
+                        <div className="absolute right-0 mt-1 w-56 bg-white rounded-lg shadow-lg border border-gray-100 py-1 z-10">
                           <button
-                            onClick={() => setSelectedTicket(ticket)}
+                            onClick={() => {
+                              setSelectedTicket(ticket);
+                              setShowDropdown(null);
+                            }}
                             className="w-full flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-50"
                           >
                             <Eye className="w-4 h-4 mr-2" />
@@ -549,6 +708,106 @@ export default function HelpDeskPage() {
         )}
       </div>
 
+      {/* Create Ticket Modal */}
+      {showCreateModal && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+          onClick={() => setShowCreateModal(false)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-2xl w-full max-w-sm"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-3 border-b flex items-center justify-between">
+              <h2 className="text-base font-bold text-gray-900">New Ticket</h2>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="p-1 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-4 h-4 text-gray-500" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateTicket} className="p-3 space-y-2.5">
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Subject *</label>
+                <input
+                  type="text"
+                  value={newTicket.subject}
+                  onChange={(e) => setNewTicket({ ...newTicket, subject: e.target.value })}
+                  required
+                  placeholder="Brief summary"
+                  className="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-highlight focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Email *</label>
+                <input
+                  type="email"
+                  value={newTicket.email}
+                  onChange={(e) => setNewTicket({ ...newTicket, email: e.target.value })}
+                  required
+                  placeholder="customer@example.com"
+                  className="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-highlight focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Priority & Category</label>
+                <div className="grid grid-cols-2 gap-1.5">
+                  <select
+                    value={newTicket.priority}
+                    onChange={(e) => setNewTicket({ ...newTicket, priority: e.target.value })}
+                    className="border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-highlight focus:border-transparent bg-white"
+                  >
+                    {priorityOptions.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                  <select
+                    value={newTicket.category}
+                    onChange={(e) => setNewTicket({ ...newTicket, category: e.target.value })}
+                    className="border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-highlight focus:border-transparent bg-white"
+                  >
+                    <option value="">General</option>
+                    <option value="Technical">Technical</option>
+                    <option value="Billing">Billing</option>
+                    <option value="Account">Account</option>
+                    <option value="Feature Request">Feature Req</option>
+                    <option value="Bug Report">Bug Report</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-700 mb-1">Description *</label>
+                <textarea
+                  value={newTicket.description}
+                  onChange={(e) => setNewTicket({ ...newTicket, description: e.target.value })}
+                  required
+                  rows={3}
+                  placeholder="Describe the issue..."
+                  className="w-full border border-gray-200 rounded px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-highlight focus:border-transparent resize-none"
+                />
+              </div>
+              <div className="flex justify-end gap-2 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="px-3 py-1.5 text-xs font-medium text-gray-700 border border-gray-200 rounded hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className="px-3 py-1.5 text-xs font-medium bg-highlight text-white rounded hover:bg-opacity-90 transition-all disabled:opacity-50"
+                >
+                  {creating ? 'Creating...' : 'Create'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Ticket Detail Modal */}
       {selectedTicket && (
         <div
@@ -556,21 +815,21 @@ export default function HelpDeskPage() {
           onClick={() => setSelectedTicket(null)}
         >
           <div
-            className="bg-white rounded-xl shadow-2xl w-full max-w-3xl max-h-[90vh] overflow-y-auto"
+            className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Header */}
-            <div className="p-6 border-b sticky top-0 bg-white">
+            <div className="p-4 border-b sticky top-0 bg-white">
               <div className="flex items-start justify-between">
                 <div>
-                  <p className="text-sm text-gray-500">{selectedTicket.ticketNumber}</p>
-                  <h2 className="text-xl font-bold text-gray-900 mt-1">
+                  <p className="text-xs text-gray-500 font-medium">{selectedTicket.ticketNumber}</p>
+                  <h2 className="text-lg font-bold text-gray-900 mt-0.5">
                     {selectedTicket.subject}
                   </h2>
                 </div>
                 <button
                   onClick={() => setSelectedTicket(null)}
-                  className="p-2 hover:bg-gray-100 rounded-lg"
+                  className="p-1 hover:bg-gray-100 rounded-lg"
                 >
                   <X className="w-5 h-5 text-gray-500" />
                 </button>
@@ -578,17 +837,17 @@ export default function HelpDeskPage() {
             </div>
 
             {/* Content */}
-            <div className="p-6 space-y-6">
+            <div className="p-4 space-y-4">
               {/* Ticket Info */}
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-2 gap-3 bg-gray-50 p-3 rounded-lg">
                 <div>
-                  <p className="text-sm text-gray-500">Email</p>
-                  <p className="font-medium">{selectedTicket.email}</p>
+                  <p className="text-xs text-gray-500 font-medium uppercase">Email</p>
+                  <p className="text-sm font-medium text-gray-900 mt-0.5">{selectedTicket.email}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Priority</p>
+                  <p className="text-xs text-gray-500 font-medium uppercase">Priority</p>
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-0.5 ${
                       priorityColors[selectedTicket.priority]
                     }`}
                   >
@@ -596,9 +855,9 @@ export default function HelpDeskPage() {
                   </span>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Status</p>
+                  <p className="text-xs text-gray-500 font-medium uppercase">Status</p>
                   <span
-                    className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium mt-0.5 ${
                       statusColors[selectedTicket.status]
                     }`}
                   >
@@ -606,51 +865,76 @@ export default function HelpDeskPage() {
                   </span>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-500">Category</p>
-                  <p className="font-medium">{selectedTicket.category || 'General'}</p>
+                  <p className="text-xs text-gray-500 font-medium uppercase">Category</p>
+                  <p className="text-sm font-medium text-gray-900 mt-0.5">{selectedTicket.category || 'General'}</p>
+                </div>
+              </div>
+
+              {/* Assigned To */}
+              <div>
+                <p className="text-xs text-gray-500 font-medium uppercase mb-2">Assigned To</p>
+                <div className="flex items-center gap-2">
+                  <UserPlus className="w-4 h-4 text-gray-400" />
+                  <input
+                    type="text"
+                    placeholder="Type name..."
+                    defaultValue={selectedTicket.assignedTo || ''}
+                    onBlur={(e) => {
+                      const val = e.target.value.trim();
+                      if (val !== (selectedTicket.assignedTo || '')) {
+                        assignTicket(selectedTicket.id, val);
+                      }
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        (e.target as HTMLInputElement).blur();
+                      }
+                    }}
+                    className="flex-1 px-3 py-1.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-highlight focus:border-transparent"
+                  />
                 </div>
               </div>
 
               {/* Description */}
               <div>
-                <p className="text-sm text-gray-500 mb-2">Description</p>
-                <p className="p-3 bg-gray-50 rounded-lg text-gray-900">
+                <p className="text-xs text-gray-500 font-medium uppercase mb-2">Description</p>
+                <p className="p-2.5 bg-gray-50 rounded text-sm text-gray-900">
                   {selectedTicket.description}
                 </p>
               </div>
 
               {/* Responses */}
               <div>
-                <p className="text-sm text-gray-500 mb-3 font-medium">Responses</p>
-                <div className="space-y-3 mb-4 max-h-64 overflow-y-auto">
+                <p className="text-xs text-gray-500 font-medium uppercase mb-2">Responses</p>
+                <div className="space-y-2 mb-3 max-h-56 overflow-y-auto">
                   {selectedTicket.responses && selectedTicket.responses.length > 0 ? (
                     selectedTicket.responses.map((response) => (
                       <div
                         key={response.id}
-                        className={`p-3 rounded-lg ${
+                        className={`p-2.5 rounded text-sm ${
                           response.isInternal
-                            ? 'bg-yellow-50 border border-yellow-200'
-                            : 'bg-blue-50 border border-blue-200'
+                            ? 'bg-yellow-50 border border-yellow-100'
+                            : 'bg-blue-50 border border-blue-100'
                         }`}
                       >
-                        <div className="flex items-start justify-between">
-                          <div>
-                            <p className="text-xs font-medium text-gray-600">
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="flex-1">
+                            <p className="text-xs font-medium text-gray-700">
                               {response.createdBy || 'Support'}
                               {response.isInternal && ' (Internal)'}
                             </p>
-                            <p className="text-sm text-gray-900 mt-1">
+                            <p className="text-sm text-gray-900 mt-0.5">
                               {response.message}
                             </p>
                           </div>
-                          <span className="text-xs text-gray-500 whitespace-nowrap ml-2">
+                          <span className="text-xs text-gray-500 whitespace-nowrap flex-shrink-0">
                             {format(parseISO(response.createdAt), 'MMM d, h:mm a')}
                           </span>
                         </div>
                       </div>
                     ))
                   ) : (
-                    <p className="text-sm text-gray-500 text-center py-4">
+                    <p className="text-xs text-gray-500 text-center py-3">
                       No responses yet
                     </p>
                   )}
@@ -668,20 +952,20 @@ export default function HelpDeskPage() {
                         addResponse();
                       }
                     }}
-                    className="flex-1 px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-highlight focus:border-transparent"
+                    className="flex-1 px-3 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-highlight focus:border-transparent"
                   />
                   <button
                     onClick={addResponse}
                     disabled={!newResponse.trim()}
-                    className="p-2 bg-highlight text-white rounded-lg hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
+                    className="p-1.5 bg-highlight text-white rounded hover:bg-opacity-90 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
                   >
-                    <Send className="w-5 h-5" />
+                    <Send className="w-4 h-4" />
                   </button>
                 </div>
               </div>
 
               {/* Footer Info */}
-              <div className="text-xs text-gray-500 flex justify-between pt-4 border-t">
+              <div className="text-xs text-gray-500 flex justify-between pt-3 border-t">
                 <span>Created: {format(parseISO(selectedTicket.createdAt), 'PPpp')}</span>
                 <span>Updated: {format(parseISO(selectedTicket.updatedAt), 'PPpp')}</span>
               </div>

@@ -207,11 +207,15 @@ export default function VisitorsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-gray-900">Visitor Analytics</h1>
-        <p className="text-gray-500 mt-1">
-          Analyze your website visitors and their behavior
-        </p>
+      <div className="bg-white border-b border-gray-200 -mx-6 px-6">
+        <div className="flex items-center justify-between py-3">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Visitor Analytics</h1>
+            <p className="text-gray-500 mt-0.5 text-sm">
+              Analyze your website visitors and their behavior
+            </p>
+          </div>
+        </div>
       </div>
 
       {/* Error Alert */}

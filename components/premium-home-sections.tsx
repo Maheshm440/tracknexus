@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useRef, useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 import {
@@ -32,6 +33,7 @@ import {
   FileText,
   MapPin,
   User,
+  Brain,
 } from "lucide-react";
 
 // ============================================
@@ -415,6 +417,7 @@ export function FeatureShowcaseSection() {
 // SECTION 3: Multi-Platform Section
 // ============================================
 export function MultiPlatformSection() {
+  const router = useRouter();
   const platforms = [
     { icon: Monitor, name: "Desktop", description: "Windows & Mac apps" },
     { icon: Smartphone, name: "Mobile", description: "iOS & Android" },
@@ -446,7 +449,9 @@ export function MultiPlatformSection() {
                 width={400}
                 height={300}
                 className="rounded-xl shadow-xl"
-                unoptimized
+                quality={90}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
+                priority={false}
               />
 
               {/* Static device cards - No infinite animations */}
@@ -515,6 +520,7 @@ export function MultiPlatformSection() {
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
+              onClick={() => router.push("/signup")}
               className="px-8 py-4 bg-gradient-to-r from-cyan-600 to-emerald-600 text-white font-semibold rounded-xl shadow-lg hover:shadow-2xl transition-all flex items-center gap-2"
             >
               Download Free
@@ -611,7 +617,9 @@ export function SecuritySection() {
                 width={400}
                 height={300}
                 className="rounded-2xl shadow-xl"
-                unoptimized
+                quality={90}
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 400px"
+                priority={false}
               />
 
               {/* Security Badge Overlay */}
@@ -743,59 +751,97 @@ export function FinalCTASection() {
           transition={{ duration: 0.4 }}
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full mb-8 border border-white/20">
-            <Rocket className="w-5 h-5 text-cyan-400" />
-            <span className="text-white font-semibold">Start Your Journey Today</span>
+            <Zap className="w-5 h-5 text-cyan-400" />
+            <span className="text-white font-semibold">Transform Your Workforce Today</span>
           </div>
 
           <h2 className="text-4xl lg:text-6xl font-bold text-white mb-6 leading-tight">
-            Ready to Transform
+            Join Thousands of Teams
             <span className="block text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 via-blue-400 to-emerald-400">
-              Your Productivity?
+              Already Optimizing Performance
             </span>
           </h2>
 
-          <p className="text-xl text-gray-300 mb-12 max-w-2xl mx-auto">
-            Join 50,000+ teams who have revolutionized their time management with Track Nexus. Start your free trial today.
+          <p className="text-xl text-gray-300 mb-12 max-w-3xl mx-auto">
+            Track Nexus helps organizations worldwide streamline operations, boost productivity, and make data-driven decisions. Experience the power of intelligent workforce management with real-time analytics and automated reporting.
           </p>
 
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <motion.button
-              whileHover={{ scale: 1.05, boxShadow: "0 0 40px rgba(6, 182, 212, 0.4)" }}
-              whileTap={{ scale: 0.95 }}
-              className="px-10 py-5 bg-gradient-to-r from-cyan-500 to-emerald-500 text-white font-bold text-lg rounded-xl shadow-lg flex items-center justify-center gap-2"
-              onClick={() => window.location.href = '/signup'}
-            >
-              Start Free Trial
-              <ArrowRight className="w-5 h-5" />
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-10 py-5 bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white font-bold text-lg rounded-xl hover:bg-white/20 transition-all flex items-center justify-center gap-2"
-              onClick={() => window.location.href = '/signup'}
-            >
-              <User className="w-5 h-5" />
-              Sign Up Now
-            </motion.button>
-            <motion.button
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              className="px-10 py-5 bg-white/10 backdrop-blur-sm border-2 border-white/30 text-white font-bold text-lg rounded-xl hover:bg-white/20 transition-all flex items-center justify-center gap-2"
-              onClick={() => window.location.href = '/login'}
-            >
-              <Lock className="w-5 h-5" />
-              Login
-            </motion.button>
+          {/* Stats Grid */}
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 max-w-4xl mx-auto">
+            {[
+              { value: "500+", label: "Companies Trust Us" },
+              { value: "50K+", label: "Active Teams" },
+              { value: "1M+", label: "Hours Tracked Daily" },
+              { value: "99.9%", label: "Uptime Guarantee" }
+            ].map((stat, i) => (
+              <motion.div
+                key={i}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="bg-white/5 backdrop-blur-sm rounded-2xl p-6 border border-white/10 hover:border-cyan-400/50 transition-all"
+              >
+                <div className="text-3xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-cyan-400 to-emerald-400 mb-2">
+                  {stat.value}
+                </div>
+                <div className="text-sm text-gray-300">{stat.label}</div>
+              </motion.div>
+            ))}
           </div>
 
-          {/* Trust Indicators */}
-          <div className="mt-12 flex flex-wrap justify-center gap-8">
-            {["No Credit Card", "14-Day Free Trial", "Cancel Anytime"].map((text, i) => (
-              <div key={i} className="flex items-center gap-2 text-gray-300">
-                <CheckCircle className="w-5 h-5 text-emerald-400" />
-                <span>{text}</span>
-              </div>
-            ))}
+          {/* All Features - Uniform Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+            {[
+              {
+                icon: Clock,
+                title: "Real-Time Insights",
+                description: "Monitor your team's productivity in real-time with live dashboards and instant notifications."
+              },
+              {
+                icon: Brain,
+                title: "AI-Powered Intelligence",
+                description: "Leverage advanced AI algorithms to identify patterns, predict trends, and optimize workforce allocation."
+              },
+              {
+                icon: Shield,
+                title: "Enterprise-Grade Security",
+                description: "Bank-level encryption and SOC 2 compliance to keep your data safe and secure."
+              },
+              {
+                icon: Zap,
+                title: "Lightning Fast Setup",
+                description: "Get started in minutes, not hours. No complex configuration or technical expertise required."
+              },
+              {
+                icon: Users,
+                title: "Unlimited Team Members",
+                description: "Scale your team without limits. Add as many users as you need without extra charges."
+              },
+              {
+                icon: BarChart3,
+                title: "Advanced Analytics",
+                description: "Gain deep insights with comprehensive reports and customizable dashboards for data-driven decisions."
+              }
+            ].map((feature, i) => {
+              const Icon = feature.icon;
+              return (
+                <motion.div
+                  key={i}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: i * 0.1 }}
+                  className="bg-white/5 backdrop-blur-sm rounded-xl p-6 border border-white/10 hover:border-cyan-400/50 transition-all h-full"
+                >
+                  <div className="w-12 h-12 bg-gradient-to-br from-cyan-500/20 to-emerald-500/20 rounded-lg flex items-center justify-center mb-4">
+                    <Icon className="w-6 h-6 text-cyan-400" />
+                  </div>
+                  <h3 className="text-lg font-bold text-white mb-2">{feature.title}</h3>
+                  <p className="text-sm text-gray-400">{feature.description}</p>
+                </motion.div>
+              );
+            })}
           </div>
         </motion.div>
       </div>

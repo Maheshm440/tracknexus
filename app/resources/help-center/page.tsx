@@ -1,163 +1,225 @@
 "use client"
 
+import Link from "next/link"
 import { motion } from "framer-motion"
-import { Search, Book, MessageCircle, Video, FileText, HelpCircle } from "lucide-react"
+import { Book, Clock, BarChart3, Zap, Shield, CreditCard, FileText, Video } from "lucide-react"
+import HelpCenterSearch from "@/components/help-center/HelpCenterSearch"
+import RecentArticles from "@/components/help-center/RecentArticles"
+import FAQSection from "@/components/help-center/FAQSection"
+import QuickLinks from "@/components/help-center/QuickLinks"
+import TrendingTopics from "@/components/help-center/TrendingTopics"
+import VideoTutorials from "@/components/help-center/VideoTutorials"
+import ContactSupportForm from "@/components/help-center/ContactSupportForm"
 
 const categories = [
   {
     title: "Getting Started",
+    slug: "getting-started",
     icon: Book,
     articles: 24,
     description: "Quick start guides and setup tutorials",
   },
   {
     title: "Time Tracking",
-    icon: FileText,
+    slug: "time-tracking",
+    icon: Clock,
     articles: 18,
     description: "Track time effectively across your team",
   },
   {
     title: "Analytics & Reports",
-    icon: Video,
+    slug: "analytics-reports",
+    icon: BarChart3,
     articles: 15,
     description: "Generate insights and custom reports",
   },
   {
     title: "Integrations",
-    icon: MessageCircle,
+    slug: "integrations",
+    icon: Zap,
     articles: 22,
     description: "Connect with your favorite tools",
   },
   {
     title: "Security & Privacy",
-    icon: HelpCircle,
+    slug: "security-privacy",
+    icon: Shield,
     articles: 12,
     description: "Data protection and compliance",
   },
   {
     title: "Billing & Plans",
-    icon: FileText,
+    slug: "billing-plans",
+    icon: CreditCard,
     articles: 16,
     description: "Subscription and payment information",
   },
-]
-
-const popularArticles = [
-  "How to set up your first project",
-  "Understanding productivity metrics",
-  "Inviting team members and setting permissions",
-  "Configuring automated time tracking",
-  "Creating custom reports and dashboards",
-  "Integrating with Slack and Microsoft Teams",
 ]
 
 export default function HelpCenterPage() {
   return (
     <div className="min-h-screen bg-white">
       {/* Hero with Search */}
-      <section className="bg-gradient-to-b from-deloitte-green to-deloitte-green-dark py-20 lg:py-28">
-        <div className="max-w-4xl mx-auto px-4 lg:px-8">
+      <section className="relative bg-gradient-to-br from-deloitte-green via-deloitte-green-dark to-cyan-700 py-10 lg:py-12 overflow-hidden">
+        {/* Decorative Elements */}
+        <div className="absolute inset-0 opacity-10">
+          <div className="absolute top-10 left-10 w-48 h-48 bg-white rounded-full blur-3xl" />
+          <div className="absolute bottom-5 right-10 w-64 h-64 bg-white rounded-full blur-3xl" />
+        </div>
+
+        <div className="relative max-w-4xl mx-auto px-4 lg:px-8">
           <motion.div
             className="text-center"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-4xl lg:text-5xl font-light text-white mb-6">
+            {/* Badge */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="inline-flex items-center gap-2 px-3 py-1 bg-white/20 backdrop-blur-sm rounded-full mb-3"
+            >
+              <div className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+              <span className="text-xs font-semibold text-white">24/7 Support Available</span>
+            </motion.div>
+
+            <h1 className="text-3xl lg:text-4xl font-bold text-white mb-2 leading-tight">
               How can we help you?
             </h1>
-            <p className="text-xl text-white/90 mb-8">
-              Search our knowledge base or browse categories below
+            <p className="text-sm lg:text-base text-white/90 mb-6 max-w-xl mx-auto">
+              Search our knowledge base, browse helpful articles, or get in touch with our support team
             </p>
 
             {/* Search Bar */}
-            <div className="relative max-w-2xl mx-auto">
-              <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 w-5 h-5 text-gray-400" />
-              <input
-                type="text"
-                placeholder="Search for answers..."
-                className="w-full pl-12 pr-4 py-4 rounded-xl border-none focus:outline-none focus:ring-2 focus:ring-white text-lg"
-              />
-            </div>
+            <HelpCenterSearch />
+
+            {/* Quick Stats */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="mt-6 flex flex-wrap items-center justify-center gap-6"
+            >
+              <div className="text-center">
+                <div className="text-xl lg:text-2xl font-bold text-white">500+</div>
+                <div className="text-xs text-white/80">Help Articles</div>
+              </div>
+              <div className="w-px h-8 bg-white/20" />
+              <div className="text-center">
+                <div className="text-xl lg:text-2xl font-bold text-white">50+</div>
+                <div className="text-xs text-white/80">Video Tutorials</div>
+              </div>
+              <div className="w-px h-8 bg-white/20" />
+              <div className="text-center">
+                <div className="text-xl lg:text-2xl font-bold text-white">24/7</div>
+                <div className="text-xs text-white/80">Support Available</div>
+              </div>
+            </motion.div>
           </motion.div>
         </div>
       </section>
 
       {/* Categories */}
-      <section className="py-16 lg:py-20">
+      <section className="py-14 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 lg:px-8">
-          <h2 className="text-3xl font-semibold text-gray-900 mb-12 text-center">
-            Browse by Category
-          </h2>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.5 }}
+            className="text-center mb-10"
+          >
+            <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
+              Browse by Category
+            </h2>
+            <p className="text-base text-gray-600 max-w-2xl mx-auto">
+              Find answers organized by topic and get the help you need quickly
+            </p>
+          </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {categories.map((category, index) => {
               const Icon = category.icon
               return (
-                <motion.div
-                  key={category.title}
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: index * 0.1 }}
-                  className="group p-6 bg-white rounded-xl border border-gray-200 hover:border-deloitte-green hover:shadow-xl transition-all cursor-pointer"
+                <Link
+                  key={category.slug}
+                  href={`/resources/help-center/category/${category.slug}`}
                 >
-                  <div className="w-12 h-12 rounded-lg bg-deloitte-green/10 flex items-center justify-center mb-4 group-hover:bg-deloitte-green group-hover:scale-110 transition-all">
-                    <Icon className="w-6 h-6 text-deloitte-green group-hover:text-white transition-colors" />
-                  </div>
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {category.title}
-                  </h3>
-                  <p className="text-sm text-gray-600 mb-3">
-                    {category.description}
-                  </p>
-                  <div className="text-sm text-deloitte-green font-medium">
-                    {category.articles} articles →
-                  </div>
-                </motion.div>
+                  <motion.div
+                    initial={{ opacity: 0, y: 40 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 0.6, delay: index * 0.1 }}
+                    whileHover={{ y: -5 }}
+                    className="group relative h-full"
+                  >
+                    {/* Glow Effect on Hover */}
+                    <div className="absolute -inset-0.5 bg-gradient-to-r from-deloitte-green to-cyan-500 rounded-2xl opacity-0 group-hover:opacity-20 blur transition-opacity" />
+
+                    <div className="relative h-full p-6 bg-white rounded-xl border-2 border-gray-100 group-hover:border-deloitte-green shadow-lg group-hover:shadow-2xl transition-all cursor-pointer">
+                      {/* Icon */}
+                      <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-deloitte-green to-cyan-600 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform shadow-lg">
+                        <Icon className="w-6 h-6 text-white" />
+                      </div>
+
+                      {/* Content */}
+                      <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-deloitte-green transition-colors">
+                        {category.title}
+                      </h3>
+                      <p className="text-sm text-gray-600 mb-4 leading-relaxed">
+                        {category.description}
+                      </p>
+
+                      {/* Footer */}
+                      <div className="flex items-center justify-between pt-4 border-t border-gray-100">
+                        <span className="text-sm font-semibold text-gray-500">
+                          {category.articles} articles
+                        </span>
+                        <div className="flex items-center gap-1 text-deloitte-green font-semibold text-sm">
+                          Explore
+                          <svg
+                            className="w-4 h-4 group-hover:translate-x-1 transition-transform"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                        </div>
+                      </div>
+                    </div>
+                  </motion.div>
+                </Link>
               )
             })}
           </div>
         </div>
       </section>
 
-      {/* Popular Articles */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 lg:px-8">
-          <h2 className="text-3xl font-semibold text-gray-900 mb-8 text-center">
-            Popular Articles
-          </h2>
-          <div className="bg-white rounded-xl border border-gray-200 divide-y divide-gray-200">
-            {popularArticles.map((article, index) => (
-              <motion.div
-                key={index}
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.4, delay: index * 0.05 }}
-                className="p-4 hover:bg-gray-50 cursor-pointer group"
-              >
-                <div className="flex items-center justify-between">
-                  <span className="text-gray-900 group-hover:text-deloitte-green transition-colors">
-                    {article}
-                  </span>
-                  <svg
-                    className="w-5 h-5 text-gray-400 group-hover:text-deloitte-green group-hover:translate-x-1 transition-all"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M9 5l7 7-7 7"
-                    />
-                  </svg>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </section>
+      {/* Quick Links */}
+      <QuickLinks />
+
+      {/* Recent Articles */}
+      <RecentArticles />
+
+      {/* Trending Topics */}
+      <TrendingTopics />
+
+      {/* Video Tutorials */}
+      <VideoTutorials />
+
+      {/* FAQ Section */}
+      <FAQSection />
+
+      {/* Contact Support Form */}
+      <ContactSupportForm />
 
       {/* Additional Resources */}
       <section className="py-16 bg-white">
@@ -206,7 +268,7 @@ export default function HelpCenterPage() {
               transition={{ duration: 0.4, delay: 0.1 }}
             >
               <div className="w-12 h-12 rounded-lg bg-deloitte-green/10 flex items-center justify-center mb-4 group-hover:bg-deloitte-green transition-colors">
-                <MessageCircle className="w-6 h-6 text-deloitte-green group-hover:text-white transition-colors" />
+                <Zap className="w-6 h-6 text-deloitte-green group-hover:text-white transition-colors" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 mb-2">Case Studies</h3>
               <p className="text-sm text-gray-600 mb-3">
@@ -267,26 +329,6 @@ export default function HelpCenterPage() {
                 </svg>
               </div>
             </motion.a>
-          </div>
-        </div>
-      </section>
-
-      {/* Contact Support */}
-      <section className="py-16 bg-gray-50">
-        <div className="max-w-4xl mx-auto px-4 lg:px-8 text-center">
-          <h2 className="text-3xl font-semibold text-gray-900 mb-4">
-            Still need help?
-          </h2>
-          <p className="text-lg text-gray-600 mb-8">
-            Our support team is here to assist you
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <button className="px-8 py-3.5 bg-deloitte-green text-white rounded-lg font-semibold hover:bg-deloitte-green-dark transition-colors">
-              Contact Support
-            </button>
-            <button className="px-8 py-3.5 bg-white border border-gray-300 text-gray-900 rounded-lg font-semibold hover:border-deloitte-green hover:text-deloitte-green transition-colors">
-              Schedule a Call
-            </button>
           </div>
         </div>
       </section>

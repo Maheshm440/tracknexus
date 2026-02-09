@@ -64,7 +64,7 @@ export default function DashboardLayout({
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100">
+    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 -mt-[64px] pt-0">
       {/* Mobile sidebar overlay */}
       {sidebarOpen && (
         <div
@@ -284,7 +284,7 @@ export default function DashboardLayout({
         </div>
 
         {/* Page content */}
-        <main className="py-6 px-6">{children}</main>
+        <main className="px-6 pb-6">{children}</main>
       </div>
     </div>
   );

@@ -2,10 +2,8 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import { useRef, useState, useCallback, useEffect } from "react";
-import { Button } from "@/components/ui/button";
 import { X, Lightbulb, Target, Zap, Users, CheckCircle, ArrowRight } from "lucide-react";
 import { FormContext } from "@/components/contact-popup";
-import Link from "next/link";
 import dynamic from "next/dynamic";
 
 // Lazy load ContactPopup since it's only needed on interaction
@@ -21,26 +19,145 @@ export function HeroSectionClient() {
   const [isHeroPopupOpen, setIsHeroPopupOpen] = useState(false);
   const [isTrackNexusPopupOpen, setIsTrackNexusPopupOpen] = useState(false);
   const [formContext, setFormContext] = useState<FormContext>({ type: "demo" });
-  const [textIndex, setTextIndex] = useState(0);
+  // Text phase: 0 = hidden, 1 = "Connecting Success", 2 = "That's how Track Nexus works"
+  const [textPhase, setTextPhase] = useState(0);
+  const lastVideoTime = useRef(0);
+  const textTimerRef = useRef<NodeJS.Timeout | null>(null);
+  const textTimer2Ref = useRef<NodeJS.Timeout | null>(null);
+  const textTimer3Ref = useRef<NodeJS.Timeout | null>(null);
+  const isSequenceRunning = useRef(false);
 
-  // Text rotation data
-  const textVariations = [
-    {
-      line1: "Connecting Success",
-      line2: { prefix: "That's how ", highlight: "Track Nexus", suffix: "" },
-      line3: "works."
-    },
-    {
-      line1: "Empower Your Team",
-      line2: { prefix: "Boost ", highlight: "Productivity", suffix: "" },
-      line3: "Manage with confidence."
-    },
-    {
-      line1: "Drive Results",
-      line2: { prefix: "With ", highlight: "Real-Time Insights", suffix: "" },
-      line3: "Transform your workflow."
+  // Clear all timers
+  const clearAllTimers = useCallback(() => {
+    if (textTimerRef.current) clearTimeout(textTimerRef.current);
+    if (textTimer2Ref.current) clearTimeout(textTimer2Ref.current);
+    if (textTimer3Ref.current) clearTimeout(textTimer3Ref.current);
+  }, []);
+
+  // Show text sequence: Phase 1 (2.5s) -> Hidden (4s) -> Phase 2 (2.3s) -> Hidden
+  const startTextSequence = useCallback(() => {
+    // Don't restart if sequence is already running
+    if (isSequenceRunning.current) return;
+    isSequenceRunning.current = true;
+    clearAllTimers();
+
+    // Phase 1: Show first text for 2.5 seconds
+    setTextPhase(1);
+
+    // After 2.5 seconds, hide first text
+    textTimerRef.current = setTimeout(() => {
+      setTextPhase(0);
+
+      // After 4 seconds gap, show second text
+      textTimer2Ref.current = setTimeout(() => {
+        setTextPhase(2);
+
+        // After 2.3 seconds, hide second text
+        textTimer3Ref.current = setTimeout(() => {
+          setTextPhase(0);
+          isSequenceRunning.current = false;
+        }, 2300);
+      }, 4000);
+    }, 2500);
+  }, [clearAllTimers]);
+
+  // Sync text with video - start when video plays and on every loop
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) {
+      // Fallback if video not ready
+      startTextSequence();
+      return () => clearAllTimers();
     }
-  ];
+
+    let loopIntervalId: NodeJS.Timeout | null = null;
+    let hasStarted = false;
+
+    // More aggressive loop detection with lower threshold
+    const handleTimeUpdate = () => {
+      const currentTime = video.currentTime;
+      const previousTime = lastVideoTime.current;
+
+      // Detect loop: if time jumps backwards significantly
+      if (previousTime > 0.5 && currentTime < previousTime - 0.5) {
+        console.log('Loop detected via timeupdate:', { previousTime, currentTime });
+        startTextSequence();
+      }
+
+      lastVideoTime.current = currentTime;
+    };
+
+    // Start text and set up interval timer based on video duration
+    const handleLoadedMetadata = () => {
+      const duration = video.duration;
+      if (duration && !hasStarted) {
+        hasStarted = true;
+        console.log('Video duration:', duration);
+
+        // Start initial text sequence
+        startTextSequence();
+
+        // Set up interval to restart text on each loop
+        // Use video duration to trigger text restart
+        loopIntervalId = setInterval(() => {
+          console.log('Loop interval trigger at:', video.currentTime);
+          startTextSequence();
+        }, duration * 1000);
+      }
+    };
+
+    // Backup: detect when video seeks to beginning
+    const handleSeeked = () => {
+      const currentTime = video.currentTime;
+      if (currentTime < 0.5) {
+        console.log('Seeked to beginning:', currentTime);
+        startTextSequence();
+      }
+    };
+
+    // Start text when video plays
+    const handlePlay = () => {
+      console.log('Video play event');
+      if (!hasStarted) {
+        hasStarted = true;
+        startTextSequence();
+
+        // If duration already available, set up interval
+        if (video.duration) {
+          loopIntervalId = setInterval(() => {
+            console.log('Loop interval trigger at:', video.currentTime);
+            startTextSequence();
+          }, video.duration * 1000);
+        }
+      }
+    };
+
+    // Initialize
+    if (video.duration && !video.paused) {
+      hasStarted = true;
+      startTextSequence();
+      loopIntervalId = setInterval(() => {
+        console.log('Loop interval trigger at:', video.currentTime);
+        startTextSequence();
+      }, video.duration * 1000);
+    } else {
+      startTextSequence();
+    }
+
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('seeked', handleSeeked);
+    video.addEventListener('play', handlePlay);
+    video.addEventListener('loadedmetadata', handleLoadedMetadata);
+
+    return () => {
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('seeked', handleSeeked);
+      video.removeEventListener('play', handlePlay);
+      video.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      if (loopIntervalId) clearInterval(loopIntervalId);
+      clearAllTimers();
+    };
+  }, [startTextSequence, clearAllTimers]);
 
   // ESC key handler for popups
   const handleEscKey = useCallback((event: KeyboardEvent) => {
@@ -65,20 +182,25 @@ export function HeroSectionClient() {
   useEffect(() => {
     const video = videoRef.current;
     if (video) {
-      video.playbackRate = 1.5; // Play video at 1.5x speed
-      video.play().catch(() => {
-        // Autoplay was prevented, video will play on user interaction
+      video.playbackRate = 0.8; // Play video at 0.8x speed
+
+      // Add error handler
+      const handleError = () => {
+        console.error('Video failed to load:', video.error);
+      };
+
+      video.addEventListener('error', handleError);
+
+      video.play().catch((error) => {
+        console.log('Autoplay was prevented:', error);
       });
+
+      return () => {
+        video.removeEventListener('error', handleError);
+      };
     }
   }, []);
 
-  // Rotate text every 5 seconds
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setTextIndex((prevIndex) => (prevIndex + 1) % textVariations.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [textVariations.length]);
 
   return (
     <>
@@ -88,21 +210,24 @@ export function HeroSectionClient() {
         ref={heroRef}
       >
         {/* Full Screen Video Background */}
-        <div className="absolute inset-0 w-full h-full">
+        <div className="absolute inset-0 w-full h-full bg-black">
           <video
             ref={videoRef}
             autoPlay
             loop
             muted
             playsInline
+            preload="auto"
             className="absolute inset-0 w-full h-full object-cover"
+            onError={(e) => {
+              console.error('Video error:', e);
+            }}
+            onLoadedData={() => {
+              console.log('Video loaded successfully');
+            }}
           >
-            <source src="/videos/14840858_3840_2160_30fps (1).mp4" type="video/mp4" />
+            <source src="/videos/hero-video.mp4" type="video/mp4" />
           </video>
-
-          {/* Gradient overlay for text contrast */}
-          <div className="absolute inset-0 bg-gradient-to-r from-black/5 via-black/5 to-transparent"></div>
-
         </div>
 
         {/* Content Overlay */}
@@ -114,151 +239,86 @@ export function HeroSectionClient() {
                 Track Nexus - AI-Powered Time Tracking Software for Remote and Hybrid Teams
               </h1>
 
-              {/* Visual Heading - Animated presentation */}
-              <div
-                className="text-white font-semibold mb-6 leading-[1.25] tracking-tight"
-                style={{
-                  fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
-                  letterSpacing: '-0.01em',
-                  textShadow: '0 4px 20px rgba(0, 0, 0, 0.9), 0 2px 10px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 0, 0, 0.5)'
-                }}
-                aria-hidden="true"
-              >
+              {/* Visual Heading - Phase 1 -> Phase 2 */}
+              <div className="flex items-center justify-center md:justify-start min-h-[120px]">
                 <AnimatePresence mode="wait">
-                  <motion.span
-                    key={`line1-${textIndex}`}
-                    className="block"
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 50 }}
-                    transition={{
-                      delay: 0.2,
-                      type: "spring",
-                      stiffness: 80,
-                      damping: 15
-                    }}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => setIsHeroPopupOpen(true)}
-                      className="relative cursor-pointer hover:text-cyan-300 transition-all duration-300 group inline-block text-left hover:scale-105"
-                      aria-label="Learn more"
-                      style={{
-                        textShadow: '0 4px 20px rgba(0, 0, 0, 0.9), 0 2px 10px rgba(0, 0, 0, 0.7), 0 0 40px rgba(0, 0, 0, 0.5)'
-                      }}
+                  {textPhase === 1 && (
+                    <motion.div
+                      key="phase1"
+                      className="text-center md:text-left"
+                      aria-hidden="true"
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0, transition: { duration: 0.3 } }}
                     >
-                      {textVariations[textIndex].line1}
-                      <span className="absolute -bottom-2 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-400 to-cyan-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left shadow-lg shadow-cyan-500/50"></span>
-                    </button>.
-                  </motion.span>
-                </AnimatePresence>
+                      <h2
+                        className="text-white font-bold leading-tight"
+                        style={{
+                          fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+                          textShadow: '0 4px 30px rgba(0, 0, 0, 0.9), 0 2px 15px rgba(0, 0, 0, 0.7)'
+                        }}
+                      >
+                        {"Empower Your Team with Smarter Workforce Management".split("").map((char, index) => (
+                          <motion.span
+                            key={index}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{
+                              duration: 0.02,
+                              delay: index * 0.025,
+                            }}
+                          >
+                            {char}
+                          </motion.span>
+                        ))}
+                        <motion.span
+                          className="inline-block w-[3px] h-[1em] bg-white ml-1 align-middle"
+                          animate={{ opacity: [1, 0] }}
+                          transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+                        />
+                      </h2>
+                    </motion.div>
+                  )}
 
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={`line2-${textIndex}`}
-                    className="block mt-2"
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 50 }}
-                    transition={{
-                      delay: 0.4,
-                      type: "spring",
-                      stiffness: 80,
-                      damping: 15
-                    }}
-                  >
-                    {textVariations[textIndex].line2.prefix}
-                    <motion.button
-                      type="button"
-                      onClick={() => setIsTrackNexusPopupOpen(true)}
-                      className="relative inline-block text-cyan-400 font-bold cursor-pointer hover:text-cyan-300 transition-colors duration-300 group"
-                      style={{
-                        textShadow: '0 4px 20px rgba(0, 0, 0, 0.9), 0 2px 10px rgba(0, 0, 0, 0.7), 0 0 40px rgba(34, 211, 238, 0.4)',
-                        background: 'none',
-                        border: 'none',
-                        padding: 0,
-                        font: 'inherit'
-                      }}
-                      initial={{ opacity: 0, scale: 0.8 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{
-                        delay: 0.6,
-                        type: "spring",
-                        stiffness: 100,
-                        damping: 12
-                      }}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.98 }}
+                  {textPhase === 2 && (
+                    <motion.div
+                      key="phase2"
+                      className="text-center md:text-left"
+                      aria-hidden="true"
+                      initial={{ opacity: 1 }}
+                      animate={{ opacity: 1 }}
+                      exit={{ opacity: 0, transition: { duration: 0.3 } }}
                     >
-                      {textVariations[textIndex].line2.highlight}
-                      <span className="absolute -bottom-1 left-0 w-full h-0.5 bg-gradient-to-r from-cyan-400 to-cyan-500 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left shadow-lg shadow-cyan-500/50"></span>
-                    </motion.button>
-                    {textVariations[textIndex].line2.suffix}
-                  </motion.span>
+                      <h2
+                        className="text-white font-bold leading-tight"
+                        style={{
+                          fontSize: 'clamp(2rem, 5vw, 3.5rem)',
+                          textShadow: '0 4px 30px rgba(0, 0, 0, 0.9), 0 2px 15px rgba(0, 0, 0, 0.7)'
+                        }}
+                      >
+                        {"Transform Your Workplace with Intelligent Time Tracking".split("").map((char, index) => (
+                          <motion.span
+                            key={index}
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            transition={{
+                              duration: 0.02,
+                              delay: index * 0.025,
+                            }}
+                          >
+                            {char}
+                          </motion.span>
+                        ))}
+                        <motion.span
+                          className="inline-block w-[3px] h-[1em] bg-white ml-1 align-middle"
+                          animate={{ opacity: [1, 0] }}
+                          transition={{ duration: 0.5, repeat: Infinity, repeatType: "reverse" }}
+                        />
+                      </h2>
+                    </motion.div>
+                  )}
+
                 </AnimatePresence>
-
-                <AnimatePresence mode="wait">
-                  <motion.span
-                    key={`line3-${textIndex}`}
-                    className="block mt-2"
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 50 }}
-                    transition={{
-                      delay: 0.8,
-                      type: "spring",
-                      stiffness: 80,
-                      damping: 15
-                    }}
-                  >
-                    {textVariations[textIndex].line3}
-                  </motion.span>
-                </AnimatePresence>
-              </div>
-
-              {/* CTA Buttons */}
-              <div className="flex flex-wrap gap-4">
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    delay: 1.2,
-                    type: "spring",
-                    stiffness: 100,
-                    damping: 15
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Button
-                    className="bg-cyan-500 hover:bg-cyan-600 text-white px-6 h-11 text-sm font-semibold rounded-md transition-all duration-300 shadow-xl hover:shadow-cyan-500/50 flex items-center justify-center"
-                    onClick={() => {
-                      setFormContext({ type: "free-trial" });
-                      setIsContactPopupOpen(true);
-                    }}
-                  >
-                    Start Free Trial
-                  </Button>
-                </motion.div>
-
-                <motion.div
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{
-                    delay: 1.4,
-                    type: "spring",
-                    stiffness: 100,
-                    damping: 15
-                  }}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
-                >
-                  <Link href="/product">
-                    <Button className="bg-gray-800 border-2 border-gray-700 hover:bg-gray-900 text-white px-6 h-11 text-sm font-semibold rounded-md transition-all duration-300 flex items-center justify-center shadow-xl">
-                      Explore Features
-                    </Button>
-                  </Link>
-                </motion.div>
               </div>
             </div>
           </div>

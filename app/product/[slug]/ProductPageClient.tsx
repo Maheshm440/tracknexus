@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { notFound } from "next/navigation";
@@ -17,6 +17,7 @@ interface ProductPageClientProps {
 
 export default function ProductPageClient({ slug }: ProductPageClientProps) {
   const router = useRouter();
+  const sidebarRef = useRef<HTMLDivElement>(null);
 
   // Look up category on client side to avoid serialization issues with icons
   const category = getCategoryById(slug);
@@ -25,6 +26,29 @@ export default function ProductPageClient({ slug }: ProductPageClientProps) {
   const [formData, setFormData] = useState({ name: "", email: "" });
   const [status, setStatus] = useState<'idle' | 'sending' | 'success' | 'error'>('idle');
   const [activeSection, setActiveSection] = useState<string>("");
+
+  // Preserve sidebar scroll position
+  useEffect(() => {
+    // Restore scroll position when component mounts
+    const savedScrollPos = sessionStorage.getItem('productSidebarScroll');
+    if (savedScrollPos && sidebarRef.current) {
+      sidebarRef.current.scrollTop = parseInt(savedScrollPos, 10);
+    }
+
+    // Save scroll position before unmounting
+    return () => {
+      if (sidebarRef.current) {
+        sessionStorage.setItem('productSidebarScroll', sidebarRef.current.scrollTop.toString());
+      }
+    };
+  }, []);
+
+  // Save scroll position on scroll
+  const handleSidebarScroll = () => {
+    if (sidebarRef.current) {
+      sessionStorage.setItem('productSidebarScroll', sidebarRef.current.scrollTop.toString());
+    }
+  };
 
   if (!category) {
     notFound();
@@ -122,7 +146,11 @@ export default function ProductPageClient({ slug }: ProductPageClientProps) {
         <div className="flex gap-8">
           {/* Left Sidebar Navigation - Fixed */}
           <aside className="hidden lg:block w-72 flex-shrink-0">
-            <div className="sticky top-24 space-y-1">
+            <div
+              ref={sidebarRef}
+              onScroll={handleSidebarScroll}
+              className="sticky top-24 space-y-1 max-h-[calc(100vh-120px)] overflow-y-auto"
+            >
               {/* Product Categories Navigation */}
               <div className="mb-6">
                 <h3 className="text-xs font-semibold text-gray-500 uppercase tracking-wider px-4 py-2">

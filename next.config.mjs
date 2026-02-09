@@ -17,9 +17,6 @@ const nextConfig = {
   reactStrictMode: true,
   // PERFORMANCE: Enable production source maps only when needed
   productionBrowserSourceMaps: false,
-  turbopack: {
-    root: process.cwd(),
-  },
   // Only use static export when explicitly enabled
   ...(isStaticExport && { output: 'export' }),
   images: {
@@ -71,6 +68,7 @@ const nextConfig = {
       script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com;
       style-src 'self' 'unsafe-inline';
       img-src 'self' blob: data: https://images.unsplash.com https://www.google-analytics.com;
+      media-src 'self' blob: data:;
       font-src 'self';
       object-src 'none';
       base-uri 'self';

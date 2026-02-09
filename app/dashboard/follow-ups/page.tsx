@@ -74,6 +74,16 @@ export default function FollowUpsPage() {
   const [selectedTask, setSelectedTask] = useState<FollowUp | null>(null);
   const [showDropdown, setShowDropdown] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'all' | 'pending' | 'overdue' | 'completed'>('all');
+  const [showCreateModal, setShowCreateModal] = useState(false);
+  const [leads, setLeads] = useState<Lead[]>([]);
+  const [creating, setCreating] = useState(false);
+  const [newFollowUp, setNewFollowUp] = useState({
+    leadId: '',
+    title: '',
+    description: '',
+    dueDate: '',
+    priority: 'MEDIUM' as string,
+  });
   const [stats, setStats] = useState({
     total: 0,
     pending: 0,
@@ -198,6 +208,49 @@ export default function FollowUpsPage() {
     }
   };
 
+  const fetchLeads = async () => {
+    try {
+      const leadsData = localStorage.getItem('tracknexus_leads') || '[]';
+      const allLeads = JSON.parse(leadsData);
+      setLeads(allLeads.map((l: any) => ({ id: l.id, name: l.name, companyName: l.companyName || l.company || '' })));
+    } catch {
+      setLeads([]);
+    }
+  };
+
+  const handleCreateFollowUp = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newFollowUp.leadId || !newFollowUp.title || !newFollowUp.dueDate) return;
+
+    try {
+      setCreating(true);
+      const res = await fetch('/api/follow-ups', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newFollowUp),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setShowCreateModal(false);
+        setNewFollowUp({ leadId: '', title: '', description: '', dueDate: '', priority: 'MEDIUM' });
+        fetchFollowUps();
+      } else {
+        alert(data.error || 'Failed to create follow-up');
+      }
+    } catch (err) {
+      console.error('Failed to create follow-up:', err);
+      alert('Failed to create follow-up. Please try again.');
+    } finally {
+      setCreating(false);
+    }
+  };
+
+  const openCreateModal = () => {
+    fetchLeads();
+    setShowCreateModal(true);
+  };
+
   if (loading && followUps.length === 0) {
     return (
       <div className="flex items-center justify-center h-64">
@@ -209,17 +262,22 @@ export default function FollowUpsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-gray-900">Follow-ups</h1>
-          <p className="text-gray-500 mt-1">
-            Manage and track lead follow-up tasks
-          </p>
+      <div className="bg-white border-b border-gray-200 -mx-6 px-6">
+        <div className="flex items-center justify-between py-3">
+          <div>
+            <h1 className="text-xl font-semibold text-gray-900">Follow-ups</h1>
+            <p className="text-gray-500 mt-0.5 text-sm">
+              Manage and track lead follow-up tasks
+            </p>
+          </div>
+          <button
+            onClick={openCreateModal}
+            className="flex items-center gap-2 px-4 py-2 bg-highlight text-white rounded-lg hover:bg-opacity-90 transition-all"
+          >
+            <Plus className="w-4 h-4" />
+            New Follow-up
+          </button>
         </div>
-        <button className="flex items-center gap-2 px-4 py-2 bg-highlight text-white rounded-lg hover:bg-opacity-90 transition-all">
-          <Plus className="w-4 h-4" />
-          New Follow-up
-        </button>
       </div>
 
       {/* Error Alert */}
@@ -518,6 +576,108 @@ export default function FollowUpsPage() {
           </div>
         )}
       </div>
+
+      {/* Create Follow-up Modal */}
+      {showCreateModal && (
+        <div
+          className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50"
+          onClick={() => setShowCreateModal(false)}
+        >
+          <div
+            className="bg-white rounded-xl shadow-2xl w-full max-w-lg"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="p-6 border-b flex items-center justify-between">
+              <h2 className="text-xl font-bold text-gray-900">New Follow-up</h2>
+              <button
+                onClick={() => setShowCreateModal(false)}
+                className="p-2 hover:bg-gray-100 rounded-lg"
+              >
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+            <form onSubmit={handleCreateFollowUp} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Lead *</label>
+                <select
+                  value={newFollowUp.leadId}
+                  onChange={(e) => setNewFollowUp({ ...newFollowUp, leadId: e.target.value })}
+                  required
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-highlight focus:border-transparent"
+                >
+                  <option value="">Select a lead</option>
+                  {leads.map((lead) => (
+                    <option key={lead.id} value={lead.id}>
+                      {lead.name} {lead.companyName ? `- ${lead.companyName}` : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Title *</label>
+                <input
+                  type="text"
+                  value={newFollowUp.title}
+                  onChange={(e) => setNewFollowUp({ ...newFollowUp, title: e.target.value })}
+                  required
+                  placeholder="e.g., Schedule demo call"
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-highlight focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Description</label>
+                <textarea
+                  value={newFollowUp.description}
+                  onChange={(e) => setNewFollowUp({ ...newFollowUp, description: e.target.value })}
+                  rows={3}
+                  placeholder="Add details about this follow-up..."
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-highlight focus:border-transparent resize-none"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Due Date *</label>
+                  <input
+                    type="date"
+                    value={newFollowUp.dueDate}
+                    onChange={(e) => setNewFollowUp({ ...newFollowUp, dueDate: e.target.value })}
+                    required
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-highlight focus:border-transparent"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 mb-1">Priority</label>
+                  <select
+                    value={newFollowUp.priority}
+                    onChange={(e) => setNewFollowUp({ ...newFollowUp, priority: e.target.value })}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-highlight focus:border-transparent"
+                  >
+                    {priorityOptions.map((p) => (
+                      <option key={p} value={p}>{p}</option>
+                    ))}
+                  </select>
+                </div>
+              </div>
+              <div className="flex justify-end gap-3 pt-2">
+                <button
+                  type="button"
+                  onClick={() => setShowCreateModal(false)}
+                  className="px-4 py-2 text-gray-700 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  disabled={creating}
+                  className="px-4 py-2 bg-highlight text-white rounded-lg hover:bg-opacity-90 transition-all disabled:opacity-50"
+                >
+                  {creating ? 'Creating...' : 'Create Follow-up'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
 
       {/* Task Detail Modal */}
       {selectedTask && (
