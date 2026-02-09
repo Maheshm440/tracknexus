@@ -226,7 +226,7 @@ export function HeroSectionClient() {
               console.log('Video loaded successfully');
             }}
           >
-            <source src="/videos/hero-video.mp4" type="video/mp4" />
+            <source src="/images/landingpage/hero-video.mp4" type="video/mp4" />
           </video>
         </div>
 
