@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /private/
+
+Sitemap: https://tracknexus.com/sitemap.xml 

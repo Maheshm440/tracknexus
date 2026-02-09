@@ -1,0 +1,44 @@
+# dependencies
+node_modules/
+
+# next.js build output
+.next/
+out/
+build/
+
+# debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.pnpm-debug.log*
+
+# env files (contain secrets)
+.env
+.env.*
+!.env.example
+
+# vercel
+.vercel
+
+# typescript
+*.tsbuildinfo
+next-env.d.ts
+
+# generated prisma client
+lib/generated/prisma/
+
+# video files (too large for GitHub - host separately)
+*.mp4
+
+# claude code local config
+.claude/
+
+# macOS junk
+__MACOSX/
+.DS_Store
+
+# dev server logs
+dev_server.log
+
+# misc
+nul
