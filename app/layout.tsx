@@ -9,6 +9,9 @@ import { ScrollToTop } from "@/components/scroll-to-top"
 import { organizationSchema, softwareApplicationSchema, websiteSchema, speakableSchema } from "@/lib/seo/schemas"
 import { CookieConsentProvider } from "@/components/cookies"
 import { getConsentDefaultScript } from "@/lib/tracking/gtag-consent"
+import VisitorTracker from "@/components/VisitorTracker"
+import { getVerificationMetadata } from "@/lib/seo/verification"
+import { WebVitals } from "./web-vitals"
 
 const inter = Inter({
   subsets: ["latin"],
@@ -52,12 +55,7 @@ export const metadata: Metadata = {
     description: "Track work hours effortlessly and boost team productivity with AI-powered insights. Perfect for remote, hybrid, and in-office teams.",
     images: ["/twitter-image.jpg"],
   },
-  verification: {
-    google: 'YOUR_GOOGLE_VERIFICATION_CODE', // TODO: Replace with actual Google Search Console verification code
-    other: {
-      'msvalidate.01': '5A97D86AD48A3D922BC1B4A53876E0E8',
-    },
-  },
+  verification: getVerificationMetadata(),
 }
 
 export default function RootLayout({
@@ -66,7 +64,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         {/* Preconnect to external domains for faster resource loading */}
         <link rel="preconnect" href="https://www.googletagmanager.com" />
@@ -129,13 +127,13 @@ export default function RootLayout({
           Skip to main content
         </a>
         <CookieConsentProvider>
+          <WebVitals />
           <ScrollToTop />
           <HeaderWrapper />
           <main id="main-content" role="main" tabIndex={-1} className="pt-[64px]">{children}</main>
           <FooterWrapper />
           <MailButtonWrapper />
-          {/* Cookie consent banner is rendered by CookieConsentProvider */}
-          {/* Tracking pixels are loaded conditionally based on user consent */}
+          <VisitorTracker />
         </CookieConsentProvider>
       </body>
     </html>

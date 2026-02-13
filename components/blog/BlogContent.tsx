@@ -56,7 +56,7 @@ const components = {
     <span className="block my-6">
       <Image
         src={typeof props.src === 'string' ? props.src : ''}
-        alt={props.alt || ''}
+        alt={props.alt || 'Blog post illustration'}
         width={800}
         height={400}
         className="rounded-lg w-full h-auto"

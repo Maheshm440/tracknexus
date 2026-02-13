@@ -1,22 +1,8 @@
-// SECURITY FIX #7: Rate limiting for authentication endpoints
-// Simple in-memory rate limiter (for production, use Redis-based solution)
+// Rate limiting for authentication and API endpoints
+// Uses Upstash Redis in production, falls back to in-memory for development
 
-interface RateLimitEntry {
-  count: number;
-  resetTime: number;
-}
-
-const rateLimitMap = new Map<string, RateLimitEntry>();
-
-// Clean up old entries every 5 minutes
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, entry] of rateLimitMap.entries()) {
-    if (entry.resetTime < now) {
-      rateLimitMap.delete(key);
-    }
-  }
-}, 5 * 60 * 1000);
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
 
 export interface RateLimitConfig {
   maxRequests: number;
@@ -30,12 +16,67 @@ export interface RateLimitResult {
   reset: number;
 }
 
-export function rateLimit(identifier: string, config: RateLimitConfig): RateLimitResult {
+// --- Upstash Redis rate limiter (production) ---
+
+let redisRatelimiters: Map<string, Ratelimit> | null = null;
+
+function getRedisAvailable(): boolean {
+  return !!(process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN);
+}
+
+function getRedisRatelimiter(config: RateLimitConfig): Ratelimit {
+  if (!redisRatelimiters) {
+    redisRatelimiters = new Map();
+  }
+
+  const key = `${config.maxRequests}:${config.windowMs}`;
+  let limiter = redisRatelimiters.get(key);
+
+  if (!limiter) {
+    const redis = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL!,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    });
+
+    limiter = new Ratelimit({
+      redis,
+      limiter: Ratelimit.fixedWindow(config.maxRequests, `${config.windowMs} ms`),
+      analytics: true,
+      prefix: 'tracknexus_rl',
+    });
+
+    redisRatelimiters.set(key, limiter);
+  }
+
+  return limiter;
+}
+
+// --- In-memory rate limiter (development fallback) ---
+
+interface RateLimitEntry {
+  count: number;
+  resetTime: number;
+}
+
+const rateLimitMap = new Map<string, RateLimitEntry>();
+
+// Clean up old entries every 5 minutes
+if (typeof setInterval !== 'undefined') {
+  setInterval(() => {
+    const now = Date.now();
+    for (const [key, entry] of rateLimitMap.entries()) {
+      if (entry.resetTime < now) {
+        rateLimitMap.delete(key);
+      }
+    }
+  }, 5 * 60 * 1000);
+}
+
+function inMemoryRateLimit(identifier: string, config: RateLimitConfig): RateLimitResult {
   const now = Date.now();
   const entry = rateLimitMap.get(identifier);
 
   if (!entry || entry.resetTime < now) {
-    // Create new entry or reset expired one
     rateLimitMap.set(identifier, {
       count: 1,
       resetTime: now + config.windowMs
@@ -49,7 +90,6 @@ export function rateLimit(identifier: string, config: RateLimitConfig): RateLimi
     };
   }
 
-  // Entry exists and is still valid
   if (entry.count >= config.maxRequests) {
     return {
       success: false,
@@ -59,7 +99,6 @@ export function rateLimit(identifier: string, config: RateLimitConfig): RateLimi
     };
   }
 
-  // Increment counter
   entry.count++;
 
   return {
@@ -70,9 +109,35 @@ export function rateLimit(identifier: string, config: RateLimitConfig): RateLimi
   };
 }
 
+// --- Main rate limit function ---
+
+export async function rateLimitAsync(identifier: string, config: RateLimitConfig): Promise<RateLimitResult> {
+  if (getRedisAvailable()) {
+    try {
+      const limiter = getRedisRatelimiter(config);
+      const result = await limiter.limit(identifier);
+      return {
+        success: result.success,
+        limit: result.limit,
+        remaining: result.remaining,
+        reset: result.reset,
+      };
+    } catch (error) {
+      console.error('Redis rate limit error, falling back to in-memory:', error);
+      return inMemoryRateLimit(identifier, config);
+    }
+  }
+
+  return inMemoryRateLimit(identifier, config);
+}
+
+// Synchronous wrapper for backward compatibility
+export function rateLimit(identifier: string, config: RateLimitConfig): RateLimitResult {
+  return inMemoryRateLimit(identifier, config);
+}
+
 // Get client IP address from request
 export function getClientIp(request: Request): string {
-  // Try to get real IP from headers (for proxies/load balancers)
   const forwarded = request.headers.get('x-forwarded-for');
   if (forwarded) {
     return forwarded.split(',')[0].trim();
@@ -83,7 +148,6 @@ export function getClientIp(request: Request): string {
     return realIp;
   }
 
-  // Fallback to 'unknown' if we can't determine IP
   return 'unknown';
 }
 

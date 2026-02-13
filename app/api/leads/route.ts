@@ -119,20 +119,45 @@ export async function POST(request: NextRequest) {
 // GET - List leads with filters
 export async function GET(request: NextRequest) {
   try {
-    // Note: This is a server-side API route, so we cannot access localStorage directly
-    // Return empty data for now - the client will handle localStorage
-    // In a real app, this would query a database
+    const { searchParams } = new URL(request.url);
+    const page = parseInt(searchParams.get('page') || '1');
+    const limit = parseInt(searchParams.get('limit') || '20');
+    const status = searchParams.get('status') || '';
+    const search = searchParams.get('search') || '';
+
+    const where: Record<string, unknown> = {};
+
+    if (status) {
+      where.status = status as LeadStatus;
+    }
+
+    if (search) {
+      where.OR = [
+        { name: { contains: search, mode: 'insensitive' } },
+        { companyName: { contains: search, mode: 'insensitive' } },
+        { companyEmail: { contains: search, mode: 'insensitive' } },
+      ];
+    }
+
+    const [leads, total] = await Promise.all([
+      prisma.lead.findMany({
+        where,
+        orderBy: { createdAt: 'desc' },
+        skip: (page - 1) * limit,
+        take: limit,
+      }),
+      prisma.lead.count({ where }),
+    ]);
 
     return NextResponse.json({
       success: true,
-      data: [],
+      data: leads,
       pagination: {
-        page: 1,
-        limit: 20,
-        total: 0,
-        totalPages: 0,
+        page,
+        limit,
+        total,
+        totalPages: Math.ceil(total / limit),
       },
-      note: 'Using client-side localStorage for demo. Check dashboard for data.'
     });
   } catch (error) {
     console.error('List leads error');

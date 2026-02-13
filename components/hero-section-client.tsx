@@ -3,14 +3,7 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useRef, useState, useCallback, useEffect } from "react";
 import { X, Lightbulb, Target, Zap, Users, CheckCircle, ArrowRight } from "lucide-react";
-import { FormContext } from "@/components/contact-popup";
-import dynamic from "next/dynamic";
-
-// Lazy load ContactPopup since it's only needed on interaction
-const ContactPopup = dynamic(
-  () => import("@/components/contact-popup").then((m) => m.ContactPopup),
-  { ssr: false }
-);
+import { ContactPopup, type FormContext } from "@/components/contact-popup";
 
 export function HeroSectionClient() {
   const heroRef = useRef<HTMLElement>(null);
@@ -186,7 +179,7 @@ export function HeroSectionClient() {
 
       // Add error handler
       const handleError = () => {
-        console.error('Video failed to load:', video.error);
+        console.warn('Video failed to load:', video.error?.code, video.error?.message);
       };
 
       video.addEventListener('error', handleError);
@@ -219,8 +212,11 @@ export function HeroSectionClient() {
             playsInline
             preload="auto"
             className="absolute inset-0 w-full h-full object-cover"
-            onError={(e) => {
-              console.error('Video error:', e);
+            onError={() => {
+              const video = videoRef.current;
+              if (video?.error) {
+                console.warn('Video load warning:', video.error.code, video.error.message);
+              }
             }}
             onLoadedData={() => {
               console.log('Video loaded successfully');

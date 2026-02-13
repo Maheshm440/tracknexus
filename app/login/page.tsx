@@ -130,6 +130,8 @@ function LoginContent() {
           router.push(targetUrl);
         }, 500);
       } else {
+        // Clear success message when there's an error
+        setSuccess('');
         setError(data.error || 'Invalid verification code');
         setIsLoading(false);
       }

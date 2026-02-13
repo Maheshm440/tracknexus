@@ -1,6 +1,6 @@
 import { Metadata } from 'next';
 import Link from 'next/link';
-import { ArrowLeft, Book, FileText, Users, Settings, Shield, Zap, HelpCircle, Search, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Book, FileText, Users, Settings, Shield, Zap, HelpCircle, Search, ChevronRight, Code } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: 'Documentation - TrackNexus',
@@ -67,6 +67,19 @@ const docsSections = [
       { title: 'Two-Factor Authentication', slug: '2fa', description: 'Add an extra layer of security' },
       { title: 'Privacy Settings', slug: 'privacy', description: 'Control your privacy settings' },
       { title: 'Data Backup', slug: 'backup', description: 'Automatic backup solutions' },
+    ]
+  },
+  {
+    title: 'API Reference',
+    description: 'Complete REST API documentation for integrations',
+    icon: Code,
+    color: 'from-violet-500 to-indigo-500',
+    articles: [
+      { title: 'Authentication API', slug: 'api-auth', description: 'Login, signup, MFA, and session management' },
+      { title: 'Leads & Clients API', slug: 'api-leads', description: 'CRUD operations for leads and clients' },
+      { title: 'Tickets & Follow-ups API', slug: 'api-tickets', description: 'Help desk and follow-up management' },
+      { title: 'Analytics & Tracking API', slug: 'api-analytics', description: 'Visitor tracking and analytics data' },
+      { title: 'Rate Limits & Errors', slug: 'api-rate-limits', description: 'Rate limiting, error codes, and status codes' },
     ]
   },
   {

@@ -9,8 +9,9 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import { Check, ArrowRight, HelpCircle, Sparkles } from "lucide-react"
-import { ReactNode } from "react"
+import { ArrowRight, HelpCircle } from "lucide-react"
+import { ReactNode, useState } from "react"
+import { ContactPopup, type FormContext } from "@/components/contact-popup"
 
 // Animation variants
 const fadeInUp = {
@@ -107,7 +108,7 @@ function ProductHero({
   floatingIcons?: React.ElementType[]
 }) {
   return (
-    <section className="relative overflow-hidden bg-deloitte-black text-white px-4 py-20 lg:px-8 lg:py-28">
+    <section className="relative overflow-hidden bg-deloitte-black text-white px-4 py-14 lg:px-8 lg:py-20">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
@@ -183,14 +184,14 @@ function FeatureSection({
   features: Feature[]
 }) {
   return (
-    <section className="bg-white px-4 py-20 lg:px-8 lg:py-28">
+    <section className="bg-white px-4 py-12 lg:px-8 lg:py-16">
       <div className="mx-auto max-w-7xl">
         {features.map((feature, index) => (
           <motion.div
             key={index}
             className={`flex flex-col ${
               index % 2 === 0 ? "lg:flex-row" : "lg:flex-row-reverse"
-            } items-center gap-12 lg:gap-16 ${index > 0 ? "mt-20 lg:mt-28" : ""}`}
+            } items-center gap-8 lg:gap-12 ${index > 0 ? "mt-12 lg:mt-16" : ""}`}
             initial={{ opacity: 0, y: 40 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -198,7 +199,7 @@ function FeatureSection({
           >
             {/* Image */}
             <div className="w-full lg:w-1/2">
-              <div className="relative h-[300px] lg:h-[400px] rounded-3xl overflow-hidden shadow-2xl">
+              <div className="relative h-[260px] lg:h-[340px] rounded-2xl overflow-hidden shadow-2xl">
                 <Image
                   src={feature.image}
                   alt={feature.title}
@@ -211,10 +212,10 @@ function FeatureSection({
 
             {/* Content */}
             <div className="w-full lg:w-1/2">
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-6">
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
                 {feature.title}
               </h2>
-              <p className="text-lg text-gray-600 leading-relaxed">
+              <p className="text-base text-gray-600 leading-relaxed">
                 {feature.description}
               </p>
             </div>
@@ -236,12 +237,12 @@ function BenefitsGrid({
   benefits: Benefit[]
 }) {
   return (
-    <section className="bg-gray-50 px-4 py-20 lg:px-8 lg:py-28">
+    <section className="bg-gray-50 px-4 py-12 lg:px-8 lg:py-16">
       <div className="mx-auto max-w-7xl">
         {(title || subtitle) && (
-          <motion.div className="text-center mb-14" {...fadeInUp}>
+          <motion.div className="text-center mb-10" {...fadeInUp}>
             {title && (
-              <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-2xl lg:text-3xl font-bold text-gray-900 mb-3">
                 {title}
               </h2>
             )}
@@ -262,14 +263,14 @@ function BenefitsGrid({
             return (
               <motion.div
                 key={index}
-                className="bg-white rounded-2xl p-8 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300"
+                className="bg-white rounded-2xl p-6 shadow-lg border border-gray-100 hover:shadow-xl transition-all duration-300"
                 {...staggerItem}
                 whileHover={{ y: -5 }}
               >
-                <div className="w-14 h-14 rounded-2xl bg-deloitte-green flex items-center justify-center mb-6">
-                  <Icon className="w-7 h-7 text-white" />
+                <div className="w-12 h-12 rounded-xl bg-deloitte-green flex items-center justify-center mb-4">
+                  <Icon className="w-6 h-6 text-white" />
                 </div>
-                <h3 className="text-xl font-bold text-gray-900 mb-3">
+                <h3 className="text-lg font-bold text-gray-900 mb-2">
                   {benefit.title}
                 </h3>
                 <p className="text-gray-600 leading-relaxed">
@@ -287,7 +288,7 @@ function BenefitsGrid({
 // Stats Section Component
 function StatsSection({ stats }: { stats: Stat[] }) {
   return (
-    <section className="bg-deloitte-black px-4 py-16 lg:px-8">
+    <section className="bg-deloitte-black px-4 py-10 lg:px-8">
       <div className="mx-auto max-w-6xl">
         <motion.div
           className="grid grid-cols-2 md:grid-cols-4 gap-8"
@@ -314,9 +315,9 @@ function StatsSection({ stats }: { stats: Stat[] }) {
 // FAQ Section Component
 function FAQSection({ faqs }: { faqs: FAQ[] }) {
   return (
-    <section className="bg-gray-50 px-4 py-20 lg:px-8 lg:py-28">
+    <section className="bg-gray-50 px-4 py-12 lg:px-8 lg:py-16">
       <div className="mx-auto max-w-4xl">
-        <motion.div className="text-center mb-14" {...fadeInUp}>
+        <motion.div className="text-center mb-10" {...fadeInUp}>
           <div className="inline-flex items-center gap-2 px-4 py-2 mb-6 bg-deloitte-gray-50 border border-deloitte-gray-200 rounded-full">
             <HelpCircle className="w-4 h-4 text-deloitte-green" />
             <span className="text-sm font-medium text-deloitte-green">FAQ</span>
@@ -357,40 +358,65 @@ function CTASection({
   title?: string
   subtitle?: string
 }) {
+  const [popupOpen, setPopupOpen] = useState(false)
+  const [formContext, setFormContext] = useState<FormContext>({ type: 'demo' })
+
+  const handleFreeTrialClick = () => {
+    setFormContext({ type: 'free-trial' })
+    setPopupOpen(true)
+  }
+
+  const handleDemoClick = () => {
+    setFormContext({ type: 'demo' })
+    setPopupOpen(true)
+  }
+
   return (
-    <section className="bg-deloitte-black px-4 py-20 lg:px-8 lg:py-24">
-      <div className="mx-auto max-w-4xl text-center">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-        >
-          <h2 className="text-display font-light text-white mb-6">
-            {title}
-          </h2>
-          <p className="text-xl text-deloitte-gray-300 mb-10 max-w-2xl mx-auto">
-            {subtitle}
-          </p>
-          <div className="flex flex-col sm:flex-row gap-4 justify-center">
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button className="bg-deloitte-green hover:bg-deloitte-green-dark text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-xl">
-                Start Free Trial
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Button>
-            </motion.div>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Button
-                variant="outline"
-                className="border-2 border-white bg-white text-gray-900 hover:text-cyan-500 px-8 py-4 text-lg font-semibold rounded-xl"
-              >
-                Book a Demo
-              </Button>
-            </motion.div>
-          </div>
-        </motion.div>
-      </div>
-    </section>
+    <>
+      <section className="bg-deloitte-black px-4 py-12 lg:px-8 lg:py-16">
+        <div className="mx-auto max-w-4xl text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <h2 className="text-display font-light text-white mb-4">
+              {title}
+            </h2>
+            <p className="text-lg text-deloitte-gray-300 mb-8 max-w-2xl mx-auto">
+              {subtitle}
+            </p>
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  className="bg-deloitte-green hover:bg-deloitte-green-dark text-white px-8 py-4 text-lg font-semibold rounded-xl shadow-xl"
+                  onClick={handleFreeTrialClick}
+                >
+                  Start Free Trial
+                  <ArrowRight className="w-5 h-5 ml-2" />
+                </Button>
+              </motion.div>
+              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                <Button
+                  variant="outline"
+                  className="border-2 border-white bg-white text-gray-900 hover:text-cyan-500 px-8 py-4 text-lg font-semibold rounded-xl"
+                  onClick={handleDemoClick}
+                >
+                  Book a Demo
+                </Button>
+              </motion.div>
+            </div>
+          </motion.div>
+        </div>
+      </section>
+
+      <ContactPopup
+        isOpen={popupOpen}
+        onClose={() => setPopupOpen(false)}
+        context={formContext}
+      />
+    </>
   )
 }
 

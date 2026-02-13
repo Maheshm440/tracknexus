@@ -114,9 +114,9 @@ export async function POST(request: NextRequest) {
         take: 20,
         orderBy: { lastVisit: 'desc' }
       }).catch(() => []),
-      prisma.botActivity.findMany({
+      prisma.botVisit.findMany({
         take: 20,
-        orderBy: { detectedAt: 'desc' }
+        orderBy: { timestamp: 'desc' }
       }).catch(() => []),
     ]);
 

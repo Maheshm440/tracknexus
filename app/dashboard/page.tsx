@@ -60,26 +60,16 @@ export default function DashboardPage() {
 
   const fetchDashboardData = async () => {
     try {
-      // Use requestIdleCallback for non-critical data loading
-      const loadData = () => {
-        // Get real data from localStorage - batched read
-        const usersData = localStorage.getItem('tracknexus_users') || '[]';
-        const activitiesData = localStorage.getItem('tracknexus_activities') || '[]';
-        const leadsData = localStorage.getItem('tracknexus_leads') || '[]';
-        const visitorTrackingData = localStorage.getItem('visitor_tracking') || '[]';
+      // Fetch leads from the database API
+      const leadsResponse = await fetch('/api/leads?page=1&limit=100');
+      const leadsResult = await leadsResponse.json();
+      const leads = leadsResult.success ? leadsResult.data : [];
 
-        return {
-          users: JSON.parse(usersData),
-          activities: JSON.parse(activitiesData),
-          leads: JSON.parse(leadsData),
-          visitors: JSON.parse(visitorTrackingData)
-        };
-      };
+      // Get visitor data from localStorage (client-side tracking)
+      const visitorTrackingData = localStorage.getItem('visitor_tracking') || '[]';
+      const visitors = JSON.parse(visitorTrackingData);
 
-      const { users, activities, leads, visitors } = loadData();
-
-      // Optimized stats calculation - single pass through leads array
-      const totalUsers = users.length;
+      // Calculate lead stats
       const leadStats = leads.reduce((acc: any, lead: any) => {
         acc.total++;
         if (lead.status === 'NEW') acc.new++;
@@ -94,7 +84,7 @@ export default function DashboardPage() {
       const convertedLeads = leadStats.converted;
       const conversionRate = totalLeads > 0 ? ((convertedLeads / totalLeads) * 100).toFixed(1) : '0.0';
 
-      // Optimized visitor stats - single pass
+      // Visitor stats from localStorage
       const today = new Date().toDateString();
       const visitorStats = visitors.reduce((acc: any, v: any) => {
         acc.total++;
@@ -110,7 +100,7 @@ export default function DashboardPage() {
       const todayPageViews = visitorStats.today;
       const avgPagesPerVisit = totalVisitors > 0 ? (totalPageViews / totalVisitors).toFixed(2) : '0.00';
 
-      // Status counts from already calculated data
+      // Status counts
       const leadsByStatus = [
         { status: 'NEW', _count: leadStats.new },
         { status: 'CONTACTED', _count: leadStats.contacted },
@@ -118,20 +108,25 @@ export default function DashboardPage() {
         { status: 'CONVERTED', _count: leadStats.converted }
       ];
 
-      // Get recent items (last 3)
-      const recentLeads = [...leads]
-        .sort((a: any, b: any) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
-        .slice(0, 3)
-        .map((lead: any) => ({
-          ...lead,
-          assignedUser: lead.assignedUser || null
-        }));
+      // Recent leads from database (already sorted by API)
+      const recentLeads = leads.slice(0, 3).map((lead: any) => ({
+        id: lead.id,
+        name: lead.name,
+        email: lead.companyEmail,
+        status: lead.status,
+        priority: 'medium',
+        createdAt: lead.createdAt,
+        assignedUser: null
+      }));
 
+      // Get recent activities from localStorage
+      const activitiesData = localStorage.getItem('tracknexus_activities') || '[]';
+      const activities = JSON.parse(activitiesData);
       const recentActivities = [...activities]
         .sort((a: any, b: any) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime())
         .slice(0, 5);
 
-      // Get recent unique visitors
+      // Get recent unique visitors from localStorage
       const visitorMap = new Map();
       visitors.forEach((v: any) => {
         if (!visitorMap.has(v.ip) || new Date(v.timestamp) > new Date(visitorMap.get(v.ip).lastVisit)) {
@@ -155,7 +150,7 @@ export default function DashboardPage() {
           totalLeads,
           newLeads,
           convertedLeads,
-          totalUsers,
+          totalUsers: 0,
           conversionRate,
           totalVisitors,
           todayVisitors,
@@ -395,7 +390,7 @@ export default function DashboardPage() {
                     <div className="flex-1 min-w-0">
                       <p className="font-medium text-gray-900 text-sm leading-tight">{activity.description}</p>
                       <div className="flex items-center gap-1.5 mt-0.5">
-                        <p className="text-[10px] text-gray-600 font-medium">{activity.userRef.name}</p>
+                        <p className="text-[10px] text-gray-600 font-medium">{activity.userRef?.name || 'System'}</p>
                         <span className="text-[10px] text-gray-300">•</span>
                         <p className="text-[10px] text-gray-500">
                           {new Date(activity.timestamp).toLocaleDateString()}
@@ -420,8 +415,8 @@ export default function DashboardPage() {
               <h2 className="text-base font-bold text-gray-900">Recent Visitors</h2>
             </div>
             <div className="p-4 space-y-2">
-              {data.recentVisitors.map((visitor) => (
-                <div key={visitor.id} className="flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors">
+              {data.recentVisitors.map((visitor, index) => (
+                <div key={visitor.id || `visitor-${index}`} className="flex items-center gap-3 p-2.5 hover:bg-gray-50 rounded-lg transition-colors">
                   <div className="w-9 h-9 rounded-full bg-gradient-to-br from-purple-100 to-pink-100 flex items-center justify-center flex-shrink-0">
                     <Users className="w-4 h-4 text-purple-600" />
                   </div>

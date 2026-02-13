@@ -939,7 +939,7 @@ export default function WhitepapersPage() {
             >
               <div className="relative">
                 <div className="h-32 bg-gradient-to-r from-gray-900 to-gray-800 rounded-t-2xl overflow-hidden">
-                  <Image src={downloadPaper.image} alt="" fill className="object-cover opacity-40" />
+                  <Image src={downloadPaper.image} alt={`${downloadPaper.title} whitepaper cover`} fill className="object-cover opacity-40" />
                   <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
                 </div>
                 <button

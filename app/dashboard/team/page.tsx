@@ -338,7 +338,7 @@ export default function TeamPage() {
                           <span className="text-sm font-medium text-gray-900">{member.tasksCompleted}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
-                          <span className="text-sm text-gray-600">{format(new Date(member.lastActive), 'HH:mm')}</span>
+                          <span className="text-sm text-gray-600">{member.lastActive && !isNaN(new Date(member.lastActive).getTime()) ? format(new Date(member.lastActive), 'HH:mm') : '—'}</span>
                         </td>
                         <td className="px-6 py-4 whitespace-nowrap">
                           <div className="relative">
@@ -415,76 +415,6 @@ export default function TeamPage() {
           )}
         </div>
 
-        {/* Team Information Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
-          {/* Team Guidelines */}
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="p-2 bg-indigo-100 rounded-lg">
-                <Award className="w-5 h-5 text-indigo-600" />
-              </span>
-              Team Management Guidelines
-            </h3>
-            <ul className="text-sm text-gray-600 space-y-3">
-              <li className="flex gap-2">
-                <span className="text-indigo-600 font-bold">•</span>
-                <span><strong>Regular Check-ins:</strong> Schedule weekly 1-on-1 meetings with team members</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-indigo-600 font-bold">•</span>
-                <span><strong>Performance Reviews:</strong> Conduct quarterly performance assessments</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-indigo-600 font-bold">•</span>
-                <span><strong>Goal Setting:</strong> Set clear and measurable goals for each member</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-indigo-600 font-bold">•</span>
-                <span><strong>Professional Development:</strong> Invest in training and skill development</span>
-              </li>
-              <li className="flex gap-2">
-                <span className="text-indigo-600 font-bold">•</span>
-                <span><strong>Recognition:</strong> Acknowledge achievements and celebrate milestones</span>
-              </li>
-            </ul>
-          </div>
-
-          {/* Department Overview */}
-          <div className="bg-white rounded-xl shadow-md p-6 border border-gray-100">
-            <h3 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
-              <span className="p-2 bg-purple-100 rounded-lg">
-                <Users className="w-5 h-5 text-purple-600" />
-              </span>
-              Department Overview
-            </h3>
-            <div className="text-sm text-gray-600 space-y-3">
-              <div>
-                <p className="font-medium text-gray-900">👔 Leadership</p>
-                <p className="text-xs text-gray-500 mt-1">Executive team and strategic decision makers</p>
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">📊 Sales</p>
-                <p className="text-xs text-gray-500 mt-1">Revenue generation and client acquisition</p>
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">💬 Customer Support</p>
-                <p className="text-xs text-gray-500 mt-1">Client satisfaction and issue resolution</p>
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">📈 Analytics</p>
-                <p className="text-xs text-gray-500 mt-1">Data analysis and business intelligence</p>
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">🎨 Marketing</p>
-                <p className="text-xs text-gray-500 mt-1">Brand promotion and market strategy</p>
-              </div>
-              <div>
-                <p className="font-medium text-gray-900">⚙️ Operations</p>
-                <p className="text-xs text-gray-500 mt-1">Process management and optimization</p>
-              </div>
-            </div>
-          </div>
-        </div>
 
       {/* Member Profile Modal */}
       {selectedMember && (
@@ -541,7 +471,7 @@ export default function TeamPage() {
                   <div>
                     <p className="text-xs text-gray-500">Join Date</p>
                     <p className="text-sm font-medium text-gray-900 mt-1">
-                      {format(new Date(selectedMember.joinDate), 'MMM d, yyyy')}
+                      {selectedMember.joinDate && !isNaN(new Date(selectedMember.joinDate).getTime()) ? format(new Date(selectedMember.joinDate), 'MMM d, yyyy') : '—'}
                     </p>
                   </div>
                   <div>
@@ -581,7 +511,7 @@ export default function TeamPage() {
                     <div className="bg-gray-50 rounded-lg p-4">
                       <p className="text-xs text-gray-500 mb-1">Last Active</p>
                       <p className="text-sm font-medium text-gray-900 mt-1">
-                        {format(new Date(selectedMember.lastActive), 'HH:mm')}
+                        {selectedMember.lastActive && !isNaN(new Date(selectedMember.lastActive).getTime()) ? format(new Date(selectedMember.lastActive), 'HH:mm') : '—'}
                       </p>
                     </div>
                   </div>

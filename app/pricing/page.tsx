@@ -3,7 +3,6 @@
 import { useState } from "react"
 import { motion } from "framer-motion"
 import Image from "next/image"
-import dynamic from "next/dynamic"
 import {
   Check,
   X,
@@ -25,13 +24,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion"
-import type { FormContext } from "@/components/contact-popup"
-
-// Lazy load ContactPopup since it's only needed on interaction
-const ContactPopup = dynamic(
-  () => import("@/components/contact-popup").then((m) => m.ContactPopup),
-  { ssr: false }
-)
+import { ContactPopup, type FormContext } from "@/components/contact-popup"
 
 interface Plan {
   name: string

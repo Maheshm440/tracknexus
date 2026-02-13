@@ -550,8 +550,8 @@ export const productCategories: Category[] = [
     title: "Security & Compliance",
     description: "Enterprise-grade security with two-factor authentication, encryption, and access controls.",
     icon: Lock,
-    gradient: "from-red-500 to-rose-500",
-    color: "#ef4444",
+    gradient: "from-cyan-500 to-blue-500",
+    color: "#06b6d4",
     keywords: [
       "OTP Authentication",
       "Session Management",

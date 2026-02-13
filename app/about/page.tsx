@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion"
 import Image from "next/image"
-import { Lightbulb, Eye, Users, Shield, Quote } from "lucide-react"
+import { Lightbulb, Eye, Users, Shield, Quote, Globe, Cpu, BrainCircuit, Building2, Rocket, BarChart3, Zap, Clock, ShieldCheck, LineChart, Smartphone, Cloud, Lock, Layers, ArrowRight } from "lucide-react"
 import { StatsSection } from "@/components/stats-section"
 import { FAQSection, FAQ } from "@/components/faq-section"
 import { LogoTrain } from "@/components/logo-train"
@@ -95,70 +95,54 @@ const milestones = [
   },
 ]
 
-const teamMembers = [
+const platformCapabilities = [
   {
-    name: "Aravind Gajjela",
-    role: "Founder & CEO",
-    bio: "Visionary leader with 15+ years in enterprise software, passionate about transforming workforce management through AI",
-    expertise: "Strategy, Product Vision, Enterprise Growth",
-    achievement: "Led 3 successful SaaS exits",
-    image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=300&h=300&fit=crop&crop=faces",
+    icon: BrainCircuit,
+    title: "AI-Powered Analytics",
+    description: "Machine learning algorithms analyze work patterns and deliver actionable productivity insights in real time.",
+    gradient: "from-purple-500 to-indigo-600",
   },
   {
-    name: "Sri Lakshmi",
-    role: "Co-Founder & COO",
-    bio: "Operations expert driving global expansion with expertise in scaling distributed teams across 10+ countries",
-    expertise: "Operations, Team Building, Global Expansion",
-    achievement: "Scaled operations to 50K+ users",
-    image: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=300&h=300&fit=crop&crop=faces",
+    icon: Clock,
+    title: "Automatic Time Tracking",
+    description: "Seamlessly captures work hours, breaks, and idle time without manual input — zero disruption to your workflow.",
+    gradient: "from-cyan-500 to-blue-600",
   },
   {
-    name: "Vikram Sharma",
-    role: "CTO",
-    bio: "AI & ML expert building intelligent systems that power productivity insights for thousands of organizations",
-    expertise: "AI/ML, System Architecture, Cloud Infrastructure",
-    achievement: "Built AI engine processing 1B+ events/day",
-    image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=300&h=300&fit=crop&crop=faces",
+    icon: LineChart,
+    title: "Productivity Dashboards",
+    description: "Comprehensive dashboards with real-time metrics, trends, and customizable reports for data-driven decisions.",
+    gradient: "from-emerald-500 to-teal-600",
   },
   {
-    name: "Priya Patel",
-    role: "Head of Product",
-    bio: "User-centric design advocate committed to creating intuitive experiences that delight users and drive adoption",
-    expertise: "Product Strategy, UX Design, Analytics",
-    achievement: "Achieved 95% user satisfaction score",
-    image: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=300&h=300&fit=crop&crop=faces",
+    icon: Smartphone,
+    title: "Cross-Platform Support",
+    description: "Works across Windows, macOS, Linux, iOS, and Android — track productivity from any device, anywhere.",
+    gradient: "from-orange-500 to-amber-600",
   },
   {
-    name: "Rahul Menon",
-    role: "Head of Engineering",
-    bio: "Scalability and performance specialist ensuring 99.9% uptime while managing complex distributed systems",
-    expertise: "Distributed Systems, DevOps, Performance",
-    achievement: "Maintained 99.99% uptime for 2 years",
-    image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=300&h=300&fit=crop&crop=faces",
+    icon: Cloud,
+    title: "Cloud-Native Infrastructure",
+    description: "Built on scalable cloud architecture with 99.99% uptime, processing over 1 billion events per day globally.",
+    gradient: "from-sky-500 to-cyan-600",
   },
   {
-    name: "Ananya Singh",
-    role: "Head of Customer Success",
-    bio: "Dedicated to client satisfaction and ensuring every customer achieves their productivity goals with Track Nexus",
-    expertise: "Customer Success, Onboarding, Support",
-    achievement: "98% customer retention rate",
-    image: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=300&h=300&fit=crop&crop=faces",
+    icon: Lock,
+    title: "Enterprise-Grade Security",
+    description: "End-to-end encryption, SOC 2 compliance, GDPR-ready, and role-based access controls to protect your data.",
+    gradient: "from-red-500 to-pink-600",
   },
   {
-    name: "Karthik Reddy",
-    role: "Lead Data Scientist",
-    bio: "Transforming complex data into actionable insights that help teams work smarter and achieve more",
-    expertise: "Machine Learning, Predictive Analytics, Data Engineering",
-    achievement: "Developed 40% accuracy improvement in predictions",
-    image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=300&h=300&fit=crop&crop=faces",
+    icon: Layers,
+    title: "50+ Integrations",
+    description: "Connects with Slack, Jira, Asana, Google Workspace, Microsoft 365, and more for a unified workflow.",
+    gradient: "from-violet-500 to-purple-600",
   },
   {
-    name: "Meera Nair",
-    role: "Head of Marketing",
-    bio: "Building the Track Nexus brand globally through authentic storytelling and customer-first campaigns",
-    expertise: "Brand Strategy, Content Marketing, Growth",
-    achievement: "Grew brand awareness by 300% in 18 months",
-    image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=300&h=300&fit=crop&crop=faces",
+    icon: Globe,
+    title: "Global Team Management",
+    description: "Manage remote, hybrid, and in-office teams across time zones with location-aware tracking and reporting.",
+    gradient: "from-pink-500 to-rose-600",
   },
 ]
 
@@ -168,28 +152,36 @@ const testimonials = [
     name: "Sarah Mitchell",
     role: "VP of Operations",
     company: "TechCorp Inc.",
-    image: "https://images.unsplash.com/photo-1487412720507-e7ab37603c6f?w=150&h=150&fit=crop&crop=faces",
+    icon: Building2,
+    color: "bg-cyan-500",
+    result: "35% faster decisions",
   },
   {
     quote: "The AI-powered analytics helped us increase productivity by 40% in just 3 months. Remarkable results.",
     name: "James Chen",
     role: "CEO",
     company: "InnovateTech",
-    image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150&h=150&fit=crop&crop=faces",
+    icon: Rocket,
+    color: "bg-purple-500",
+    result: "40% productivity boost",
   },
   {
     quote: "Simple, intuitive, and powerful. Exactly what we needed for our growing distributed team.",
     name: "Emily Rodriguez",
     role: "HR Director",
     company: "GrowthFirst",
-    image: "https://images.unsplash.com/photo-1573497019940-1c28c88b4f3e?w=150&h=150&fit=crop&crop=faces",
+    icon: BarChart3,
+    color: "bg-emerald-500",
+    result: "50+ team members tracked",
   },
   {
     quote: "The best workforce management tool we've ever used. Our team's efficiency has never been higher.",
     name: "Michael Park",
     role: "CTO",
     company: "DataDriven Co.",
-    image: "https://images.unsplash.com/photo-1556157382-97eda2d62296?w=150&h=150&fit=crop&crop=faces",
+    icon: Zap,
+    color: "bg-orange-500",
+    result: "2x efficiency gains",
   },
 ]
 
@@ -302,33 +294,20 @@ export default function AboutPage() {
               </div>
             </motion.div>
 
-            {/* Right - Founder Images */}
+            {/* Right - AI Illustration */}
             <motion.div className="relative" {...fadeInRight}>
-              <div className="relative flex gap-6 justify-center">
-                <div className="relative">
-                  <div className="w-48 h-60 lg:w-56 lg:h-72 rounded-2xl overflow-hidden shadow-xl">
-                    <Image
-                      src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop&crop=faces"
-                      alt="Aravind Gajjela - Founder & CEO"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-full shadow-lg">
-                    <p className="text-sm font-semibold text-gray-900 whitespace-nowrap">Aravind Gajjela</p>
-                  </div>
-                </div>
-                <div className="relative mt-12">
-                  <div className="w-48 h-60 lg:w-56 lg:h-72 rounded-2xl overflow-hidden shadow-xl">
-                    <Image
-                      src="https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=400&h=500&fit=crop&crop=faces"
-                      alt="Sri Lakshmi - Co-Founder & COO"
-                      fill
-                      className="object-cover"
-                    />
-                  </div>
-                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 bg-white px-4 py-2 rounded-full shadow-lg">
-                    <p className="text-sm font-semibold text-gray-900 whitespace-nowrap">Sri Lakshmi</p>
+              <div className="relative w-full aspect-[4/3] rounded-2xl overflow-hidden shadow-xl">
+                <Image
+                  src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=600&fit=crop&auto=format&q=80"
+                  alt="AI-powered workforce analytics dashboard with data-driven productivity insights"
+                  fill
+                  className="object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent" />
+                <div className="absolute bottom-4 left-4 right-4">
+                  <div className="bg-white/90 backdrop-blur-sm px-4 py-3 rounded-xl">
+                    <p className="text-sm font-semibold text-gray-900">AI-Powered Workforce Intelligence</p>
+                    <p className="text-xs text-gray-600">Transforming how organizations understand and manage work</p>
                   </div>
                 </div>
               </div>
@@ -434,133 +413,93 @@ export default function AboutPage() {
         </div>
       </section>
 
-      {/* Team Members Section */}
-      <section id="team" className="bg-gray-50 px-4 py-12 lg:px-8 lg:py-16">
+      {/* What Powers Track Nexus Section */}
+      <section className="bg-gray-50 px-4 py-12 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-7xl">
-          <motion.div className="text-center mb-8" {...fadeInUp}>
+          <motion.div className="text-center mb-10" {...fadeInUp}>
             <p className="text-sm tracking-widest text-highlight uppercase font-medium mb-4">
-              Our Team
+              Our Platform
             </p>
             <h2 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-              Meet the People Behind Track Nexus
+              What Powers Track Nexus
             </h2>
-            <p className="text-gray-600 max-w-2xl mx-auto mb-12">
-              A passionate team of innovators, engineers, and strategists dedicated to transforming workforce management.
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              A comprehensive suite of AI-driven tools and enterprise-grade infrastructure designed to transform workforce management.
             </p>
           </motion.div>
 
-          {/* Team Stats */}
+          {/* Platform Stats */}
           <motion.div
-            className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-10 max-w-5xl mx-auto"
+            className="grid grid-cols-2 md:grid-cols-4 gap-6 mb-12 max-w-5xl mx-auto"
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
             transition={{ duration: 0.6, delay: 0.2 }}
           >
             <div className="bg-white p-6 rounded-xl text-center border border-gray-200 hover:border-highlight/30 hover:shadow-lg transition-all duration-300">
+              <div className="text-3xl font-bold text-highlight mb-2">1B+</div>
+              <div className="text-sm text-gray-600 font-medium">Events Processed Daily</div>
+            </div>
+            <div className="bg-white p-6 rounded-xl text-center border border-gray-200 hover:border-highlight/30 hover:shadow-lg transition-all duration-300">
+              <div className="text-3xl font-bold text-highlight mb-2">99.99%</div>
+              <div className="text-sm text-gray-600 font-medium">Platform Uptime</div>
+            </div>
+            <div className="bg-white p-6 rounded-xl text-center border border-gray-200 hover:border-highlight/30 hover:shadow-lg transition-all duration-300">
               <div className="text-3xl font-bold text-highlight mb-2">50+</div>
-              <div className="text-sm text-gray-600 font-medium">Team Members</div>
+              <div className="text-sm text-gray-600 font-medium">Integrations</div>
             </div>
             <div className="bg-white p-6 rounded-xl text-center border border-gray-200 hover:border-highlight/30 hover:shadow-lg transition-all duration-300">
               <div className="text-3xl font-bold text-highlight mb-2">10+</div>
-              <div className="text-sm text-gray-600 font-medium">Countries</div>
-            </div>
-            <div className="bg-white p-6 rounded-xl text-center border border-gray-200 hover:border-highlight/30 hover:shadow-lg transition-all duration-300">
-              <div className="text-3xl font-bold text-highlight mb-2">15+</div>
-              <div className="text-sm text-gray-600 font-medium">Years Experience</div>
-            </div>
-            <div className="bg-white p-6 rounded-xl text-center border border-gray-200 hover:border-highlight/30 hover:shadow-lg transition-all duration-300">
-              <div className="text-3xl font-bold text-highlight mb-2">100%</div>
-              <div className="text-sm text-gray-600 font-medium">Remote Friendly</div>
+              <div className="text-sm text-gray-600 font-medium">Countries Served</div>
             </div>
           </motion.div>
 
-          {/* Leadership Team Heading */}
+          {/* Capabilities Grid */}
           <motion.div
-            className="text-center mb-6"
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-          >
-            <h3 className="text-2xl font-bold text-gray-900 mb-1">Leadership Team</h3>
-            <p className="text-gray-600 max-w-xl mx-auto">
-              Experienced leaders driving innovation, growth, and customer success across every aspect of our business.
-            </p>
-          </motion.div>
-
-          <motion.div
-            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8"
+            className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
             variants={staggerContainer}
             initial="initial"
             whileInView="animate"
             viewport={{ once: true }}
           >
-            {teamMembers.map((member, index) => (
+            {platformCapabilities.map((cap, index) => (
               <motion.div
                 key={index}
-                className="bg-white rounded-2xl overflow-hidden group hover:shadow-2xl transition-all duration-500 border border-gray-100 hover:border-highlight/30"
+                className="bg-white rounded-2xl overflow-hidden group hover:shadow-xl transition-all duration-300 border border-gray-100 hover:border-highlight/30"
                 variants={staggerItem}
-                whileHover={{ y: -8 }}
+                whileHover={{ y: -4 }}
               >
-                {/* Image Section */}
-                <div className="relative h-64 overflow-hidden">
-                  <Image
-                    src={member.image}
-                    alt={member.name}
-                    fill
-                    className="object-cover grayscale group-hover:grayscale-0 group-hover:scale-110 transition-all duration-500"
-                  />
-                  {/* Gradient Overlay */}
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-
-                  {/* Achievement Badge */}
-                  <div className="absolute top-4 right-4 bg-highlight text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
-                    ⭐ Top Performer
-                  </div>
-                </div>
-
-                {/* Content Section */}
+                <div className={`h-2 bg-gradient-to-r ${cap.gradient}`} />
                 <div className="p-6">
-                  {/* Name & Role */}
-                  <h3 className="text-lg font-bold text-gray-900 mb-1 group-hover:text-highlight transition-colors duration-300">
-                    {member.name}
+                  <div className={`w-12 h-12 bg-gradient-to-br ${cap.gradient} rounded-xl flex items-center justify-center mb-4`}>
+                    <cap.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2 group-hover:text-highlight transition-colors duration-300">
+                    {cap.title}
                   </h3>
-                  <p className="text-sm text-highlight font-semibold mb-3">{member.role}</p>
-
-                  {/* Bio */}
-                  <p className="text-sm text-gray-600 leading-relaxed mb-4 line-clamp-3">
-                    {member.bio}
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    {cap.description}
                   </p>
-
-                  {/* Expertise Tags */}
-                  <div className="mb-4">
-                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
-                      Expertise
-                    </p>
-                    <div className="flex flex-wrap gap-1">
-                      {member.expertise.split(', ').slice(0, 2).map((skill, i) => (
-                        <span
-                          key={i}
-                          className="px-2 py-1 bg-gray-100 text-gray-700 text-xs rounded-md font-medium"
-                        >
-                          {skill}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-
-                  {/* Achievement */}
-                  <div className="pt-4 border-t border-gray-100">
-                    <p className="text-xs text-gray-500 mb-1">Key Achievement</p>
-                    <p className="text-sm font-medium text-gray-900">{member.achievement}</p>
-                  </div>
                 </div>
-
-                {/* Hover Effect Border */}
-                <div className="absolute inset-0 border-2 border-highlight rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none" />
               </motion.div>
             ))}
+          </motion.div>
+
+          {/* CTA */}
+          <motion.div
+            className="text-center mt-10"
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6, delay: 0.4 }}
+          >
+            <a
+              href="/product"
+              className="inline-flex items-center gap-2 bg-highlight text-white px-8 py-3 rounded-full font-semibold hover:bg-highlight/90 transition-colors duration-300"
+            >
+              Explore All Features
+              <ArrowRight className="w-4 h-4" />
+            </a>
           </motion.div>
         </div>
       </section>
@@ -594,20 +533,18 @@ export default function AboutPage() {
                 <p className="text-gray-700 mb-6 leading-relaxed relative z-10">
                   &ldquo;{testimonial.quote}&rdquo;
                 </p>
-                <div className="flex items-center gap-3">
-                  <div className="relative w-12 h-12 rounded-full overflow-hidden">
-                    <Image
-                      src={testimonial.image}
-                      alt={testimonial.name}
-                      fill
-                      className="object-cover"
-                    />
+                <div className="flex items-center gap-3 mb-4">
+                  <div className={`w-10 h-10 ${testimonial.color} rounded-full flex items-center justify-center`}>
+                    <testimonial.icon className="w-5 h-5 text-white" />
                   </div>
                   <div>
-                    <p className="font-semibold text-gray-900">{testimonial.name}</p>
-                    <p className="text-sm text-gray-600">{testimonial.role}</p>
+                    <p className="text-sm font-semibold text-gray-900">{testimonial.role}</p>
                     <p className="text-sm text-highlight">{testimonial.company}</p>
                   </div>
+                </div>
+                <div className="pt-3 border-t border-gray-200">
+                  <p className="text-xs text-gray-500 uppercase tracking-wider">Result</p>
+                  <p className="text-sm font-semibold text-highlight">{testimonial.result}</p>
                 </div>
               </motion.div>
             ))}

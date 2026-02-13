@@ -13,6 +13,8 @@ const categories = ["All", "Productivity", "Time Management", "Privacy"]
 
 export default function BlogPage() {
   const [activeCategory, setActiveCategory] = useState("All")
+  const [email, setEmail] = useState("")
+  const [subscribeStatus, setSubscribeStatus] = useState<"idle" | "loading" | "success" | "error">("idle")
 
   const posts = useMemo(
     () =>
@@ -37,6 +39,38 @@ export default function BlogPage() {
     const matchCategories = categoryMap[activeCategory] || []
     return posts.filter((p) => matchCategories.includes(p.category))
   }, [posts, activeCategory])
+
+  const handleSubscribe = async (e: React.FormEvent) => {
+    e.preventDefault()
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!email || !emailRegex.test(email)) {
+      setSubscribeStatus("error")
+      return
+    }
+
+    setSubscribeStatus("loading")
+
+    try {
+      // TODO: Add actual API endpoint for newsletter subscription
+      // For now, simulate API call
+      await new Promise(resolve => setTimeout(resolve, 1000))
+
+      setSubscribeStatus("success")
+      setEmail("")
+
+      // Reset success message after 3 seconds
+      setTimeout(() => {
+        setSubscribeStatus("idle")
+      }, 3000)
+    } catch (error) {
+      setSubscribeStatus("error")
+      setTimeout(() => {
+        setSubscribeStatus("idle")
+      }, 3000)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-white">
@@ -171,16 +205,33 @@ export default function BlogPage() {
           <p className="text-lg text-gray-600 mb-4">
             Subscribe to our newsletter for weekly tips and industry trends
           </p>
-          <div className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
+          <form onSubmit={handleSubscribe} className="flex flex-col sm:flex-row gap-3 justify-center max-w-md mx-auto">
             <input
               type="email"
               placeholder="Enter your email"
-              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-deloitte-green"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              disabled={subscribeStatus === "loading"}
+              className="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:border-deloitte-green disabled:opacity-50 disabled:cursor-not-allowed"
             />
-            <button className="px-6 py-3 bg-deloitte-green text-white rounded-lg font-semibold hover:bg-deloitte-green-dark transition-colors">
-              Subscribe
+            <button
+              type="submit"
+              disabled={subscribeStatus === "loading"}
+              className="px-6 py-3 bg-deloitte-green text-white rounded-lg font-semibold hover:bg-deloitte-green-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {subscribeStatus === "loading" ? "Subscribing..." : "Subscribe"}
             </button>
-          </div>
+          </form>
+          {subscribeStatus === "success" && (
+            <p className="mt-4 text-green-600 font-medium">
+              ✓ Successfully subscribed! Check your email for confirmation.
+            </p>
+          )}
+          {subscribeStatus === "error" && (
+            <p className="mt-4 text-red-600 font-medium">
+              ✗ Please enter a valid email address.
+            </p>
+          )}
         </div>
       </section>
     </div>

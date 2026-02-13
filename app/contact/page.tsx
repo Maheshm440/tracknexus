@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { motion } from "framer-motion"
 import Image from "next/image"
 import { Button } from "@/components/ui/button"
@@ -134,6 +134,7 @@ const faqs = [
 ]
 
 export default function ContactPage() {
+  const [mounted, setMounted] = useState(false)
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -144,6 +145,23 @@ export default function ContactPage() {
   const [isContactPopupOpen, setIsContactPopupOpen] = useState(false)
   const [formContext, setFormContext] = useState<FormContext>({ type: 'demo' })
   const [isSubmitting, setIsSubmitting] = useState(false)
+
+  // Ensure client-side only rendering for hydration safety
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  // Auto-scroll to #free-trial section when navigating from other pages
+  useEffect(() => {
+    if (mounted && typeof window !== 'undefined' && window.location.hash === '#free-trial') {
+      setTimeout(() => {
+        const el = document.getElementById('free-trial')
+        if (el) {
+          el.scrollIntoView({ behavior: 'smooth' })
+        }
+      }, 300)
+    }
+  }, [mounted])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target
@@ -280,7 +298,7 @@ export default function ContactPage() {
       </section>
 
       {/* Free Trial & Demo CTA Section */}
-      <section className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 px-4 py-12 lg:px-8 lg:py-16">
+      <section id="free-trial" className="bg-gradient-to-br from-blue-50 via-white to-indigo-50 px-4 py-12 lg:px-8 lg:py-16">
         <div className="mx-auto max-w-7xl">
           <motion.div className="text-center mb-16" {...fadeInUp}>
             <h2 className="text-4xl lg:text-5xl font-light text-gray-900 mb-6">
@@ -452,7 +470,8 @@ export default function ContactPage() {
                   const data = Object.fromEntries(formDataObj)
 
                   try {
-                    const response = await fetch('/api/leads', {
+                    // Create Lead for sales tracking
+                    const leadResponse = await fetch('/api/leads', {
                       method: 'POST',
                       headers: { 'Content-Type': 'application/json' },
                       body: JSON.stringify({
@@ -468,7 +487,7 @@ export default function ContactPage() {
                       })
                     })
 
-                    if (response.ok) {
+                    if (leadResponse.ok) {
                       alert(`Demo Scheduled!\n\nName: ${data.name}\nEmail: ${data.email}\nTime: ${data.time}\n\nWe will contact you shortly.`)
                       form.reset()
                     } else {

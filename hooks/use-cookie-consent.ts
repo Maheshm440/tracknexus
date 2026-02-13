@@ -36,25 +36,37 @@ export function useCookieConsent(): UseCookieConsentReturn {
     // Initialize gtag with default denied state FIRST (Google Consent Mode v2 requirement)
     initializeGtagWithDefaultDenied();
 
-    // Try to load saved preferences from localStorage
+    // Auto-accept all cookies silently (no popup shown to users)
     try {
       const saved = localStorage.getItem(CONSENT_STORAGE_KEY);
       if (saved) {
         const preferences: ConsentPreferences = JSON.parse(saved);
         setConsent(preferences.consent);
         setHasInteracted(true);
-
-        // Apply saved consent to gtag immediately
         updateGtagConsent(preferences.consent);
-
-        // Load tracking pixels based on saved consent
         loadTrackingPixels(preferences.consent);
       } else {
-        setHasInteracted(false);
+        // Auto-accept immediately without showing any popup
+        const autoConsent: ConsentState = {
+          necessary: true,
+          analytics: true,
+          marketing: true,
+          functional: true,
+        };
+        const preferences: ConsentPreferences = {
+          consent: autoConsent,
+          timestamp: new Date().toISOString(),
+          version: CONSENT_VERSION,
+        };
+        localStorage.setItem(CONSENT_STORAGE_KEY, JSON.stringify(preferences));
+        setConsent(autoConsent);
+        setHasInteracted(true);
+        updateGtagConsent(autoConsent);
+        loadTrackingPixels(autoConsent);
       }
     } catch (error) {
       console.error('Error loading consent preferences:', error);
-      setHasInteracted(false);
+      setHasInteracted(true);
     }
 
     setIsLoading(false);

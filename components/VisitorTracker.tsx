@@ -1,82 +1,160 @@
 "use client";
 
-import { useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface VisitorTrackerProps {
   page?: string;
 }
 
-export default function VisitorTracker({ page = window.location.pathname }: VisitorTrackerProps) {
+export default function VisitorTracker({ page }: VisitorTrackerProps) {
+  const [mounted, setMounted] = useState(false);
+  const sessionStartTime = useRef<number>(0);
+  const lastPageViewId = useRef<string | null>(null);
+
   useEffect(() => {
-    // Track visitor when component mounts or page changes
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!mounted || typeof window === 'undefined') return;
+
+    // Initialize session start time on client only
+    if (sessionStartTime.current === 0) {
+      sessionStartTime.current = Date.now();
+    }
+
     const trackVisitor = async () => {
       try {
+        const currentPage = page || window.location.pathname;
         const userAgent = navigator.userAgent;
-        const referrer = document.referrer;
 
-        // Get IP address (fallback to client-side detection)
-        const ip = await getClientIP();
+        // Check if this page was already tracked in this session
+        const trackedPages = JSON.parse(sessionStorage.getItem('tracked_pages') || '[]');
+        const visitorId = sessionStorage.getItem('tn_visitor_id');
+        const sessionId = sessionStorage.getItem('tn_session_id');
 
-        // Simulate tracking for demo purposes (no backend required)
-        const visitorData = {
-          page,
-          userAgent,
-          ip,
-          referrer,
-          timestamp: new Date().toISOString()
-        };
+        // If no visitor/session yet, create one via consent API (auto-accepted)
+        if (!visitorId || !sessionId) {
+          // Generate a simple fingerprint from browser info
+          const fingerprint = generateFingerprint();
 
-        // Store in localStorage for demo purposes
-        const existingData = localStorage.getItem('visitor_tracking') || '[]';
-        const trackingHistory = JSON.parse(existingData);
-        trackingHistory.push(visitorData);
+          const consentRes = await fetch('/api/tracking/consent', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              fingerprint,
+              consentGiven: true,
+              userAgent,
+            }),
+          });
 
-        // Keep only last 50 entries
-        if (trackingHistory.length > 50) {
-          trackingHistory.shift();
+          if (consentRes.ok) {
+            const consentData = await consentRes.json();
+            if (consentData.success) {
+              sessionStorage.setItem('tn_visitor_id', consentData.visitorId);
+              sessionStorage.setItem('tn_session_id', consentData.sessionId || '');
+              sessionStartTime.current = Date.now();
+
+              // Now track the first page view
+              if (consentData.sessionId) {
+                await trackPageView(consentData.visitorId, consentData.sessionId, currentPage);
+              }
+            }
+          }
+          return;
         }
 
-        localStorage.setItem('visitor_tracking', JSON.stringify(trackingHistory));
-
-        console.log('Visitor tracked (demo mode):', visitorData);
+        // Visitor and session exist — track page view if not already tracked
+        const pageKey = `${sessionId}_${currentPage}`;
+        if (!trackedPages.includes(pageKey) && sessionId) {
+          await trackPageView(visitorId, sessionId, currentPage);
+          trackedPages.push(pageKey);
+          sessionStorage.setItem('tracked_pages', JSON.stringify(trackedPages));
+        }
       } catch (error) {
-        console.error('Failed to track visitor:', error);
+        console.error('Visitor tracking error:', error);
       }
     };
 
-    // Track visitor immediately
     trackVisitor();
 
-    // Track page changes
+    // Track page changes for SPA navigation
     const handleRouteChange = () => {
-      setTimeout(trackVisitor, 100); // Small delay to ensure page is loaded
+      setTimeout(trackVisitor, 200);
     };
 
-    // Listen for route changes (for SPAs)
     window.addEventListener('popstate', handleRouteChange);
 
-    // Custom event for programmatic navigation
-    window.addEventListener('routechange', handleRouteChange);
+    // End session when user leaves the page
+    const handleBeforeUnload = () => {
+      const sessionId = sessionStorage.getItem('tn_session_id');
+      if (sessionId) {
+        const duration = Math.round((Date.now() - sessionStartTime.current) / 1000);
+        navigator.sendBeacon(
+          '/api/tracking/session',
+          JSON.stringify({
+            sessionId,
+            duration,
+            lastPageViewId: lastPageViewId.current,
+          })
+        );
+      }
+    };
+
+    window.addEventListener('beforeunload', handleBeforeUnload);
 
     return () => {
       window.removeEventListener('popstate', handleRouteChange);
-      window.removeEventListener('routechange', handleRouteChange);
+      window.removeEventListener('beforeunload', handleBeforeUnload);
     };
-  }, [page]);
+  }, [page, mounted]);
 
-  // This component doesn't render anything visible
+  // Don't render anything during SSR
+  if (!mounted) return null;
+
   return null;
 }
 
-// Helper function to get client IP (fallback method)
-async function getClientIP(): Promise<string> {
+async function trackPageView(visitorId: string, sessionId: string, path: string) {
   try {
-    // Try to get IP from a public API
-    const response = await fetch('https://api.ipify.org?format=json');
-    const data = await response.json();
-    return data.ip;
-  } catch (error) {
-    // Fallback to a generic IP if the API fails
-    return '127.0.0.1';
+    const res = await fetch('/api/tracking/pageview', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        visitorId,
+        sessionId,
+        path,
+        title: document.title,
+        referrer: document.referrer,
+      }),
+    });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.pageViewId) {
+        // Store for session end tracking
+        sessionStorage.setItem('tn_last_pageview', data.pageViewId);
+      }
+    }
+  } catch {
+    // Silently ignore tracking failures
   }
+}
+
+function generateFingerprint(): string {
+  const components = [
+    navigator.userAgent,
+    navigator.language,
+    screen.width + 'x' + screen.height,
+    screen.colorDepth,
+    new Date().getTimezoneOffset(),
+  ];
+  // Simple hash
+  let hash = 0;
+  const str = components.join('|');
+  for (let i = 0; i < str.length; i++) {
+    const char = str.charCodeAt(i);
+    hash = ((hash << 5) - hash) + char;
+    hash |= 0;
+  }
+  return 'fp_' + Math.abs(hash).toString(36);
 }

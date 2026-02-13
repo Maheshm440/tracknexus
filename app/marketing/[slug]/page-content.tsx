@@ -1,9 +1,16 @@
 'use client';
 
 import React, { useState } from 'react';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
-import { ChevronRight, Star, Zap, Globe, CheckCircle2, Shield, Clock, Settings, BarChart3, Users, ArrowRight, Sparkles } from 'lucide-react';
+import {
+  ChevronRight, ChevronDown, Star, Zap, Globe, CheckCircle2, Shield, Clock,
+  Settings, BarChart3, Users, ArrowRight, Sparkles, Gauge, FileCheck,
+  TrendingUp, Building2, Mail, MapPin, Monitor, Briefcase, Target,
+  LineChart, Lock, CreditCard, CalendarDays, PieChart, Layers
+} from 'lucide-react';
 import { ContactPopup } from '@/components/contact-popup';
+import { HeroContactForm } from '@/components/hero-contact-form';
 
 interface MarketingPage {
   id: string;
@@ -30,7 +37,6 @@ interface MarketingPage {
   campaignDuration: string;
   performanceTrend: 'up' | 'down' | 'stable';
   notes: string;
-  // Comprehensive marketing fields
   heroHeadline?: string;
   heroSubheadline?: string;
   heroImage?: string;
@@ -74,999 +80,663 @@ interface MarketingPage {
   }>;
   ctaText?: string;
   ctaButtonText?: string;
+  location?: string;
+  officeAddress?: string;
+  officeEmail?: string;
+  mapLat?: number;
+  mapLng?: number;
 }
 
-// Category-specific content generators
-function getOverviewContent(category: string, title: string, targetAudience: string): { heading: string; paragraphs: string[] } {
-  const categoryContent: Record<string, { heading: string; paragraphs: string[] }> = {
-    'Time & Attendance': {
-      heading: `Why ${title} Matters for Your Business`,
-      paragraphs: [
-        `Accurate time and attendance tracking is the foundation of workforce management. Without reliable data on employee hours, organizations face payroll inaccuracies, compliance violations, and productivity blind spots. ${title} provides a comprehensive solution designed specifically for ${targetAudience} who need visibility into how time is spent across their organization.`,
-        `Modern teams need more than simple clock-in and clock-out systems. TrackNexus delivers intelligent time tracking that automatically captures work hours, breaks, and overtime while providing real-time insights into team productivity. Our platform integrates seamlessly with your existing payroll and HR systems, eliminating manual data entry and reducing errors by up to 95%.`,
-        `Whether your team works remotely, in-office, or in a hybrid model, our solution adapts to your workflow. Employees can track time from any device, managers get instant visibility into attendance patterns, and leadership receives automated reports for strategic decision-making.`
-      ]
-    },
-    'Monitoring': {
-      heading: `Comprehensive Employee Monitoring with ${title}`,
-      paragraphs: [
-        `Employee monitoring has evolved far beyond simple surveillance. Today's leading organizations use intelligent monitoring tools to understand work patterns, optimize productivity, and ensure compliance without compromising employee trust. ${title} gives ${targetAudience} the visibility they need while maintaining a culture of transparency and respect.`,
-        `TrackNexus provides real-time activity tracking, application usage analytics, and productivity scoring that helps managers identify bottlenecks, recognize top performers, and provide targeted coaching. Our monitoring approach focuses on outcomes and productivity rather than micromanagement, helping teams achieve more while maintaining healthy work-life boundaries.`,
-        `With built-in privacy controls and customizable monitoring policies, you can tailor the system to match your organization's culture. Employees see exactly what is being tracked, fostering trust while giving management the data they need to make informed decisions about resource allocation and team development.`
-      ]
-    },
-    'Analytics': {
-      heading: `Data-Driven Decisions with ${title}`,
-      paragraphs: [
-        `In today's competitive business landscape, data-driven decision-making separates industry leaders from the rest. ${title} transforms raw workforce data into actionable intelligence, giving ${targetAudience} the insights they need to optimize operations, reduce costs, and drive growth across the organization.`,
-        `TrackNexus analytics goes beyond basic reporting to deliver predictive insights powered by advanced algorithms. Identify trends before they become problems, spot opportunities for efficiency gains, and benchmark your team's performance against industry standards. Our customizable dashboards present complex data in intuitive visualizations that make it easy to communicate findings across your organization.`,
-        `From individual performance metrics to department-level productivity trends, our analytics platform provides the complete picture. Automated reporting saves hours of manual work each week while ensuring stakeholders always have access to the latest data for strategic planning and resource allocation.`
-      ]
-    },
-    'Team Management': {
-      heading: `Smarter Team Management with ${title}`,
-      paragraphs: [
-        `Managing teams effectively requires more than assigning tasks and tracking deadlines. ${title} provides a holistic approach to team management that helps ${targetAudience} coordinate work, foster collaboration, and maximize the collective potential of their workforce.`,
-        `TrackNexus combines project coordination, resource allocation, and team communication into a unified platform. Managers can see at a glance who is working on what, identify capacity gaps, and redistribute workloads to prevent burnout while meeting deadlines. Our intelligent scheduling system accounts for skills, availability, and preferences to optimize team assignments.`,
-        `Whether you manage a team of five or a distributed workforce of thousands, our platform scales to meet your needs. Real-time collaboration tools keep everyone aligned, while automated workflows reduce administrative overhead so your team can focus on delivering results.`
-      ]
-    },
-    'Security': {
-      heading: `Enterprise-Grade Security with ${title}`,
-      paragraphs: [
-        `Security and compliance are non-negotiable in today's regulatory environment. ${title} provides ${targetAudience} with robust security controls, comprehensive audit trails, and automated compliance monitoring that protect your organization while simplifying governance.`,
-        `TrackNexus is built on a zero-trust security architecture with end-to-end encryption, multi-factor authentication, and role-based access controls. Every action is logged and auditable, making it easy to demonstrate compliance with SOC 2, GDPR, HIPAA, and ISO 27001 requirements. Our security team continuously monitors for threats and releases updates to stay ahead of emerging vulnerabilities.`,
-        `Beyond protecting data, our platform helps you enforce security policies across your workforce. Automated alerts notify administrators of unusual activity, while detailed access logs provide complete visibility into who accessed what information and when.`
-      ]
-    },
-    'Billing': {
-      heading: `Streamlined Billing Operations with ${title}`,
-      paragraphs: [
-        `Accurate billing is critical to maintaining healthy cash flow and client relationships. ${title} automates the billing process from time capture to invoice generation, giving ${targetAudience} complete control over project financials and eliminating revenue leakage.`,
-        `TrackNexus connects time tracking directly to your billing workflow, ensuring every billable hour is captured and accurately invoiced. Customizable billing rates, project budgets, and approval workflows give you the flexibility to handle complex billing scenarios while maintaining accuracy. Clients receive professional, detailed invoices that build confidence and reduce payment disputes.`,
-        `Real-time budget tracking alerts you before projects exceed estimates, enabling proactive conversations with clients. Historical billing data provides insights into project profitability, helping you make better pricing decisions and improve margins over time.`
-      ]
-    },
-    'Workforce Management': {
-      heading: `Complete Workforce Management with ${title}`,
-      paragraphs: [
-        `Workforce management encompasses everything from scheduling and attendance to performance optimization and compliance. ${title} provides ${targetAudience} with a unified platform that addresses every aspect of managing a modern workforce.`,
-        `TrackNexus brings together time tracking, scheduling, performance monitoring, and analytics in one integrated solution. Eliminate the complexity of managing multiple disconnected tools and gain a single source of truth for all workforce data. Our platform automates routine tasks like schedule generation, overtime calculations, and compliance reporting, freeing your team to focus on strategic initiatives.`,
-        `With support for remote, hybrid, and on-site work arrangements, our platform adapts to the way your organization operates. Scalable architecture means you can start with the features you need today and expand as your requirements grow.`
-      ]
-    },
-    'Productivity': {
-      heading: `Boost Productivity with ${title}`,
-      paragraphs: [
-        `Productivity is the lifeblood of every successful organization. ${title} helps ${targetAudience} understand where time goes, identify inefficiencies, and implement data-driven strategies to help every team member perform at their best.`,
-        `TrackNexus provides comprehensive productivity tracking that goes beyond simple activity monitoring. Our platform analyzes work patterns, identifies peak performance periods, and surfaces actionable recommendations for improving efficiency. Smart categorization automatically classifies activities as productive, neutral, or unproductive, giving managers clear visibility into how work time is spent.`,
-        `Unlike traditional productivity tools that feel intrusive, TrackNexus empowers employees with personal productivity insights and goal-tracking features. When employees can see their own patterns and progress, they become active participants in improving their performance.`
-      ]
-    },
-    'Reports': {
-      heading: `Comprehensive Reporting with ${title}`,
-      paragraphs: [
-        `Effective reporting transforms raw data into actionable insights that drive better business decisions. ${title} delivers powerful reporting capabilities designed specifically for ${targetAudience} who need comprehensive visibility into workforce metrics, project performance, and operational efficiency across their organization.`,
-        `TrackNexus combines automated report generation, customizable templates, and real-time data visualization to provide exactly the insights you need, when you need them. From executive dashboards that highlight key performance indicators to detailed operational reports that track every metric, our platform eliminates hours of manual report compilation. Schedule reports to be delivered automatically to stakeholders, export data in multiple formats, and drill down from summary views to granular details with just a few clicks.`,
-        `Whether you need compliance reports for regulatory audits, productivity reports for performance reviews, or financial reports for budget planning, our comprehensive reporting engine has you covered. Advanced filtering, cross-departmental comparisons, and trend analysis capabilities ensure you can answer any question about your workforce. Integration with business intelligence tools like Tableau and Power BI extends your reporting capabilities even further.`
-      ]
-    },
-    'Integration': {
-      heading: `Seamless Integration with ${title}`,
-      paragraphs: [
-        `Modern businesses rely on dozens of specialized tools to operate efficiently. ${title} eliminates data silos and workflow friction by providing seamless integration capabilities that connect your entire technology stack. For ${targetAudience} managing complex workflows, our integration platform ensures data flows effortlessly between systems without manual intervention.`,
-        `TrackNexus integrates with over 100 popular business applications including Slack, Microsoft Teams, Jira, Asana, Salesforce, QuickBooks, ADP, BambooHR, and Google Workspace. Real-time data synchronization ensures information stays consistent across all platforms, while automated workflows trigger actions across integrated systems based on events and conditions you define. Our REST API and webhooks provide unlimited flexibility for custom integrations, and our dedicated integration team can help you connect any system to TrackNexus.`,
-        `Beyond simple data exchange, our integration platform enables intelligent automation that spans your entire tool ecosystem. Automatically create invoices in your accounting system when projects are completed, sync employee data between HR and time tracking systems, or trigger notifications in Slack when productivity thresholds are crossed. Pre-built integration templates get you started in minutes, while our extensive documentation and developer support ensure you can build exactly the workflow automation your organization needs.`
-      ]
-    },
-  };
+// ── Local image pools — real professional workplace photos only ──
+// All sourced from /images/blog/ — verified real photography, no illustrations
+// Pool 1: "Built For" section (analytics, dashboards, productivity)
+const builtForImages = [
+  '/images/blog/01-productivity-tracker.jpg',
+  '/images/blog/03-productivity-tracking-analytics.jpg',
+  '/images/blog/05-employee-productivity-software.jpg',
+  '/images/blog/06-employee-monitoring-dashboard.jpg',
+  '/images/blog/09-work-analytics-dashboard.jpg',
+  '/images/blog/11-project-time-tracking.jpg',
+  '/images/blog/20-performance-management-analytics.jpg',
+  '/images/blog/22-team-productivity-software.jpg',
+  '/images/blog/27-roi-tracking-analytics.jpg',
+  '/images/blog/29-business-intelligence-dashboard.jpg',
+  '/images/blog/28-workforce-efficiency-metrics.jpg',
+  '/images/blog/04-productivity-tracking-tools.jpg',
+];
 
-  const defaultContent = {
-    heading: `Transform Your Operations with ${title}`,
-    paragraphs: [
-      `${title} is designed to address the unique challenges faced by ${targetAudience} in today's fast-paced business environment. Our comprehensive platform combines intelligent automation, real-time analytics, and seamless collaboration tools to help your organization operate more efficiently and achieve better outcomes.`,
-      `TrackNexus provides an all-in-one solution that replaces fragmented tools and manual processes with a unified, intelligent platform. From day one, you will have access to powerful features that automate routine tasks, provide actionable insights, and enable better decision-making at every level of your organization.`,
-      `Our platform is trusted by organizations of all sizes, from fast-growing startups to Fortune 500 enterprises. With flexible deployment options and an intuitive interface, you can be up and running in days, not months.`
-    ]
-  };
+// Pool 2: "How It Works" section (monitoring, workflows, remote work)
+const howItWorksImages = [
+  '/images/blog/02-automatic-time-tracking.jpg',
+  '/images/blog/07-workforce-monitoring-software.jpg',
+  '/images/blog/08-activity-monitoring-reports.jpg',
+  '/images/blog/10-screen-monitoring-software.jpg',
+  '/images/blog/14-remote-team-management.jpg',
+  '/images/blog/16-work-from-home-productivity.jpg',
+  '/images/blog/18-time-management-tools.jpg',
+  '/images/blog/23-productivity-tools-teams.jpg',
+  '/images/blog/30-web-development-workflow.jpg',
+  '/images/blog/33-remote-work-management.jpg',
+  '/images/blog/15-distributed-team-productivity.jpg',
+  '/images/blog/19-employee-accountability-trust.jpg',
+];
 
-  return categoryContent[category] || defaultContent;
+// Pool 3: "Why Choose" section (teams, collaboration, business meetings)
+const whyChooseImages = [
+  '/images/blog/13-team-collaboration-remote.jpg',
+  '/images/blog/17-office-productivity-team.jpg',
+  '/images/blog/25-client-billing-accuracy.jpg',
+  '/images/blog/26-project-profitability-analysis.jpg',
+  '/images/blog/32-team-productivity-office.jpg',
+  '/images/blog/34-business-team-meeting.jpg',
+  '/images/blog/12-employee-tracking-software.jpg',
+  '/images/blog/21-task-management-software.jpg',
+  '/images/blog/31-automatic-tracking-system.jpg',
+  '/images/blog/employee-monitoring-guide.jpg',
+  '/images/blog/remote-work-productivity-tips.jpg',
+  '/images/blog/time-tracking-best-practices.jpg',
+];
+
+// Each page gets a unique image per section using its numeric ID as index
+function getPageImages(pageId: string) {
+  const idx = (parseInt(pageId, 10) - 1) || 0;
+  return {
+    builtFor: builtForImages[idx % builtForImages.length],
+    howItWorks: howItWorksImages[idx % howItWorksImages.length],
+    whyChoose: whyChooseImages[idx % whyChooseImages.length],
+  };
 }
 
-// Detailed in-depth content for each category (5 sections with 4-5 comprehensive paragraphs each)
-function getDetailedContent(category: string, title: string, targetAudience: string): Array<{ heading: string; paragraphs: string[] }> {
-  const detailedCategoryContent: Record<string, Array<{ heading: string; paragraphs: string[] }>> = {
+// ── Category Icon Map ──────────────────────────────────────────────
+const categoryIcons: Record<string, React.ElementType> = {
+  'Time & Attendance': Clock,
+  'Monitoring': Monitor,
+  'Analytics': LineChart,
+  'Security': Lock,
+  'Billing': CreditCard,
+  'Team Management': Users,
+  'Workforce Management': Building2,
+  'Productivity': TrendingUp,
+  'Reports': PieChart,
+  'Integration': Layers,
+};
+
+// ── Get transformation cards per category ──────────────────────────
+function getTransformationCards(category: string) {
+  const cards: Record<string, Array<{ icon: React.ElementType; value: string; label: string }>> = {
     'Time & Attendance': [
-      {
-        heading: 'Advanced Time Tracking for Modern Organizations',
-        paragraphs: [
-          `Organizations today face unprecedented challenges in tracking workforce time accurately across diverse work environments. ${title} addresses these challenges with a sophisticated platform that goes far beyond traditional time clocks. For ${targetAudience}, this means having complete confidence in every hour recorded, whether employees work remotely, in the office, at client sites, or in a hybrid arrangement. Our platform eliminates the gray areas that lead to payroll disputes, compliance violations, and budget overruns, replacing uncertainty with precision and accountability.`,
-          `The foundation of effective time tracking is accurate data capture, but accuracy alone isn't enough. TrackNexus understands that context matters just as much as clock-in and clock-out times. Our platform automatically captures not just when work happens, but what work is being done, which projects are consuming resources, and how time allocation aligns with business priorities. This contextual intelligence transforms raw time data into strategic business intelligence that drives better resource allocation, more accurate project estimation, and improved operational efficiency across the entire organization.`,
-          `Integration capabilities separate basic time tracking from enterprise-grade workforce management solutions. TrackNexus seamlessly connects with your existing ecosystem of payroll systems, project management tools, HR platforms, and financial software. Time data flows automatically to where it's needed—payroll processing, client invoicing, project budgeting, and compliance reporting—eliminating manual data entry and the errors that come with it. For finance teams, this means faster month-end close processes. For project managers, it means real-time visibility into budget burn rates. For HR, it means simplified compliance with labor regulations and overtime rules.`,
-          `Compliance isn't just about avoiding penalties—it's about building a culture of fairness and transparency. TrackNexus helps ${targetAudience} navigate the complex landscape of labor regulations, from FLSA overtime rules to industry-specific requirements for break periods, shift differentials, and paid time off accrual. Our platform automatically flags potential violations before they become problems, provides audit-ready documentation for regulatory reviews, and adapts to changing regulations without requiring manual policy updates. This proactive approach to compliance protection saves organizations from costly penalties while demonstrating commitment to fair labor practices.`,
-          `The true measure of a time tracking system isn't just what it records—it's what it enables. With TrackNexus, organizations gain the insights needed to optimize workforce deployment, identify productivity trends, forecast labor costs accurately, and make data-driven decisions about staffing levels and resource allocation. Historical data reveals patterns that inform strategic planning, while predictive analytics help anticipate future needs. For growing organizations, this intelligence becomes a competitive advantage, enabling more agile responses to market demands and more efficient use of the most valuable resource—your people's time.`
-        ]
-      },
-      {
-        heading: 'Seamless Integration with Your Existing Systems',
-        paragraphs: [
-          `Modern organizations operate complex technology ecosystems where data must flow seamlessly between systems to maintain operational efficiency. ${title} recognizes that time tracking doesn't exist in isolation—it's a critical component of a larger workforce management and financial infrastructure. Our platform provides enterprise-grade integration capabilities that connect time data with every system that depends on accurate workforce information, creating a unified technology environment where information flows automatically without manual intervention or data reconciliation.`,
-          `Payroll integration represents the most immediate and impactful connection for most organizations. TrackNexus connects directly with leading payroll systems including ADP, Paychex, Gusto, and QuickBooks Payroll, automatically transferring approved time records for processing. This automation eliminates the manual data entry that consumes hours each pay period and introduces errors that require costly correction. For ${targetAudience}, this means payroll processing becomes faster, more accurate, and requires minimal administrative oversight. Pay period close happens in minutes rather than hours, and employees receive accurate compensation without delays or disputes.`,
-          `Project management integration provides real-time visibility into how time investment aligns with project plans and budgets. Connect TrackNexus with tools like Jira, Asana, Monday.com, or Microsoft Project to automatically attribute time to specific projects, tasks, and deliverables. Project managers see exactly how much time has been invested in each component, can identify variances from estimates immediately, and make informed decisions about resource reallocation. This integration transforms time tracking from an administrative requirement into a strategic project management tool that helps deliver projects on time and within budget.`,
-          `Financial system integration ensures time data flows seamlessly into billing, budgeting, and financial reporting processes. For professional services organizations, TrackNexus connects with accounting systems to support accurate client billing based on actual time invested. Time entries become invoice line items automatically, complete with billing rates, project codes, and descriptive information. For all organizations, integration with financial planning systems enables more accurate labor cost forecasting, budget vs. actual tracking, and cost center allocation. This financial integration gives ${targetAudience} complete visibility into labor costs and supports more accurate financial planning and analysis.`,
-          `HR system integration keeps employee data synchronized across platforms and supports comprehensive workforce analytics. When employee information changes in your HRIS—new hires, terminations, rate changes, department transfers—those changes flow automatically to TrackNexus, ensuring time tracking always reflects current organizational structure. Conversely, attendance data from TrackNexus can flow back to HR systems to support absence management, performance reviews, and workforce planning. This bidirectional integration eliminates data silos and ensures ${targetAudience} always have access to complete, accurate workforce information regardless of which system they're accessing.`
-        ]
-      },
-      {
-        heading: 'Mobile-First Design for the Modern Workforce',
-        paragraphs: [
-          `Today's workforce isn't confined to traditional office environments, and time tracking systems must adapt to this new reality. ${title} provides mobile-first time tracking capabilities that enable accurate time capture regardless of where work happens. For ${targetAudience} managing distributed teams, field service operations, or remote workers, our mobile applications ensure time tracking compliance doesn't force employees back to desks or create friction that reduces adoption and accuracy.`,
-          `Native mobile applications for iOS and Android provide full-featured time tracking that works seamlessly whether employees have internet connectivity or not. The applications support offline time entry, storing records locally when network access isn't available and automatically synchronizing when connectivity is restored. This offline capability is essential for field workers, traveling employees, or anyone working in locations with unreliable internet access. Employees can clock in and out, switch between projects, record breaks, and add notes from anywhere, ensuring complete and accurate time records regardless of location or connectivity.`,
-          `Location verification features leverage mobile device capabilities to provide confidence in time records without invasive surveillance. GPS check-in confirms employees are at designated work locations when they clock in, supporting payroll accuracy and client billing verification. Geofencing automatically starts and stops time tracking when employees enter or leave defined work areas, eliminating forgotten time entries while maintaining privacy. For ${targetAudience}, these location features provide the verification needed for confident payroll processing and client billing while respecting employee privacy and maintaining trust.`,
-          `Biometric authentication on mobile devices adds security and prevents time theft without requiring specialized hardware. Employees can use fingerprint or face recognition to clock in and out, preventing buddy punching and ensuring the person recording time is actually the person working. This mobile biometric capability provides the same security as traditional time clocks at a fraction of the cost, without requiring employees to visit physical time clock locations. The convenience of biometric authentication combined with mobile accessibility drives adoption while eliminating common sources of time tracking fraud.`,
-          `Push notifications keep employees informed about time tracking requirements and approvals without requiring them to constantly check the application. Reminders prompt employees to clock in if they haven't started tracking time during normal work hours, reducing forgotten time entries. Notifications alert employees to approval requests for time off or schedule changes. Managers receive alerts about pending time sheet approvals, overtime thresholds, and attendance issues, enabling rapid response. This proactive notification system transforms time tracking from a passive record-keeping system into an active workforce management tool that helps ${targetAudience} maintain compliance and respond quickly to attendance issues.`
-        ]
-      },
-      {
-        heading: 'Advanced Reporting and Analytics for Strategic Insights',
-        paragraphs: [
-          `Time tracking data represents a goldmine of workforce intelligence that most organizations fail to fully leverage. ${title} transforms time records into strategic insights through advanced reporting and analytics capabilities that reveal patterns, identify opportunities, and support data-driven decision-making. For ${targetAudience}, this means time tracking evolves from compliance documentation into a strategic tool that informs workforce planning, project estimation, and operational optimization across the organization.`,
-          `Real-time dashboards provide instant visibility into current workforce status and trends. See at a glance who is currently working, total hours logged today, overtime trends, absence rates, and project time allocation—all updating in real time as employees clock in and out. Customizable dashboard widgets allow ${targetAudience} to surface the specific metrics most relevant to their role and responsibilities. Executives see high-level workforce utilization and cost trends. Department managers focus on their team's attendance and productivity. Project managers track time investment against project budgets. This role-based approach ensures everyone has immediate access to the workforce intelligence they need without being overwhelmed by irrelevant information.`,
-          `Historical trending and comparative analysis reveal patterns that inform strategic planning and operational improvements. Analyze attendance trends over time to identify seasonal patterns, predict future staffing needs, and optimize scheduling. Compare actual time investment against project estimates to improve future estimation accuracy. Benchmark labor costs across departments, projects, or time periods to identify opportunities for efficiency gains. TrackNexus provides the analytical tools to slice workforce data by virtually any dimension—employee, department, project, client, task type, location, or custom fields—enabling ${targetAudience} to answer specific questions about workforce deployment and identify opportunities for optimization that would remain hidden in aggregate data.`,
-          `Predictive analytics leverage historical patterns to forecast future workforce needs and identify potential issues before they become problems. Machine learning algorithms analyze historical attendance patterns to predict future absence rates, helping ${targetAudience} plan for coverage and avoid understaffing. Project time tracking data trains models that improve future project estimation accuracy, reducing budget overruns and deadline misses. Overtime trend analysis identifies employees at risk of burnout before it impacts performance or leads to turnover. These predictive capabilities transform time tracking from a rear-view mirror into a forward-looking strategic planning tool.`,
-          `Automated report distribution ensures stakeholders always have access to the workforce intelligence they need without manual report generation. Schedule reports to be generated and delivered automatically on any cadence—daily, weekly, monthly, or custom schedules that align with your business rhythms. Define recipient lists that ensure the right information reaches the right stakeholders automatically. Configure report filters and formats to match stakeholder needs without requiring technical skills or IT involvement. This automation eliminates the recurring burden of manual report generation while ensuring ${targetAudience} never miss critical workforce trends or compliance deadlines that require timely reporting.`
-        ]
-      },
-      {
-        heading: 'Compliance Management and Audit Readiness',
-        paragraphs: [
-          `Labor law compliance has become increasingly complex as regulations multiply at federal, state, and local levels. ${title} helps ${targetAudience} navigate this regulatory landscape through automated compliance monitoring, comprehensive audit trails, and built-in support for key labor regulations. Rather than requiring constant manual oversight to catch potential violations, our platform proactively identifies compliance risks and provides the documentation needed to demonstrate adherence to labor laws during audits or investigations.`,
-          `Overtime monitoring and alerts ensure compliance with Fair Labor Standards Act (FLSA) requirements and state-specific overtime regulations. TrackNexus automatically calculates overtime based on weekly hours worked, tracking daily overtime for jurisdictions that require it. Configurable overtime rules accommodate different requirements for different employee classifications, job roles, or locations. When employees approach overtime thresholds, automatic alerts notify managers, enabling proactive schedule adjustments that control costs while maintaining compliance. For ${targetAudience}, this automation eliminates the manual tracking that often leads to unexpected overtime costs or compliance violations.`,
-          `Break and meal period compliance monitoring protects organizations from violations that can result in significant penalties. Configure required break and meal periods based on hours worked, ensuring compliance with state and local requirements that vary significantly across jurisdictions. TrackNexus automatically tracks whether employees have taken required breaks and flags missed breaks for manager review. Attestation features allow employees to confirm break compliance when required by policy or regulation. This automated break monitoring eliminates the manual tracking burden while providing the documentation needed to demonstrate compliance during audits or wage and hour investigations.`,
-          `Comprehensive audit trails document every action taken within the time tracking system, providing the evidence needed to demonstrate compliance and resolve disputes. Every time entry, edit, approval, and deletion is logged with complete details—who made the change, when it occurred, what was changed, and why. Managers can review edit histories to understand discrepancies. Auditors can trace any time record back to its original entry and track all subsequent modifications. For ${targetAudience}, these audit trails provide essential protection during wage disputes, compliance audits, or legal proceedings where documentation of workforce hours becomes critical evidence.`,
-          `Regulatory reporting capabilities simplify compliance documentation requirements that vary by jurisdiction and industry. Pre-built reports support common regulatory requirements including certified payroll reports for prevailing wage compliance, EEO reporting for government contractors, DCAA compliance for defense contractors, and various state-specific reporting requirements. Customizable report templates can be configured to match specific regulatory formats without custom development. Scheduled generation ensures compliance reports are produced on time without manual intervention. For ${targetAudience} operating in regulated industries or multiple jurisdictions, these reporting capabilities transform compliance from recurring administrative burden into automated process that requires minimal oversight.`
-        ]
-      },
-      {
-        heading: 'Scalable Architecture for Growing Organizations',
-        paragraphs: [
-          `Organizations evolve, and workforce management systems must grow alongside them without requiring disruptive platform migrations or architectural overhauls. ${title} provides enterprise-grade scalability that supports organizations from their initial implementation through unlimited growth in users, locations, complexity, and data volume. For ${targetAudience}, this means the time tracking solution implemented today will continue serving your needs years into the future, regardless of how dramatically your organization changes.`,
-          `User scalability ensures performance remains fast as your workforce grows from tens to thousands to tens of thousands of employees. TrackNexus architecture is built on cloud infrastructure that scales automatically to accommodate growing user bases without degradation in response times or system availability. Add new users in seconds through individual entry or bulk import from HR systems. Deactivate departing employees without losing historical data needed for audits or analytics. For rapidly growing organizations, this scalability means time tracking grows seamlessly with headcount without requiring capacity planning, infrastructure upgrades, or performance tuning that consume IT resources and create user frustration.`,
-          `Geographic distribution support enables consistent time tracking processes across multiple locations, time zones, and countries. Configurable work schedules accommodate different work patterns across locations. Time zone support ensures time records are accurate regardless of where employees work or where managers review records. Multi-currency capabilities support accurate labor cost tracking for international operations. Localization features adapt the interface and compliance rules to match local requirements and languages. For ${targetAudience} managing distributed operations, this geographic flexibility means one platform can support the entire organization while accommodating regional differences in work practices and regulatory requirements.`,
-          `Organizational complexity management supports sophisticated organizational structures without sacrificing simplicity for end users. Hierarchical team structures roll up reporting from individuals to teams to departments to divisions to business units. Matrix organization support allows employees to belong to multiple teams simultaneously, reflecting the cross-functional reality of modern organizations. Custom fields and classifications support organization-specific data requirements without requiring database modifications. Role-based permissions ensure users see exactly what they need to see without being overwhelmed by the full complexity of large organizational structures. This flexibility means ${targetAudience} can model their actual organizational structure rather than forcing organizational compromises to accommodate system limitations.`,
-          `Data volume scalability ensures TrackNexus remains fast and responsive even as years of historical time tracking data accumulate. Optimized database architecture maintains query performance across billions of time records. Archival capabilities move historical data offline while maintaining accessibility for audits or long-term trend analysis. Data retention policies automate record lifecycle management to comply with legal requirements and storage constraints. For long-term TrackNexus users, this data management capability means the system remains as responsive in year five as it was on day one, regardless of how much historical data has accumulated. ${targetAudience} never face the common dilemma of choosing between system performance and historical data accessibility that plagues poorly architected workforce management platforms.`
-        ]
-      }
-    ],
-    'Monitoring': [{
-      heading: 'Intelligent Workforce Monitoring for Peak Performance',
-      paragraphs: [
-        `Modern workforce monitoring has evolved from simple surveillance to sophisticated productivity intelligence. ${title} represents this evolution, providing ${targetAudience} with visibility into work patterns while maintaining the privacy and trust that defines high-performing cultures. The platform recognizes that effective monitoring isn't about watching over shoulders—it's about understanding workflows, identifying bottlenecks, and creating environments where every team member can perform at their best. This balanced approach to workforce visibility drives productivity improvements while strengthening rather than eroding employee trust.`,
-        `Application and activity monitoring forms the foundation of productivity insights, but raw activity data only tells part of the story. TrackNexus employs advanced categorization algorithms that understand context, recognizing that the same application might be productive for a designer but distracting for an accountant. Our platform learns your organization's specific workflows, adapting its productivity scoring to reflect actual business value rather than arbitrary rules. This intelligence means ${targetAudience} receive insights that reflect real productivity patterns rather than simplistic activity metrics that miss the nuances of knowledge work.`,
-        `Privacy concerns have historically created tension between management's need for visibility and employees' expectation of trust. TrackNexus resolves this tension through transparent, configurable monitoring policies that balance organizational needs with individual privacy. Employees see exactly what is being monitored, can access their own productivity data, and understand how information is being used. Managers receive aggregate insights and anomaly alerts without micromanaging individual activities. This transparency transforms monitoring from a surveillance tool into a productivity partnership where both organization and individual benefit from better understanding of work patterns.`,
-        `Remote and hybrid work environments present unique monitoring challenges that traditional systems weren't designed to address. TrackNexus provides consistent visibility across all work locations without requiring invasive monitoring of personal devices or home networks. Our platform respects the boundaries between work and personal life while ensuring accountability and productivity regardless of physical location. For distributed teams, this means ${targetAudience} can maintain team cohesion and performance standards without sacrificing the flexibility that makes remote work attractive to top talent.`,
-        `Security and insider threat detection represent a critical but often overlooked aspect of workforce monitoring. Beyond productivity metrics, TrackNexus watches for unusual patterns that might indicate security risks—employees accessing systems outside normal hours, unusual data downloads, or access attempts to unauthorized resources. These security insights protect intellectual property and sensitive data while providing early warning of potential insider threats. For organizations in regulated industries or handling sensitive information, this security layer adds essential protection without requiring separate security monitoring systems or creating additional complexity for IT teams.`
-      ]
-    },
-    {
-      heading: 'Advanced Analytics and Productivity Scoring',
-      paragraphs: [
-        `Understanding productivity requires more than simply measuring time spent in applications—it demands sophisticated analytics that reveal patterns, identify optimization opportunities, and provide actionable insights. ${title} transforms monitoring data into productivity intelligence through advanced analytics that help ${targetAudience} understand not just what employees are doing, but how effectively work is being accomplished and where improvements can drive the greatest impact on business outcomes.`,
-        `Productivity scoring algorithms evaluate work patterns across multiple dimensions to generate comprehensive productivity metrics. Time allocation analysis reveals how work hours are distributed across productive activities, collaboration, administrative tasks, and breaks. Focus time measurement identifies periods of deep work versus fragmented attention. Meeting efficiency analytics quantify time spent in meetings and assess meeting productivity based on patterns like duration, frequency, and participant engagement. Application efficiency metrics reveal whether teams have the right tools and identify opportunities to streamline workflows through better software choices or training.`,
-        `Trend analysis reveals productivity patterns over time, helping ${targetAudience} understand whether initiatives are improving performance and identify factors that correlate with high productivity. Compare productivity across teams, departments, or time periods to understand organizational performance variations. Seasonal pattern recognition identifies cyclical trends that inform workforce planning and capacity management. Long-term trending shows whether productivity is improving, declining, or remaining stable, enabling data-driven decisions about process improvements, technology investments, and organizational changes.`,
-        `Benchmarking capabilities provide context for productivity metrics by comparing your organization's performance against industry standards and best practices. TrackNexus maintains anonymized benchmark data across industries, company sizes, and role types, allowing ${targetAudience} to understand how their teams compare to similar organizations. Internal benchmarking compares productivity across teams or departments to identify high-performing groups whose practices can be shared organization-wide. These comparative insights transform absolute productivity metrics into actionable intelligence about where your organization excels and where improvement opportunities exist.`,
-        `Predictive analytics leverage historical monitoring data to forecast future productivity trends and identify potential issues before they impact performance. Machine learning models predict which team members might be at risk of burnout based on work patterns, enabling proactive intervention. Productivity forecasting helps plan capacity and understand how organizational changes might impact output. Anomaly prediction identifies unusual patterns that might indicate problems requiring management attention. These predictive capabilities transform monitoring from a rear-view mirror into a forward-looking tool that enables ${targetAudience} to manage proactively rather than react to problems after they occur.`
-      ]
-    },
-    {
-      heading: 'Privacy-First Monitoring Architecture',
-      paragraphs: [
-        `Employee privacy concerns represent the primary obstacle to monitoring adoption, yet visibility into work patterns is essential for modern workforce management. ${title} resolves this fundamental tension through privacy-first architecture that provides ${targetAudience} with the insights they need while respecting employee privacy and maintaining the trust that defines high-performing cultures. Our approach recognizes that effective monitoring builds trust rather than eroding it, creating transparency that benefits both organization and individual.`,
-        `Configurable monitoring policies allow organizations to define exactly what gets monitored based on their culture, compliance requirements, and management philosophy. Choose monitoring levels that range from aggregate team metrics to individual activity tracking. Define which applications and websites get monitored and which are considered private. Set monitoring schedules that respect work-life boundaries, automatically disabling monitoring outside defined work hours. Role-based monitoring applies different monitoring levels to different employee groups based on job requirements and seniority. This flexibility means ${targetAudience} can implement monitoring policies that match their organizational values rather than accepting one-size-fits-all surveillance that creates resentment.`,
-        `Employee transparency features ensure workers understand exactly what is being monitored and how information is being used. Clear monitoring disclosures explain monitoring scope, data usage, and retention policies in plain language that employees can understand. Personal dashboard access allows employees to view their own monitoring data, seeing the same productivity metrics and activity patterns that managers see. Opt-out capabilities for non-work activities ensure personal browsing during breaks or lunch isn't captured. This transparency transforms monitoring from hidden surveillance into an open system where employees understand and accept monitoring as a tool for mutual benefit rather than unilateral control.`,
-        `Data minimization principles ensure TrackNexus captures only the information necessary for legitimate business purposes, avoiding the privacy violations that come from excessive data collection. Activity categorization happens at the application or website level rather than capturing detailed content, protecting the privacy of what employees are working on while providing visibility into how time is allocated. Screenshot and keystroke logging capabilities are available but disabled by default, requiring explicit enablement and clear business justification. Automatic data deletion policies remove monitoring data after defined retention periods, ensuring historical monitoring information doesn't accumulate indefinitely. For ${targetAudience}, these privacy protections reduce legal risk while demonstrating respect for employee privacy that builds trust and drives adoption.`,
-        `Anonymization and aggregation features protect individual privacy while providing organizational insights. Team-level reporting shows aggregate productivity trends without exposing individual performance, enabling managers to identify team issues without singling out individuals. Statistical reporting presents productivity distributions and patterns across groups rather than ranking individuals. Threshold-based alerts notify managers only when metrics fall outside acceptable ranges, avoiding constant monitoring of individual activity. These privacy-preserving analytics give ${targetAudience} the insights needed to manage teams effectively while respecting individual privacy and avoiding the micromanagement that drives employee dissatisfaction and turnover.`
-      ]
-    },
-    {
-      heading: 'Real-Time Alerts and Proactive Management',
-      paragraphs: [
-        `Reactive management based on historical reports misses opportunities for timely intervention that could prevent problems before they impact productivity or morale. ${title} enables proactive workforce management through real-time alerts that notify ${targetAudience} of important events, unusual patterns, and potential issues requiring attention. This shift from periodic review to continuous awareness transforms monitoring from documentation tool into active management system that enables rapid response to emerging situations.`,
-        `Productivity alerts notify managers when individual or team productivity falls outside expected ranges, enabling timely investigation and support. Declining productivity trends trigger alerts before performance drops become serious, creating opportunities for early intervention. Unusual activity patterns flag potential issues like excessive overtime, weekend work, or late-night activity that might indicate burnout risk or work-life balance problems. Extended inactivity alerts identify potential attendance issues or technical problems preventing work. These automated notifications ensure ${targetAudience} become aware of problems quickly rather than discovering issues weeks later through periodic reports.`,
-        `Security alerts provide early warning of unusual patterns that might indicate insider threats, compromised accounts, or policy violations. Access anomalies notify security teams when employees access resources they don't normally use or attempt to access unauthorized systems. Data movement alerts flag unusual file downloads, uploads, or transfers that might indicate data exfiltration. After-hours access notifications identify employees working at unusual times or from unusual locations, patterns that sometimes indicate account compromise. These security-focused alerts give ${targetAudience} the early warning needed to investigate and contain potential security incidents before they result in data loss or compliance violations.`,
-        `Capacity alerts help managers balance workloads and prevent burnout by identifying team members approaching or exceeding sustainable work levels. Overtime threshold alerts notify managers when employees exceed defined overtime limits, enabling proactive workload redistribution. Work intensity monitoring identifies periods of extended focused work without adequate breaks, patterns associated with burnout risk. Workload distribution analysis alerts managers to significant imbalances across team members, indicating opportunities to redistribute work more equitably. These capacity management alerts help ${targetAudience} maintain team health and productivity by enabling proactive workload management rather than reactive crisis response after burnout occurs.`,
-        `Customizable alert rules and escalation workflows ensure alerts reach the right people at the right time without creating alert fatigue. Define alert thresholds and conditions that match your organization's specific needs and tolerances. Configure alert routing to ensure notifications reach appropriate managers based on organizational hierarchy, team assignment, or role. Set alert frequencies and aggregation rules to balance timeliness with avoiding notification overload. Escalation policies automatically elevate alerts that aren't acknowledged or addressed within defined timeframes. This alert customization ensures ${targetAudience} receive actionable notifications about situations requiring their attention while filtering out noise that would undermine alert effectiveness through habituation.`
-      ]
-    },
-    {
-      heading: 'Integration with Performance Management',
-      paragraphs: [
-        `Monitoring data provides objective insights into work patterns and productivity that can transform performance management from subjective assessment into data-driven evaluation. ${title} connects monitoring insights with performance management processes, giving ${targetAudience} concrete data to support fair, comprehensive performance reviews and enabling continuous feedback that drives improvement year-round rather than only during annual review cycles.`,
-        `Performance documentation capabilities capture objective data about employee contributions, work patterns, and productivity trends throughout the evaluation period. Activity summaries document time allocation across projects, clients, and activity types, providing complete visibility into how employees spent their time. Productivity trending shows whether performance is improving, declining, or stable over the review period. Goal tracking connects monitoring data with defined objectives, showing progress toward quantitative targets. This comprehensive documentation gives ${targetAudience} the evidence needed to support performance evaluations with facts rather than relying solely on manager recall or subjective impressions.`,
-        `Continuous feedback mechanisms leverage monitoring data to enable ongoing performance conversations rather than waiting for annual reviews. Weekly or monthly productivity summaries provide objective data for regular one-on-one discussions about performance trends and improvement opportunities. Real-time goal progress visibility enables timely recognition when employees achieve milestones and early intervention when progress lags. Comparative analytics showing how individual performance relates to team or organizational benchmarks inform coaching conversations with concrete data about performance gaps or excellence. This continuous performance dialogue builds on monitoring insights to create development-focused conversations that improve performance throughout the year.`,
-        `Recognition automation identifies achievements and positive performance patterns that deserve acknowledgment, ensuring high performers receive the recognition that drives engagement and retention. Productivity improvements trigger recognition recommendations when employees demonstrate sustained performance gains. Exceptional output identification flags periods of particularly high productivity that merit special acknowledgment. Consistency recognition highlights employees who maintain steady, reliable performance over extended periods. Peer impact metrics identify employees whose collaboration and support elevate team performance even if their individual productivity metrics are average. These recognition insights help ${targetAudience} ensure recognition is fairly distributed and based on objective contribution rather than subjective favoritism.`,
-        `Development planning uses monitoring insights to identify skill gaps, training needs, and opportunities for growth that support employee development and career progression. Application usage patterns reveal which tools employees use frequently versus capabilities they might benefit from learning. Work pattern analysis identifies efficiency opportunities where training or process improvement could enhance productivity. Task distribution analysis shows which types of work employees handle frequently versus areas where they lack experience, informing stretch assignment decisions. These development insights help ${targetAudience} create personalized development plans based on actual work patterns and skill utilization rather than generic training prescriptions, ensuring development investments address real needs and capabilities.`
-      ]
-    },
-    {
-      heading: 'Compliance Documentation and Audit Support',
-      paragraphs: [
-        `Regulatory compliance and audit requirements increasingly demand documentation of workforce activities, productivity, and management practices. ${title} provides ${targetAudience} with comprehensive compliance documentation capabilities that simplify audit preparation, demonstrate regulatory adherence, and reduce the risk of penalties from inadequate workforce documentation. Our monitoring platform creates the audit trails and documentation that regulators, auditors, and legal counsel expect while ensuring information is readily accessible when needed.`,
-        `Activity audit trails maintain complete records of employee activities, management actions, and system configurations that satisfy regulatory documentation requirements. Timestamped activity logs document what work was performed, when it occurred, and which employees were responsible, creating the chain of custody and activity documentation required for regulatory compliance. Configuration change logs track monitoring policy changes, alert threshold adjustments, and system configuration modifications, demonstrating governance over monitoring practices. Access logs document who accessed monitoring data and when, protecting the integrity of evidence and satisfying audit requirements for data access controls.`,
-        `Regulatory reporting capabilities generate documentation required by industry-specific regulations and compliance frameworks. FLSA compliance reports document work hours, overtime, and pay practices for Department of Labor audits. DCAA compliance reporting provides the activity and time documentation required for government contractors subject to Defense Contract Audit Agency scrutiny. Financial services monitoring reports demonstrate surveillance of employee trading activities and communications as required by FINRA and SEC regulations. Healthcare workforce documentation supports HIPAA compliance requirements for tracking access to protected health information. These pre-built compliance reports give ${targetAudience} rapid access to documentation in formats auditors expect, transforming audit preparation from weeks of frantic document assembly into automated report generation.`,
-        `Legal hold capabilities preserve monitoring data when litigation or regulatory investigations require evidence preservation. When legal matters arise, legal hold flags prevent automatic deletion of monitoring data for specific employees or time periods, ensuring evidence is preserved as required by discovery obligations. Monitoring data relevant to employment disputes provides objective documentation of work patterns, attendance, and activities that can support or refute claims. Investigation support features allow authorized legal and HR personnel to search monitoring data for evidence relevant to workplace investigations, policy violations, or performance issues. This litigation support capability gives ${targetAudience} the documentation needed to defend employment decisions and respond to legal challenges with concrete evidence.`,
-        `Data retention and deletion policies balance audit requirements with privacy obligations and storage costs through automated lifecycle management. Configurable retention periods ensure monitoring data is preserved long enough to satisfy regulatory and legal requirements while avoiding indefinite retention that creates privacy risks and storage costs. Automatic deletion workflows remove monitoring data once retention periods expire, demonstrating data minimization and supporting privacy regulations like GDPR. Selective preservation exempts certain data from automatic deletion when ongoing legal or regulatory matters require extended retention. Policy audit trails document retention decisions and deletions, demonstrating governance over data lifecycle. These retention capabilities help ${targetAudience} balance competing obligations to preserve evidence, protect privacy, and control costs through intelligent data lifecycle management.`
-      ]
-    }],
-    'Analytics': [{
-      heading: 'Transform Workforce Data into Strategic Intelligence',
-      paragraphs: [
-        `Data without insight is just noise, and insights without action are just interesting observations. ${title} transforms workforce data into actionable intelligence that drives measurable business outcomes for ${targetAudience}. Our analytics platform doesn't just show what happened—it explains why it happened, predicts what will happen next, and recommends what to do about it. This progression from descriptive to predictive to prescriptive analytics represents the evolution of workforce management from reactive administration to proactive strategic planning that gives organizations competitive advantage in rapidly changing markets.`,
-        `The challenge facing modern organizations isn't lack of data—it's making sense of the overwhelming volume of workforce information generated daily. TrackNexus solves this challenge with intelligent data aggregation that pulls information from multiple systems, normalizes different data formats, and creates a unified analytics foundation. Time tracking data, project management information, productivity metrics, financial data, and HR records all flow into a single analytics platform that eliminates data silos and provides the complete picture. For ${targetAudience}, this unified view means no more reconciling conflicting reports or making decisions based on incomplete information.`,
-        `Visualization transforms complex data into intuitive insights that drive action. TrackNexus provides customizable dashboards that present information in formats tailored to different roles and decision-making needs. Executive dashboards highlight strategic KPIs and trends. Department managers see operational metrics relevant to their teams. Project managers track budget burn rates and resource utilization. Individual contributors access personal productivity insights and goal progress. This role-based approach to analytics ensures everyone gets the information they need without being overwhelmed by irrelevant data, accelerating decision-making at every organizational level.`,
-        `Predictive analytics represents the frontier of workforce intelligence, moving beyond what has happened to anticipate what will happen. TrackNexus employs machine learning algorithms that identify patterns in historical data to forecast future trends—predicting which projects will overrun budgets, which team members might be at risk of burnout, which clients will require additional resources, and which productivity initiatives will deliver the greatest ROI. These predictions give ${targetAudience} the lead time needed to take proactive action, transforming workforce management from reactive problem-solving to strategic opportunity creation.`,
-        `The true value of analytics emerges in continuous improvement cycles where insights drive actions that generate new data that refines insights. TrackNexus facilitates this cycle with automated recommendations that suggest specific actions based on analytical findings, tracking systems that measure the impact of changes over time, and feedback loops that continuously refine analytical models. This approach transforms workforce analytics from a reporting tool into a strategic planning engine that drives sustainable, measurable improvements in productivity, efficiency, and business outcomes quarter after quarter.`
-      ]
-    },
-    {
-      heading: 'Advanced Data Visualization and Dashboard Design',
-      paragraphs: [
-        `Complex workforce data becomes actionable only when presented in formats that enable rapid comprehension and decision-making. ${title} provides ${targetAudience} with sophisticated visualization capabilities that transform numerical data into intuitive graphics, charts, and dashboards that reveal patterns and insights at a glance. Our visualization engine understands that different data types require different presentation methods and different audiences need different levels of detail, automatically selecting optimal visualization formats while allowing customization for specific needs.`,
-        `Interactive dashboards provide real-time visibility into workforce metrics with the ability to drill down from high-level summaries to granular details. Executive dashboards present strategic KPIs like overall productivity trends, labor cost per revenue dollar, and organizational capacity utilization with visual indicators of performance against targets. Department dashboards focus on metrics relevant to specific operational areas—project completion rates for operations managers, billable utilization for professional services leaders, or absence rates for HR directors. Individual contributor dashboards show personal productivity metrics, goal progress, and performance trends that empower employees to manage their own performance. This role-based dashboard approach ensures everyone sees relevant information presented appropriately for their decision-making needs.`,
-        `Chart and graph libraries provide diverse visualization options optimized for different data types and analytical questions. Time series line charts reveal trends and patterns over days, weeks, months, or years. Bar and column charts enable comparisons across teams, departments, projects, or other categorical dimensions. Pie and donut charts show composition and proportion—how total effort breaks down across different activities or how capacity is allocated across projects. Heatmaps reveal patterns in two-dimensional data like productivity by day of week and hour of day. Scatter plots identify correlations between variables like hours worked and output quality. For ${targetAudience}, this visualization diversity means the right chart type is always available to communicate specific insights effectively.`,
-        `Customization capabilities allow users to tailor dashboards and visualizations to match their specific information needs and aesthetic preferences. Drag-and-drop dashboard builders enable non-technical users to create custom layouts without coding or IT assistance. Widget libraries provide pre-built visualizations that can be configured and added to dashboards in seconds. Filter controls allow users to focus dashboards on specific teams, time periods, or other dimensions relevant to their current analytical question. Color scheme customization ensures visualizations align with organizational branding and personal preferences. Save and share capabilities allow users to preserve custom dashboard configurations and share them with colleagues. This customization flexibility transforms TrackNexus from a fixed reporting tool into a personalized analytics environment that adapts to individual workflow and information needs.`,
-        `Mobile-optimized visualizations ensure workforce analytics remain accessible regardless of device or location. Responsive dashboard designs automatically adapt to different screen sizes, reformatting complex multi-column layouts into single-column mobile views while preserving information hierarchy. Touch-optimized interactions enable intuitive drill-down and filtering on tablets and smartphones. Key metrics cards provide glanceable summaries perfect for quick mobile check-ins. Progressive disclosure shows essential information immediately while making detailed data available through tap or swipe interactions. For ${targetAudience} managing teams on the go, these mobile analytics capabilities ensure critical workforce insights are always available, enabling informed decisions and rapid responses regardless of physical location.`
-      ]
-    },
-    {
-      heading: 'Predictive Analytics and Machine Learning',
-      paragraphs: [
-        `Historical reporting shows what happened, but predictive analytics reveals what will happen, enabling proactive management that prevents problems and capitalizes on opportunities. ${title} employs advanced machine learning algorithms that analyze historical patterns to generate predictions about future workforce trends, project outcomes, and organizational performance. For ${targetAudience}, this predictive capability transforms workforce analytics from rear-view mirror into crystal ball that enables anticipatory management and strategic planning based on probable futures rather than uncertain guesses.`,
-        `Project outcome prediction leverages historical data from similar projects to forecast whether current initiatives will meet deadlines and budgets. Time tracking patterns from ongoing projects are compared against historical projects with similar characteristics—size, complexity, team composition, and client requirements. Machine learning models identify early warning signs that historically preceded project overruns or delays. Prediction confidence scores indicate how certain the system is about each forecast based on historical pattern strength. These project predictions give ${targetAudience} the lead time needed to take corrective action—adding resources, adjusting scope, or managing client expectations—before minor issues become major problems requiring expensive recovery efforts.`,
-        `Workforce capacity forecasting predicts future staffing needs based on historical demand patterns, growth trends, and seasonal variations. Absence prediction models forecast expected time-off based on historical patterns, holiday schedules, and accrual policies. Turnover risk scoring identifies employees at elevated risk of voluntary departure based on engagement patterns, tenure, and behavioral indicators. Hiring need forecasting predicts when additional staff will be required based on growth projections and anticipated attrition. Skill gap identification predicts which capabilities the organization will need but currently lacks based on project pipeline and strategic initiatives. These workforce predictions enable ${targetAudience} to plan proactively for talent needs rather than scrambling reactively to fill gaps after they create operational problems.`,
-        `Performance trend forecasting extends current productivity patterns into the future to predict whether teams will meet targets and where intervention might be needed. Individual performance trajectories predict whether employees are on track to meet annual goals based on current progress and historical patterns. Team productivity forecasting predicts capacity available for new work based on current workload and historical velocity. Quality trend prediction forecasts whether output quality will meet standards based on current error rates and rework patterns. These performance predictions enable ${targetAudience} to take preemptive action to address performance gaps before they impact deliverables or require emergency intervention.`,
-        `Recommendation engines transform predictions into suggested actions that guide decision-making and improvement initiatives. When predictions indicate potential problems, the system automatically suggests specific interventions based on what has proven effective in similar historical situations. Resource reallocation recommendations suggest optimal reassignment of team members to balance workload and prevent predicted bottlenecks. Training recommendations identify skill development that would address predicted capability gaps. Process improvement suggestions identify workflow changes that would address root causes of predicted problems. For ${targetAudience}, these AI-powered recommendations transform analytics from passive reporting into active decision support that guides action and drives continuous improvement based on data-driven insights about probable futures.`
-      ]
-    },
-    {
-      heading: 'Automated Reporting and Insight Distribution',
-      paragraphs: [
-        `Manual report generation consumes valuable time while ensuring reports are often out of date by the time stakeholders receive them. ${title} eliminates this inefficiency through comprehensive report automation that generates and distributes workforce analytics on defined schedules without manual intervention. For ${targetAudience}, this automation transforms reporting from recurring burden into automated process that ensures stakeholders always have timely access to current workforce intelligence without consuming analyst time on routine report production.`,
-        `Scheduled report generation produces standard reports automatically on daily, weekly, monthly, or custom cadences. Daily team productivity summaries provide managers with overnight updates on previous day's work. Weekly project status reports roll up time investment, completion progress, and budget consumption across all active initiatives. Monthly department performance reports aggregate key metrics for leadership review. Quarterly trend reports reveal long-term patterns in productivity, utilization, and capacity. Custom schedule support accommodates organizational rhythms like sprint cycles or fiscal reporting periods. These automated reports eliminate the hours analysts previously spent compiling recurring reports while ensuring reports are always current and delivered consistently.`,
-        `Smart distribution ensures reports reach appropriate stakeholders without manual forwarding or distribution list maintenance. Role-based distribution automatically sends reports to appropriate organizational roles—department heads receive their team's reports, project managers receive their project reports, executives receive enterprise summaries. Hierarchical routing sends reports up the management chain while respecting organizational structure. Conditional distribution sends reports only when certain conditions are met, like when metrics exceed thresholds or significant changes occur. Secure external sharing enables controlled report distribution to clients, auditors, or board members without compromising security. For ${targetAudience}, these distribution capabilities ensure the right people receive relevant reports at the right time without creating distribution overhead or information overload from irrelevant reports.`,
-        `Format flexibility accommodates different stakeholder preferences and use cases through multiple export and delivery options. PDF reports provide professional documents suitable for printing, presentations, or offline review. Excel exports enable stakeholders to perform additional analysis or incorporate analytics into their own reports. CSV exports support data import into other systems or advanced statistical analysis. Interactive HTML reports provide clickable dashboards with drill-down capabilities delivered via email. API access enables programmatic report retrieval for integration with business intelligence tools. This format flexibility ensures every stakeholder can consume workforce analytics in their preferred format for their specific use case.`,
-        `Alert-based reporting delivers insights when action is needed rather than on arbitrary schedules. Threshold alerts notify stakeholders immediately when key metrics exceed defined boundaries—productivity dropping below targets, project budgets approaching limits, or capacity utilization reaching saturation. Anomaly alerts identify unusual patterns that differ significantly from historical norms, flagging situations requiring investigation even if thresholds aren't technically exceeded. Change alerts notify stakeholders when significant shifts occur in key metrics, ensuring visibility into important trends as they emerge. For ${targetAudience}, this alert-based approach supplements scheduled reporting with event-driven notification that ensures awareness of situations requiring immediate attention rather than waiting for next scheduled report cycle.`
-      ]
-    },
-    {
-      heading: 'Advanced Analytics for Strategic Workforce Planning',
-      paragraphs: [
-        `Workforce planning traditionally relies on intuition and rough estimates rather than rigorous analysis of historical data and predictive modeling. ${title} transforms workforce planning into a data-driven strategic capability through advanced analytics that reveal current capacity, forecast future needs, model scenarios, and optimize resource allocation. For ${targetAudience}, these strategic planning capabilities elevate workforce management from tactical execution to strategic organizational capability that drives competitive advantage through superior talent deployment.`,
-        `Capacity analysis provides comprehensive visibility into current workforce availability and utilization across all dimensions. Total capacity calculations show maximum theoretical work hours available from current workforce. Utilization metrics reveal what percentage of capacity is actually deployed on productive work versus consumed by meetings, training, administrative tasks, or remaining unallocated. Specialization analysis shows capacity distribution across different skill types, revealing where the organization has surplus capacity versus scarce capabilities. Project allocation shows which initiatives are consuming what portions of available capacity. This capacity intelligence helps ${targetAudience} understand whether they're understaffed, overstaffed, or have the wrong mix of capabilities, informing hiring decisions and resource allocation strategies.`,
-        `Demand forecasting predicts future workforce requirements based on business growth projections, historical workload patterns, and pipeline analysis. Revenue growth models translate business development forecasts into implied workforce requirements based on historical labor intensity. Project pipeline analysis converts known future commitments into staffing requirements based on historical project resource consumption. Seasonal demand patterns identify cyclical variations in workforce needs based on multi-year historical data. Strategic initiative planning quantifies the workforce investment required for planned organizational changes or new service offerings. These demand forecasts give ${targetAudience} visibility into future talent needs with sufficient lead time for effective recruiting, training, or contracting rather than discovering staffing gaps only when projects are starting.`,
-        `Scenario modeling enables what-if analysis of different workforce strategies and their likely outcomes. Growth scenario models project workforce requirements and costs under different business growth assumptions. Automation scenario planning quantifies how productivity improvements from technology investments would affect workforce requirements. Restructuring analysis models the impact of organizational changes on capacity, costs, and capability distribution. Make-versus-buy analysis compares the cost and capability implications of hiring additional staff versus outsourcing or contracting specific functions. For ${targetAudience}, this scenario modeling transforms strategic workforce decisions from one-time commitments into iterative analytical exercises where multiple options are evaluated quantitatively before final decisions.`,
-        `Optimization algorithms identify optimal resource allocation strategies that maximize organizational objectives while satisfying operational constraints. Project staffing optimization assigns team members to projects in ways that balance skill requirements, development goals, workload distribution, and project deadlines simultaneously. Budget allocation optimization distributes limited budget across competing hiring and development priorities to maximize organizational capability subject to financial constraints. Training investment optimization identifies which skill development initiatives would deliver the greatest organizational benefit given current capability gaps and future requirements. For ${targetAudience}, these optimization capabilities transform intuitive resource allocation into mathematical optimization that identifies solutions superior to what human judgment alone could achieve, driving measurable improvements in workforce productivity and strategic capability.`
-      ]
-    },
-    {
-      heading: 'Data Governance and Analytics Security',
-      paragraphs: [
-        `Workforce analytics involves sensitive employee data that requires careful governance to protect privacy, maintain security, and ensure appropriate use. ${title} provides ${targetAudience} with comprehensive data governance capabilities that enable powerful analytics while maintaining the security controls and privacy protections that employees, regulators, and organizational policies demand. Our governance framework recognizes that analytics value and privacy protection aren't opposing goals but complementary objectives that both require careful architecture and ongoing management.`,
-        `Access controls ensure workforce analytics are visible only to authorized users with legitimate business need for specific information. Role-based permissions grant analytics access based on organizational role and management responsibilities—managers see their team's data, executives see enterprise aggregates, HR sees organization-wide information. Hierarchical access controls automatically scope data visibility based on reporting relationships, ensuring managers see only their direct and indirect reports. Attribute-based access extends basic role permissions with fine-grained rules based on project assignment, location, department, or custom attributes. Audit logging tracks who accessed which analytics when, creating accountability and enabling investigation of inappropriate access. These access controls give ${targetAudience} confidence that sensitive workforce information remains appropriately protected while ensuring legitimate analytical users have the access they need.`,
-        `Data anonymization and aggregation features protect individual privacy while enabling organizational insights. Team-level aggregation shows team metrics without exposing individual performance, enabling management insights while protecting privacy. Statistical methods present distributions and trends across populations rather than individual data points. Minimum group size rules prevent analytics from being generated for groups too small to protect individual anonymity. Anonymized benchmarking enables external comparisons without exposing organization-specific details. These privacy-preserving analytics techniques give ${targetAudience} valuable workforce intelligence while maintaining the privacy protections that build employee trust and satisfy regulatory requirements.`,
-        `Data retention and deletion policies ensure analytics data doesn't accumulate indefinitely, balancing analytical value against privacy principles and storage costs. Configurable retention periods automatically remove detailed analytics data after defined timeframes while preserving summary statistics for long-term trending. Legal hold capabilities prevent deletion when regulatory or legal matters require evidence preservation. Selective deletion allows targeted removal of specific data while preserving broader datasets. Policy audit trails document retention decisions and deletions, demonstrating governance over analytics data lifecycle. For ${targetAudience}, these retention capabilities balance the analytical value of historical data against the privacy and cost implications of indefinite retention.`,
-        `Compliance frameworks embed regulatory requirements directly into analytics governance, simplifying adherence to GDPR, CCPA, and industry-specific regulations. Data subject rights workflows support employee requests to access, correct, or delete their personal data as required by privacy regulations. Purpose limitation controls ensure analytics data is used only for documented business purposes. Data minimization principles limit analytics data collection to information necessary for legitimate business purposes. Cross-border data transfer controls ensure analytics data handling complies with data residency and international transfer requirements. For ${targetAudience} operating in regulated environments, these compliance capabilities transform regulatory obligations from manual governance processes into automated technical controls that ensure ongoing adherence with minimal administrative overhead.`
-      ]
-    }],
-    'Team Management': [{
-      heading: 'Orchestrate Team Success with Intelligent Coordination',
-      paragraphs: [
-        `Team management in today's complex business environment demands more than task assignment and deadline tracking. ${title} provides ${targetAudience} with comprehensive team orchestration capabilities that coordinate work, optimize resource allocation, foster collaboration, and maximize collective potential. The platform recognizes that high-performing teams require balance—between individual autonomy and coordinated effort, between current project demands and long-term capacity planning, between achieving immediate goals and developing future capabilities. This sophisticated approach to team management transforms groups of individuals into cohesive, high-performing units that consistently exceed expectations.`,
-        `Resource allocation represents one of the most critical and challenging aspects of team management. TrackNexus provides intelligent scheduling and assignment capabilities that consider multiple factors simultaneously—individual skills and experience levels, current workload and capacity, project priorities and deadlines, learning and development goals, and team member preferences. This multidimensional optimization ensures work is assigned to the right people at the right time, preventing both burnout from overallocation and disengagement from underutilization. For ${targetAudience}, this means teams consistently operate at optimal capacity without the constant firefighting that characterizes poor resource management.`,
-        `Collaboration doesn't happen by accident—it requires intentional systems that facilitate communication, coordination, and knowledge sharing. TrackNexus integrates collaboration tools directly into the workflow, ensuring team members can communicate about projects, share updates on progress, request assistance, and coordinate handoffs without switching between multiple platforms. Real-time visibility into who is working on what prevents duplicate effort and missed dependencies. Shared timelines and calendars keep everyone aligned on deadlines and milestones. This integrated approach to collaboration reduces friction, accelerates project velocity, and ensures information flows freely across team boundaries.`,
-        `Performance management extends beyond annual reviews to continuous feedback, recognition, and development. TrackNexus provides ${targetAudience} with objective data to support fair, comprehensive performance assessments—productivity metrics, project contributions, collaboration patterns, and goal achievement tracking. This data-driven approach removes subjectivity and bias from performance evaluation while providing concrete examples to support both positive recognition and constructive feedback. Recognition systems allow immediate acknowledgment of achievements, while development planning tools help map career progression and skill building. This continuous performance management approach drives engagement and retention by ensuring team members feel valued and see clear paths for growth.`,
-        `Scaling team management from small groups to large organizations requires systems that maintain visibility and coordination as complexity grows. TrackNexus provides hierarchical team structures, cross-functional project teams, and matrix organization support that adapt to however your organization is structured. Delegation capabilities allow team leaders to distribute management responsibilities while maintaining oversight. Reporting and analytics roll up from individuals to teams to departments to divisions, providing appropriate visibility at every level. This scalability means the same platform that helps a manager coordinate a five-person team can help an executive orchestrate a workforce of thousands, growing alongside your organization without requiring platform transitions or management process overhauls.`
-      ]
-    },
-    {
-      heading: 'Advanced Team Capacity Planning and Workload Balancing',
-      paragraphs: [
-        `Effective team management requires sophisticated capacity planning that extends beyond simple headcount to understand the nuanced availability, skills, and limitations of each team member. ${title} empowers ${targetAudience} with advanced capacity planning tools that provide comprehensive visibility into current workload distribution, future commitments, and available capacity across all team members and projects. The platform aggregates data from project assignments, time tracking, leave schedules, and skill inventories to create a complete picture of team capacity. This holistic approach enables managers to make informed decisions about new project assignments, resource requests, and timeline commitments based on actual capacity rather than assumptions or outdated spreadsheets.`,
-        `Workload balancing represents a critical challenge that directly impacts both productivity and employee satisfaction. TrackNexus provides real-time workload visualization that reveals which team members are operating at capacity, who has available bandwidth, and where bottlenecks are forming. Predictive analytics forecast future workload based on project pipelines and historical patterns, enabling proactive capacity adjustments before problems emerge. Automated workload balancing algorithms can suggest optimal task redistribution when imbalances are detected, considering factors like skill requirements, project priorities, and individual development goals. For ${targetAudience}, this means preventing the common scenario where some team members are overwhelmed while others are underutilized, creating resentment and inefficiency.`,
-        `Skills matrix management enables intelligent resource allocation based on competencies rather than just availability. TrackNexus maintains comprehensive skills profiles for each team member, tracking technical capabilities, domain expertise, certifications, and soft skills. The platform can match project requirements with team member qualifications, ensuring work is assigned to people with appropriate expertise. Skills gap analysis identifies areas where team capabilities don't align with project demands, informing hiring decisions and training investments. Career development tracking shows how team members are expanding their capabilities over time. This skills-based approach to team management ensures ${targetAudience} can confidently commit to projects knowing their team has the necessary expertise while identifying development opportunities that prepare teams for future challenges.`,
-        `Cross-team coordination becomes increasingly complex as organizations grow and projects span multiple departments. TrackNexus provides shared resource management capabilities that enable coordination when team members contribute to multiple projects or work across organizational boundaries. Transparency into cross-team dependencies prevents scheduling conflicts and ensures adequate availability for all commitments. Priority hierarchies help resolve conflicts when resources are contested across multiple initiatives. Communication tools facilitate coordination between team leaders who share resources. This enterprise-level coordination capability ensures ${targetAudience} can manage complex matrix organizations and cross-functional initiatives without the chaos and confusion that often characterizes distributed team management.`,
-        `ROI measurement for team management initiatives requires connecting management practices to business outcomes. TrackNexus provides analytics that correlate team management approaches with results—showing how workload balancing impacts productivity, how skills matching affects project success rates, and how capacity planning accuracy influences timeline adherence. Comparative analysis reveals which team structures and management practices deliver the best results. Historical trending shows how team management improvements compound over time. For ${targetAudience}, these insights transform team management from an art based on intuition to a science driven by evidence, enabling continuous refinement of practices based on measurable outcomes rather than management fads or untested assumptions.`
-      ]
-    },
-    {
-      heading: 'Real-Time Team Communication and Collaboration Enhancement',
-      paragraphs: [
-        `Modern teams operate across distributed locations, time zones, and work arrangements, making effective communication more critical and more challenging than ever before. ${title} provides ${targetAudience} with integrated communication tools that bridge geographic and temporal boundaries while maintaining the context and continuity essential for productive collaboration. The platform connects communication directly to work context—conversations happen within projects, attached to specific tasks, and associated with relevant documents and data. This context-aware communication eliminates the constant switching between disparate tools and the lost information that characterizes fragmented communication systems. Team members always have the full picture because communication is embedded in workflow rather than separated from it.`,
-        `Asynchronous collaboration capabilities recognize that distributed teams don't always work simultaneously and that deep work requires uninterrupted focus periods. TrackNexus supports threaded discussions that allow team members to contribute when convenient rather than requiring real-time participation. Rich media support enables sharing of screenshots, recordings, and documents that communicate complex information more effectively than text. Status updates provide visibility into progress without interrupting flow with meetings. Notification management allows individuals to control when they receive alerts based on priority and personal focus schedules. This asynchronous-first approach to collaboration gives ${targetAudience} the flexibility to build teams around talent rather than geography while respecting the focus time that knowledge workers need for creative and analytical tasks.`,
-        `Meeting management and optimization tools help teams collaborate synchronously when beneficial while eliminating wasteful meetings that consume time without producing value. TrackNexus provides meeting analytics that quantify time spent in meetings across teams and individuals, revealing where meeting load may be undermining productivity. Meeting effectiveness surveys gather feedback on whether meetings accomplish objectives. Calendar integration provides visibility into meeting schedules and identifies opportunities to consolidate or eliminate recurring meetings. Meeting agendas and action items connect meetings to project workflows, ensuring discussions produce documented decisions and assigned tasks. For ${targetAudience}, these capabilities transform meetings from default communication mode to intentional collaboration tool used when genuinely beneficial.`,
-        `Knowledge management and information sharing prevent the common problem where critical information lives in individual email inboxes or messaging threads, creating dependencies on specific people and knowledge loss when team members leave. TrackNexus provides centralized knowledge repositories where teams can document processes, share best practices, maintain project histories, and create searchable institutional knowledge. Automated documentation captures decisions and rationale from project communications. Version control maintains history of evolving documents and decisions. Search capabilities enable finding relevant information across all team communications and documents. This systematic approach to knowledge management ensures ${targetAudience} build organizational capabilities that transcend individual team members, reducing onboarding time for new hires and preventing repeated rediscovery of solutions to recurring problems.`,
-        `Collaboration analytics provide insights into team interaction patterns that inform both immediate interventions and long-term team development. TrackNexus reveals communication patterns—who communicates with whom, which team members are central to information flow, and where communication gaps exist. Response time analysis identifies bottlenecks where delayed responses slow project progress. Collaboration frequency metrics show whether teams are over-communicating with excessive interruptions or under-communicating with insufficient coordination. Network analysis reveals informal team structures and identifies isolated team members who may need better integration. These insights enable ${targetAudience} to optimize team structures, improve information flow, and identify collaboration dysfunctions before they undermine team performance, transforming collaboration from chance occurrence to managed capability that systematically improves over time.`
-      ]
-    },
-    {
-      heading: 'Performance Management and Employee Development Integration',
-      paragraphs: [
-        `Traditional annual performance reviews fail to drive meaningful improvement because they occur too infrequently, rely on manager recall rather than objective data, and focus on backward-looking evaluation rather than forward-looking development. ${title} enables ${targetAudience} to implement continuous performance management that provides ongoing feedback, celebrates achievements in real-time, and supports employee growth through objective data and structured development planning. The platform captures performance indicators throughout the year—project contributions, goal progress, productivity metrics, collaboration effectiveness, and skill development. This continuous data collection eliminates recency bias and ensures evaluations reflect full performance periods rather than just recent activity. When review time arrives, managers have comprehensive performance data at their fingertips rather than relying on incomplete memory.`,
-        `Goal setting and tracking capabilities connect individual objectives to organizational priorities while providing the visibility needed to ensure progress. TrackNexus supports cascading goals that connect company objectives to department goals to team targets to individual commitments, ensuring alignment throughout the organization. Progress tracking shows real-time advancement toward goals, enabling course correction when targets appear at risk. Goal achievement analytics reveal which types of goals are consistently met versus which are routinely missed, informing future goal-setting practices. Milestone celebrations recognize intermediate achievements rather than waiting for annual reviews. For ${targetAudience}, this systematic approach to goal management ensures organizational priorities translate to individual action while maintaining motivation through visible progress and regular recognition.`,
-        `Competency assessment and skill development planning transform vague development discussions into concrete capability building with measurable progress. TrackNexus maintains competency frameworks that define required capabilities for different roles and career levels. Assessment tools enable both self-evaluation and manager evaluation against these frameworks, identifying strengths to leverage and gaps to address. Development plans outline specific actions to build targeted capabilities, from formal training to stretch assignments to mentoring relationships. Progress tracking shows capability growth over time. Certification tracking ensures compliance with professional development requirements. This structured approach to development gives ${targetAudience} confidence that team members are continuously building capabilities while providing employees with clear development paths that support career advancement.`,
-        `Recognition and reward systems provide the positive reinforcement that drives sustained high performance and engagement. TrackNexus enables multiple recognition mechanisms—peer-to-peer recognition that builds team cohesion, manager recognition that reinforces desired behaviors, and milestone recognition that celebrates project achievements. Recognition is captured and accumulated, providing tangible evidence of contributions during performance reviews and promotion discussions. Public recognition options enable celebrating achievements with broader audiences. Recognition analytics identify high performers who might be overlooked in traditional review processes and reveal whether recognition is distributed equitably across teams. For ${targetAudience}, systematic recognition transforms acknowledgment from sporadic manager-driven activity to regular practice embedded in team culture, driving engagement and retention through demonstrated appreciation.`,
-        `Performance improvement planning provides structured support for team members who are struggling while protecting the organization from prolonged underperformance. TrackNexus enables documentation of performance concerns, clear articulation of improvement expectations, and objective tracking of progress against improvement plans. The platform provides templates for performance improvement documentation that ensure compliance with HR policies and legal requirements. Regular check-ins and progress updates create accountability while demonstrating organizational commitment to employee success. Successful completion of improvement plans can be celebrated as development achievements. For ${targetAudience}, these capabilities ensure performance management addresses both high performers and those needing support, creating fair, documented processes that protect both employees and the organization while maximizing the likelihood that improvement efforts succeed and valuable team members remain productive contributors.`
-      ]
-    },
-    {
-      heading: 'Team Analytics and Continuous Improvement Methodologies',
-      paragraphs: [
-        `Exceptional teams don't happen by accident—they result from intentional design, continuous monitoring, and systematic improvement based on performance data and feedback. ${title} provides ${targetAudience} with comprehensive team analytics that reveal not just what teams accomplish but how they operate, where friction exists, and what interventions might improve performance. The platform measures team health across multiple dimensions—productivity and output quality, collaboration effectiveness, workload balance, skill coverage, engagement and satisfaction, and alignment with organizational goals. This multidimensional assessment provides a holistic view of team performance that goes beyond simplistic output metrics to understand the underlying dynamics that drive sustainable high performance versus short-term results achieved through unsustainable practices.`,
-        `Benchmarking capabilities enable comparing team performance against internal and external standards to understand relative performance and identify improvement opportunities. TrackNexus allows ${targetAudience} to compare teams within their organization, revealing which teams are highest performing and what practices might explain their success. Industry benchmarks provide external context, showing how your teams compare to similar organizations. Historical benchmarking tracks improvement over time, quantifying the impact of team management changes and celebrating progress. Peer team comparison identifies outliers—both positive outliers that might share best practices and negative outliers that need support. This comparative approach to team analytics moves beyond absolute metrics to relative performance, providing context that informs realistic goals and identifies proven practices worth replicating.`,
-        `Experimentation frameworks enable testing team management hypotheses systematically rather than implementing changes organization-wide based on intuition or industry trends. TrackNexus supports A/B testing where different approaches are piloted with different teams, with rigorous measurement of outcomes. Control groups provide baseline comparisons that isolate the impact of changes from broader trends. Statistical analysis determines whether observed differences represent genuine improvements or random variation. Rollout planning facilitates expanding successful experiments while abandoning unsuccessful ones. For ${targetAudience}, this scientific approach to team management reduces risk of counterproductive changes while accelerating identification of genuinely beneficial practices, transforming management from opinion-based decisions to evidence-driven continuous improvement.`,
-        `Retrospective and lessons learned processes ensure teams learn from both successes and failures, accumulating wisdom over time rather than repeatedly encountering the same problems. TrackNexus provides structured retrospective tools that guide teams through post-project reviews, identifying what went well, what could improve, and specific actions to implement going forward. Action item tracking ensures retrospective insights translate to actual changes rather than just discussion. Pattern analysis across multiple retrospectives reveals recurring themes that indicate systemic issues requiring intervention. Success pattern identification highlights practices that consistently contribute to positive outcomes. This systematic learning approach gives ${targetAudience} mechanisms to capture and propagate team wisdom, ensuring organizational capability grows with each project rather than starting from zero with each new initiative.`,
-        `Predictive analytics and early warning systems enable proactive team management that prevents problems rather than reacting after issues become crises. TrackNexus analyzes historical patterns to identify leading indicators of team dysfunction—changes in collaboration patterns, increasing workload imbalance, declining productivity trends, or rising turnover risk among key team members. Automated alerts notify managers when concerning patterns emerge, enabling early intervention. Risk scoring helps prioritize management attention on teams most likely to need support. Intervention recommendations suggest proven approaches for addressing identified issues. For ${targetAudience}, these predictive capabilities transform team management from reactive firefighting to proactive stewardship, addressing small issues before they become big problems and ensuring teams remain healthy, productive, and engaged over the long term rather than cycling through periods of high performance and crisis.`
-      ]
-    }],
-    'Security': [{
-      heading: 'Enterprise Security and Compliance Without Compromise',
-      paragraphs: [
-        `Security and compliance represent non-negotiable requirements for modern organizations, yet traditional security approaches often create friction that reduces productivity and frustrates users. ${title} resolves this tension by providing ${targetAudience} with enterprise-grade security controls that protect sensitive data and ensure compliance without imposing cumbersome processes that slow down legitimate work. Our zero-trust architecture, end-to-end encryption, and granular access controls operate transparently in the background, maintaining security posture while keeping the user experience fast and frictionless. This balance between protection and productivity represents the evolution of enterprise security from obstacle to enabler.`,
-        `Access control forms the foundation of data security, determining who can see what information and perform which actions. TrackNexus implements role-based access control (RBAC) with fine-grained permissions that align precisely with job responsibilities and organizational policies. Every access request is authenticated and authorized before granting access, regardless of network location or device. Multi-factor authentication adds an additional verification layer for sensitive operations. Time-based access policies automatically adjust permissions based on work schedules and project assignments. This comprehensive approach to access control ensures ${targetAudience} can confidently grant the access people need to do their jobs while preventing unauthorized access to sensitive resources.`,
-        `Audit trails and compliance monitoring provide the documentation needed to demonstrate regulatory compliance and investigate security incidents. TrackNexus automatically logs every system action—user logins, data access, configuration changes, report generation, and administrative operations—creating comprehensive audit trails that satisfy the most stringent compliance requirements. Automated compliance monitoring continuously evaluates system usage against policy requirements, flagging potential violations before they become audit findings. Pre-built compliance frameworks for SOC 2, GDPR, HIPAA, ISO 27001, and industry-specific regulations simplify compliance management, while customizable policy engines adapt to your organization's specific requirements. This proactive approach to compliance transforms regulatory obligations from periodic scrambles to continuous assurance.`,
-        `Threat detection and incident response capabilities protect organizations from both external attacks and insider threats. TrackNexus employs behavioral analytics that establish baselines for normal activity patterns and alert administrators to anomalies that might indicate security incidents—unusual access patterns, unexpected data downloads, access attempts outside normal hours, or other suspicious behaviors. Automated response playbooks can immediately contain potential threats by suspending access, requiring additional authentication, or alerting security teams. This real-time threat intelligence provides ${targetAudience} with early warning and rapid response capabilities that minimize the window of exposure for security incidents, often catching problems before they result in data loss or compliance violations.`,
-        `Data protection extends beyond access control to encryption, backup, and recovery capabilities that ensure information remains secure and available. TrackNexus encrypts data both in transit and at rest, using industry-standard encryption protocols that protect information from unauthorized access. Automated backup systems ensure data can be recovered in the event of system failures or security incidents. Geographic data residency options allow organizations to comply with data sovereignty requirements. Data retention and deletion policies automate information lifecycle management to comply with privacy regulations. This comprehensive approach to data protection gives ${targetAudience} confidence that sensitive workforce information remains secure while remaining accessible to authorized users when and where they need it.`
-      ]
-    },
-    {
-      heading: 'Advanced Identity and Access Management Infrastructure',
-      paragraphs: [
-        `Identity and access management serves as the cornerstone of organizational security, determining not just who can access systems but establishing trust relationships that span your entire technology ecosystem. ${title} provides ${targetAudience} with enterprise-grade identity management that implements single sign-on (SSO) across all integrated applications, centralizing authentication while eliminating password fatigue and reducing security vulnerabilities from weak or reused credentials. Integration with leading identity providers like Okta, Azure AD, and Auth0 ensures seamless deployment within your existing IAM infrastructure. Directory synchronization keeps user accounts and permissions synchronized with authoritative HR systems, automatically provisioning access when employees join and deprovisioning when they leave. This centralized approach to identity management reduces administrative overhead while strengthening security through consistent authentication policies and automated lifecycle management.`,
-        `Privileged access management recognizes that administrative and power user accounts represent heightened security risks requiring additional controls. TrackNexus implements just-in-time privilege elevation that grants elevated permissions only when needed and automatically revokes them after use. Approval workflows require authorization before granting privileged access to sensitive functions or data. Session recording captures all administrative activities for audit and forensic purposes. Credential vaulting protects administrative passwords and API keys from exposure. Privileged account analytics monitor usage patterns of high-permission accounts, detecting anomalies that might indicate compromised credentials. For ${targetAudience}, these privileged access controls protect against the insider threats and credential compromises that represent the most damaging security incidents while maintaining the administrative flexibility needed to manage systems effectively.`,
-        `Adaptive authentication uses contextual factors and risk signals to adjust security requirements dynamically based on the sensitivity of requested actions and the risk profile of access attempts. TrackNexus evaluates multiple factors when authenticating users—device fingerprinting, network location, access time patterns, user behavior analytics, and threat intelligence feeds. Low-risk access from recognized devices on corporate networks proceeds smoothly with minimal friction. High-risk scenarios like access from new devices, unusual locations, or outside normal hours trigger additional verification requirements like multi-factor authentication or manager approval. Failed authentication attempts trigger progressive security responses from temporary lockouts to security alerts. This risk-based approach to authentication gives ${targetAudience} security that adapts to threat levels rather than imposing uniform friction regardless of risk.`,
-        `Access certification and attestation processes ensure permissions remain appropriate as roles and responsibilities evolve over time. TrackNexus automates periodic access reviews where managers certify that team members' permissions remain appropriate for their current responsibilities. Automated workflows present managers with clear summaries of each team member's access rights and flag potentially inappropriate permissions based on role definitions and peer comparisons. Attestation tracking maintains audit trails showing who approved access and when reviews occurred. Orphaned account detection identifies accounts that should have been deactivated. Excessive permission reports highlight accounts with privileges beyond role requirements. These governance capabilities ensure ${targetAudience} maintain least-privilege access as the organization evolves, preventing permission creep that accumulates security risk over time while demonstrating access governance during audits and compliance reviews.`,
-        `Federation and partner access management extends security controls beyond organizational boundaries to contractors, vendors, and partner organizations that need limited access to systems or data. TrackNexus supports SAML and OAuth federation that allows external users to authenticate using their own organization's identity systems while enforcing your security policies. Guest access controls limit external users to specific resources and time periods. Contractor-specific policies can enforce additional restrictions like preventing data export or limiting access to business hours. Partner organization management groups external users by organization for simplified administration. Access expiration automatically terminates external access when contracts or projects end. For ${targetAudience} managing extended enterprises with complex partner ecosystems, these federation capabilities enable secure collaboration without compromising security or creating administrative burden maintaining external user accounts.`
-      ]
-    },
-    {
-      heading: 'Comprehensive Data Privacy and Protection Framework',
-      paragraphs: [
-        `Data privacy regulations like GDPR, CCPA, and industry-specific requirements create complex obligations that extend beyond basic security to encompass data minimization, purpose limitation, consent management, and individual rights. ${title} provides ${targetAudience} with comprehensive privacy controls that automate compliance with global privacy regulations while respecting employee privacy rights. The platform implements privacy by design principles—collecting only data necessary for legitimate business purposes, providing transparency about data collection and use, enabling individual access to personal data, and supporting data subject rights like deletion and portability. Privacy impact assessments help evaluate privacy implications of new data collection or processing activities. Data flow mapping documents where personal information is stored and how it moves through systems. This comprehensive privacy framework ensures ${targetAudience} meet regulatory obligations while building employee trust through transparent, respectful data practices.`,
-        `Consent management becomes critical when processing personal data for purposes beyond core employment functions like performance analysis or wellness programs. TrackNexus provides consent capture and management capabilities that ensure processing occurs only with appropriate authorization. Granular consent options allow individuals to opt into or out of specific processing activities while maintaining necessary employment-related processing. Consent records maintain audit trails documenting who consented to what processing and when. Consent withdrawal mechanisms allow individuals to revoke consent, with automated processing to respect those decisions. Age verification prevents processing of minor data where prohibited. These consent management capabilities give ${targetAudience} confidence that discretionary data processing occurs only with proper authorization while providing the documentation needed to demonstrate consent during privacy audits and investigations.`,
-        `Data subject rights automation handles the complex workflows required when individuals exercise privacy rights like access, rectification, erasure, or portability. TrackNexus provides request management tools that track privacy requests from submission through fulfillment, ensuring timely responses within regulatory deadlines. Data discovery capabilities locate all personal information about individuals across the system. Access request fulfillment compiles comprehensive reports of personal data in human-readable formats. Rectification tools enable correcting inaccurate personal information. Erasure functionality deletes or anonymizes personal data while preserving business records where legally required. Data portability exports personal information in machine-readable formats. For ${targetAudience}, these automation capabilities transform privacy rights from manual, high-effort processes requiring legal and IT coordination to streamlined workflows that meet regulatory obligations efficiently while demonstrating commitment to privacy rights.`,
-        `Data minimization and retention management implement privacy principles requiring collection of only necessary data and retention only as long as required. TrackNexus enables defining data retention policies that automatically delete or anonymize information when retention periods expire. Retention schedules vary by data type based on legal requirements and business needs. Automated enforcement eliminates manual retention management and demonstrates systematic data minimization. Legal hold capabilities suspend automatic deletion when litigation or investigations require preservation. Anonymization functionality removes identifying information while preserving data utility for analytics. Storage optimization capabilities archive historical data to cost-effective storage while maintaining retrieval capabilities. These data lifecycle management capabilities give ${targetAudience} confidence that data retention aligns with privacy principles and regulatory requirements while optimizing storage costs and reducing breach exposure by not retaining unnecessary personal information.`,
-        `Privacy monitoring and incident response capabilities detect potential privacy violations and manage privacy incidents when they occur. TrackNexus monitors for privacy risk indicators—excessive data access, unusual export activities, processing without documented legal basis, or data retention beyond policy periods. Privacy incident workflows guide investigation, notification, and remediation when privacy breaches or violations occur. Automated breach notification capabilities support regulatory notification requirements by identifying affected individuals, preparing required notifications, and documenting notification timing. Privacy impact dashboards provide visibility into privacy metrics like data subject requests, consent rates, and privacy incidents. For ${targetAudience}, these monitoring and response capabilities transform privacy management from reactive compliance to proactive risk management, preventing privacy violations before they occur and ensuring rapid, comprehensive response when incidents happen, minimizing both regulatory risk and reputational damage from privacy failures.`
-      ]
-    },
-    {
-      heading: 'Security Operations and Incident Management Excellence',
-      paragraphs: [
-        `Effective security requires not just preventive controls but comprehensive capabilities to detect, investigate, and respond to security incidents when they occur. ${title} provides ${targetAudience} with security operations tools that enable rapid incident detection and response without requiring dedicated security operations center infrastructure. The platform aggregates security events from across the system—authentication failures, authorization violations, anomalous behavior, configuration changes, and system errors—into a centralized security event stream that enables holistic security monitoring. Real-time alerting notifies security teams immediately when critical events occur. Event correlation identifies patterns spanning multiple activities that might indicate sophisticated attacks. Historical event retention provides the data needed for forensic investigation after incidents are discovered. This comprehensive security event management gives ${targetAudience} visibility into security posture and early warning of potential incidents.`,
-        `Automated incident response capabilities enable rapid containment and mitigation without waiting for security personnel to manually implement responses. TrackNexus supports defining response playbooks that automatically execute when specific conditions are detected—automatically suspending accounts after repeated authentication failures, requiring additional verification when suspicious behavior is detected, blocking data export when anomalous download patterns occur, or escalating alerts to security teams when critical thresholds are exceeded. These automated responses operate at machine speed, containing threats within seconds rather than the minutes or hours human response requires. Playbook customization allows tailoring responses to organizational needs and risk tolerance. Response simulation enables testing playbooks without impact to production systems. For ${targetAudience}, automated incident response provides always-on security operations that protect against threats 24/7 without requiring staffing security operations centers around the clock.`,
-        `Security information and event management (SIEM) integration connects TrackNexus to enterprise security infrastructure for organizations with dedicated security operations capabilities. TrackNexus supports standard security logging protocols like syslog and CEF that enable forwarding events to SIEM platforms like Splunk, QRadar, or Azure Sentinel. Structured logging ensures events include all context needed for security analysis. Real-time event streaming enables immediate SIEM correlation and alerting. Bidirectional integration allows SIEM platforms to query TrackNexus for additional context when investigating incidents. Threat intelligence integration enables enriching TrackNexus security events with external threat data. This SIEM integration gives ${targetAudience} with mature security operations the visibility and control needed to protect TrackNexus within their broader security architecture while enabling security teams to leverage existing security investments and expertise.`,
-        `Forensic investigation capabilities provide the tools and data needed to thoroughly investigate security incidents after detection. TrackNexus maintains comprehensive audit logs that capture detailed forensic evidence—complete user sessions showing all actions performed, system state changes with before and after values, network context including IP addresses and locations, and timing information enabling reconstruction of event sequences. Search and filtering capabilities enable investigators to quickly locate relevant events from massive log volumes. Timeline reconstruction provides chronological views of incident progression. Data export enables sharing forensic evidence with external investigators or law enforcement. Log integrity verification proves logs haven't been tampered with. For ${targetAudience}, these forensic capabilities ensure security incidents can be thoroughly investigated to understand attack methods, identify all compromised systems and data, and develop remediation plans that address root causes rather than just symptoms.`,
-        `Security metrics and compliance reporting provide the visibility and documentation needed to demonstrate security posture to executives, boards, auditors, and regulators. TrackNexus provides security dashboards showing key security indicators—authentication success rates, policy violations, security incidents, and access patterns. Trend analysis reveals whether security posture is improving or degrading over time. Compliance reports demonstrate adherence to security frameworks like NIST, CIS Controls, or ISO 27001. Executive summaries present security status in business-focused language appropriate for non-technical stakeholders. Audit report generation produces the documentation auditors require with minimal manual compilation effort. Security ROI calculations quantify security investment value. These reporting capabilities give ${targetAudience} confidence that security investments deliver measurable protection while providing the communication and documentation needed to satisfy stakeholder security questions and regulatory compliance requirements, transforming security from technical concern to well-managed business risk with appropriate visibility and governance.`
-      ]
-    },
-    {
-      heading: 'Regulatory Compliance Automation and Management',
-      paragraphs: [
-        `Navigating the complex landscape of regulatory compliance represents one of the most challenging aspects of modern business, with requirements varying by industry, geography, and business model. ${title} simplifies compliance for ${targetAudience} by providing pre-configured compliance frameworks that automate monitoring and reporting for major regulatory requirements. The platform includes templates for SOC 2 Type II audits that satisfy customer security requirements, GDPR compliance supporting European operations, HIPAA adherence for healthcare organizations, CCPA compliance for California privacy obligations, and industry-specific regulations like FINRA, PCI DSS, and government contractor requirements. Each framework includes control mappings that connect system capabilities to regulatory requirements, automated monitoring that continuously evaluates compliance status, and pre-built reports that generate audit-ready documentation. This comprehensive compliance automation transforms regulatory adherence from reactive scrambles before audits to continuous assurance with always-ready documentation.`,
-        `Control mapping and evidence collection automate the laborious process of documenting how organizational practices satisfy regulatory requirements. TrackNexus maps system capabilities and configurations to specific regulatory controls—access control policies to authorization requirements, audit logging to accountability obligations, encryption to data protection mandates, and retention policies to record-keeping rules. Automated evidence collection gathers the documentation auditors require—access control matrices, audit logs, policy documents, and configuration reports—without manual compilation. Evidence repositories organize documentation by control and regulation for efficient audit support. Continuous evidence collection ensures documentation reflects current state rather than point-in-time snapshots that become outdated. This systematic approach to control mapping and evidence collection gives ${targetAudience} confidence that compliance documentation is comprehensive, current, and readily available when auditors come calling, dramatically reducing audit preparation time and improving audit outcomes.`,
-        `Gap analysis and remediation planning identify compliance deficiencies and guide corrective actions before they become audit findings or regulatory violations. TrackNexus continuously evaluates organizational practices against regulatory requirements, flagging controls that aren't fully implemented or areas where practices don't align with obligations. Risk scoring prioritizes gaps based on violation severity and likelihood of detection. Remediation workflows assign corrective actions with deadlines and track completion. Compensating control documentation explains why alternative approaches satisfy requirements when standard implementations aren't feasible. Exception tracking maintains records of approved deviations with appropriate authorization and justification. For ${targetAudience}, these gap analysis capabilities enable proactive compliance management that identifies and addresses issues before audits rather than discovering problems when auditors arrive, reducing audit stress while demonstrating systematic commitment to compliance that improves audit outcomes and regulatory relationships.`,
-        `Compliance workflow automation streamlines the processes required to maintain ongoing compliance, from policy reviews to access certifications to training completion. TrackNexus automates compliance task assignment and tracking—scheduling periodic policy reviews, triggering access certification workflows, requiring training completion, and managing exception approvals. Automated reminders ensure compliance tasks are completed on schedule. Escalation workflows engage management when tasks are overdue. Completion tracking maintains records of who completed requirements and when. Workflow analytics identify bottlenecks that slow compliance processes. Integration with HR and IT systems ensures compliance workflows trigger appropriately when employees change roles or systems are modified. These workflow automation capabilities ensure ${targetAudience} maintain ongoing compliance without extensive manual tracking and follow-up, reducing compliance program overhead while improving completion rates and maintaining continuous compliance rather than periodic compliance sprints before audits.`,
-        `Multi-jurisdictional compliance support helps organizations navigate varying requirements across different regulatory regimes. TrackNexus enables defining jurisdiction-specific rules that apply different requirements based on employee location, data location, or business operations geography. Data residency controls ensure data is stored and processed in compliant locations. Jurisdiction-specific reporting generates documentation appropriate for different regulatory authorities. Conflict resolution helps navigate situations where regulations impose contradictory requirements. Cross-border data transfer documentation satisfies transfer mechanism requirements like Standard Contractual Clauses or Privacy Shield. Global compliance dashboards provide executive visibility into compliance status across all jurisdictions. For ${targetAudience} operating across multiple countries and regulatory environments, these multi-jurisdictional capabilities transform compliance from an overwhelming maze of conflicting requirements to a managed capability with appropriate controls and documentation for each jurisdiction, enabling global operations without compromising compliance in any location or exposing the organization to regulatory risk from incomplete understanding of local requirements.`
-      ]
-    }],
-    'Billing': [{
-      heading: 'Transform Time into Revenue with Intelligent Billing',
-      paragraphs: [
-        `Billing accuracy directly impacts cash flow, client relationships, and business profitability, yet many organizations struggle with billing processes that lose revenue, delay payments, and create client disputes. ${title} eliminates these problems by connecting time tracking directly to billing workflows, ensuring ${targetAudience} capture every billable hour and convert work into revenue efficiently and accurately. The platform automates the entire billing cycle from time capture through invoice generation and payment tracking, removing manual steps that introduce errors and delay cash collection. This automation doesn't just save time—it fundamentally transforms billing from administrative burden to strategic revenue management.`,
-        `Flexible billing models accommodate the complexity of modern service delivery. TrackNexus supports hourly billing with custom rate cards for different team members, projects, and clients. Fixed-fee projects with milestone-based billing track progress against deliverables. Retainer arrangements monitor usage against allocated hours. Value-based pricing connects deliverables to agreed-upon amounts. Mixed billing models combine different approaches within single projects. This flexibility means ${targetAudience} can implement whatever pricing strategy best serves their business model without being constrained by rigid billing system limitations. Custom approval workflows ensure appropriate review before invoices go out, maintaining quality control while accelerating the billing cycle.`,
-        `Invoice quality directly impacts payment speed and client satisfaction. TrackNexus generates professional, detailed invoices that build client confidence and reduce payment disputes. Customizable invoice templates match your brand identity and communication standards. Detailed time breakdowns show exactly what work was performed, when it occurred, and who performed it. Project descriptions and milestone achievements provide context. Expense documentation supports reimbursable costs. Supporting documentation can be attached directly to invoices. This transparency helps clients understand exactly what they're paying for, reducing disputes and questions that delay payment. Automated invoice delivery ensures timely billing, while payment tracking monitors accounts receivable aging and triggers follow-up reminders for overdue payments.`,
-        `Budget management capabilities prevent scope creep and revenue leakage by providing real-time visibility into project financials. TrackNexus tracks actual time and expenses against estimated budgets, alerting ${targetAudience} when projects approach or exceed estimates. This early warning enables proactive client conversations about scope changes, additional budget requirements, or timeline adjustments before overruns become fait accompli. Historical data reveals which types of projects consistently overrun estimates, enabling more accurate future estimation. Client-level profitability analysis identifies which relationships deliver the best margins and which might require pricing adjustments. This financial intelligence transforms project management from delivery focus to profit optimization.`,
-        `Revenue recognition and financial reporting capabilities bridge the gap between operations and finance. TrackNexus provides the data finance teams need for accurate revenue recognition under ASC 606 and IFRS 15 standards. Work in progress reports show earned but not yet billed revenue. Accounts receivable aging tracks outstanding invoices. Revenue forecasting projects future income based on contracted work and historical billing patterns. Integration with accounting systems ensures financial data flows seamlessly to general ledgers and financial statements. This financial intelligence gives ${targetAudience} complete visibility into business performance, supporting better strategic planning and providing the metrics investors and stakeholders expect from well-managed professional services organizations.`
-      ]
-    },
-    {
-      heading: 'Sophisticated Rate Management and Pricing Optimization',
-      paragraphs: [
-        `Pricing strategy directly determines profitability in professional services, yet many organizations struggle with rate management complexity spanning multiple dimensions—different rates for different team members, clients, projects, and service types. ${title} provides ${targetAudience} with comprehensive rate management capabilities that handle this complexity without manual tracking or spreadsheet gymnastics. The platform supports unlimited rate cards that define billing rates based on any combination of factors—individual team member, role or seniority level, client or client tier, project or project type, service category, work location, and time period. Rate effective dating enables scheduling rate changes in advance, ensuring billing uses correct rates when changes take effect. Rate history maintains complete audit trails of rate evolution over time. This sophisticated rate management ensures accurate billing regardless of pricing complexity while providing the flexibility to implement whatever pricing strategy best serves business objectives.`,
-        `Blended rate calculations automatically compute appropriate rates when multiple factors apply, eliminating manual rate determination and ensuring consistency. TrackNexus can calculate blended rates based on team composition for projects billed at team average rates, weight rates by seniority mix for capability-based pricing, or apply client-specific discounts and premium adjustments to standard rates. Rate rounding rules ensure rates align with client agreements and pricing psychology—rounding to nearest 5 or 25, using psychological price points, or maintaining exact calculated rates. Rate override capabilities allow manual rate specification when business circumstances require deviation from standard rates, with appropriate approval workflows and documentation. For ${targetAudience}, these blended rate capabilities ensure pricing flexibility while maintaining billing accuracy and consistency, accommodating complex pricing arrangements without sacrificing automation or introducing pricing errors.`,
-        `Competitive pricing intelligence helps optimize rates to maximize revenue while remaining competitive. TrackNexus provides benchmarking data showing how your rates compare to market rates for similar services, roles, and geographies. Win rate analysis correlates pricing with deal success, identifying rates that maximize revenue without sacrificing competitive positioning. Client price sensitivity analysis reveals which clients accept rate increases versus which require aggressive pricing. Profitability analysis by rate band identifies whether volume at different price points delivers optimal margins. Scenario modeling enables testing pricing strategy changes before implementation. These pricing analytics give ${targetAudience} confidence that rates are optimized for both competitiveness and profitability rather than based on outdated pricing or arbitrary annual increases disconnected from market dynamics and value delivery.`,
-        `Discount management and promotional pricing enable strategic pricing flexibility while maintaining control and visibility. TrackNexus supports percentage and fixed-amount discounts applied at project, client, or line-item levels. Discount authorization workflows ensure appropriate approval based on discount magnitude and strategic importance. Discount expiration automatically terminates temporary promotional pricing. Volume discounts reward clients for commitment with tiered pricing based on contracted amounts or usage levels. Early payment discounts incentivize prompt payment. Package pricing bundles multiple services at attractive rates. For ${targetAudience}, these discount capabilities enable strategic pricing flexibility that wins business and rewards desired client behaviors while preventing unauthorized discounting that erodes margins and creates unsustainable pricing expectations.`,
-        `Rate change management and client communication streamline the sensitive process of implementing rate increases. TrackNexus provides rate change planning tools that model financial impact of proposed changes across client portfolio. Client segmentation identifies which clients should receive increases and which require special handling. Communication templates ensure professional, consistent rate change notifications. Implementation scheduling coordinates rate effective dates with contract renewals and project cycles. Acceptance tracking monitors which clients accept changes versus which require negotiation. Rate change analytics reveal historical acceptance rates and revenue impact. These rate change management capabilities give ${targetAudience} systematic processes for necessary but difficult pricing adjustments, improving acceptance rates while maintaining client relationships and minimizing revenue risk from poorly executed rate changes that trigger client departures or extended price negotiations.`
-      ]
-    },
-    {
-      heading: 'Expense Management and Reimbursement Tracking',
-      paragraphs: [
-        `Professional services billing often includes reimbursable expenses in addition to time-based fees, creating additional tracking and billing complexity. ${title} provides ${targetAudience} with comprehensive expense management that captures, approves, and bills expenses seamlessly alongside time charges. Expense entry supports multiple capture methods—manual entry with receipt attachment, credit card integration that imports transactions automatically, and mobile receipt scanning that eliminates manual data entry. Expense categorization organizes costs by type—travel, meals, materials, subcontractors, and custom categories matching your business needs. Project attribution connects expenses to specific client projects for accurate cost allocation and billing. This integrated expense management ensures all project costs are captured and recovered rather than absorbed as untracked overhead that erodes project profitability.`,
-        `Expense policy enforcement prevents out-of-policy spending that creates reimbursement disputes and audit issues. TrackNexus enables defining expense policies that set limits and rules for different expense categories—daily meal allowances, hotel rate caps, approved vendors, required documentation, and approval requirements based on amount thresholds. Policy violations are flagged automatically when expenses are submitted, requiring explanation or higher-level approval. Automated policy compliance reduces reimbursement processing time by eliminating review of compliant expenses while focusing attention on exceptions. Policy reporting identifies frequent violations that may indicate policy problems or compliance issues. For ${targetAudience}, these policy enforcement capabilities ensure expense reimbursement aligns with organizational policies and client agreements while reducing administrative burden and reimbursement cycle time through automated compliance verification.`,
-        `Approval workflows route expense reports through appropriate review and authorization before reimbursement and billing. TrackNexus supports multi-level approval hierarchies where manager approval precedes finance review and client billing. Automatic routing based on expense amounts, categories, and policy compliance ensures appropriate review without unnecessary approvals for routine expenses. Approval delegation accommodates manager availability without stalling expense processing. Mobile approval enables managers to review and authorize expenses from any location without being desk-bound. Approval analytics reveal processing bottlenecks and identify managers requiring additional capacity or support. These workflow capabilities ensure ${targetAudience} maintain appropriate expense controls and audit trails while minimizing reimbursement delays that frustrate employees and impact cash flow for team members fronting business expenses.`,
-        `Billable expense management determines which expenses are client-billable versus internal costs absorbed as overhead. TrackNexus enables marking expenses as billable, non-billable, or billable at different markup rates—cost plus defined percentage, cost plus fixed amount, or custom rates for specific expense types. Client agreements define expense policies—which categories are reimbursable, what markup applies, and what documentation is required. Expense approval workflows can include client review for large or unusual expenses before invoice inclusion. Invoice presentation options control expense detail level shown to clients—detailed line items, category summaries, or consolidated expense amounts. For ${targetAudience}, these billable expense capabilities ensure appropriate expense recovery based on client agreements while maintaining transparency that prevents disputes and payment delays from unclear expense charges.`,
-        `Expense analytics and cost intelligence reveal spending patterns that inform cost management and profitability improvement. TrackNexus provides expense reporting across multiple dimensions—by project, client, team member, expense category, and time period. Variance analysis compares actual expenses to budgeted amounts, identifying cost overruns requiring attention. Trend analysis reveals whether expenses are increasing over time and at what rate. Benchmark comparisons show how project expenses compare to similar engagements. Category analysis identifies which expense types consume the most budget. Client profitability analysis includes both time and expense costs for complete margin visibility. These expense analytics give ${targetAudience} comprehensive visibility into cost structures that inform pricing decisions, identify cost reduction opportunities, and ensure project profitability isn't undermined by poorly managed expense tracking that allows costs to be incurred but not recovered through billing.`
-      ]
-    },
-    {
-      heading: 'Client Financial Management and Relationship Insights',
-      paragraphs: [
-        `Professional services success depends on maintaining healthy, profitable client relationships over extended periods. ${title} provides ${targetAudience} with comprehensive client financial management capabilities that go beyond individual project billing to understand overall relationship economics. Client portfolio views aggregate all projects, revenue, costs, and profitability for each client relationship. Historical analysis shows client financial evolution—revenue growth or decline, margin trends, payment patterns, and engagement volume. Client lifetime value calculations quantify total relationship value over time. Client concentration analysis reveals revenue dependency on specific clients that might represent risk. Share of wallet estimates help understand growth potential within existing relationships. This comprehensive client financial intelligence enables ${targetAudience} to manage client relationships strategically based on complete economic understanding rather than project-by-project tactical billing.`,
-        `Contract management and work authorization tracking ensure billing aligns with contractual terms and authorized work scope. TrackNexus maintains complete contract records including terms, rates, billing arrangements, caps or not-to-exceed limits, and special provisions. Work authorization linking connects time and expenses to specific authorizations, preventing billing for unauthorized work. Contract consumption monitoring tracks spending against contract values and remaining capacity. Expiration alerts notify managers when contracts approach end dates, enabling renewal discussions before work interruption. Contract compliance reporting documents that billing adheres to contract terms. For ${targetAudience}, these contract management capabilities prevent the revenue risk and client disputes that arise when billing doesn't align with contracts, while ensuring proactive contract renewal discussions that prevent relationship interruptions and revenue gaps.`,
-        `Payment terms management and collection optimization improve cash flow by accelerating payment cycles. TrackNexus supports diverse payment terms—net 30, net 60, custom terms by client, and prepayment or deposit requirements. Automated invoice delivery ensures timely billing that starts payment term clocks immediately. Payment due date tracking shows when payments should arrive. Accounts receivable aging reports reveal overdue invoices requiring follow-up. Automated payment reminders send professional collection notices at configured intervals. Escalation workflows engage management when payment issues require attention. Payment history analysis identifies chronically late-paying clients requiring stricter terms or deposits. For ${targetAudience}, these payment management capabilities reduce days sales outstanding and improve cash flow predictability while maintaining professional client relationships even when collections become necessary.`,
-        `Client profitability analysis reveals which relationships deliver the best returns and which might require pricing adjustments or service changes. TrackNexus calculates client profitability considering all revenue streams and costs—billed time at actual rates, expenses recovered, cost of service delivery including team member costs, overhead allocation, and unbilled or written-off time. Profitability metrics include gross margin, net margin, hourly realization rates, and return on invested time. Trend analysis shows whether profitability is improving or declining over relationship lifecycle. Comparison analysis reveals which clients are most profitable versus which might be unprofitable. Service mix analysis shows which service offerings deliver best margins with each client. These profitability insights enable ${targetAudience} to focus account management attention appropriately, have data-driven pricing conversations, and make strategic decisions about which client relationships to invest in growing versus which might require restructuring or even termination if persistently unprofitable.`,
-        `Budget-based billing and subscription management support modern pricing models beyond traditional hourly billing. TrackNexus enables budget-based arrangements where clients pay fixed monthly amounts regardless of hours consumed, with monitoring to ensure scope remains within budget allocations. Subscription billing supports recurring revenue models with automated invoice generation and payment processing. Usage-based billing applies rates to consumption metrics beyond time—transactions processed, users supported, or other value-based metrics. Hybrid models combine recurring fees with variable usage charges. Budget burn-down visualizations show remaining capacity under budgets or retainers. For ${targetAudience} transitioning to modern service delivery and pricing models, these capabilities enable implementing subscription and value-based pricing that improves revenue predictability and client lifetime value while differentiating service offerings from traditional hourly rate competitors, positioning the organization for sustainable growth in evolving professional services markets.`
-      ]
-    },
-    {
-      heading: 'Financial System Integration and Accounting Automation',
-      paragraphs: [
-        `Billing systems cannot operate in isolation—they must integrate seamlessly with accounting, ERP, and financial management systems to ensure data consistency and eliminate manual data transfer. ${title} provides ${targetAudience} with comprehensive financial system integration that automates data flow between time tracking, billing, and accounting systems. Pre-built integrations connect to popular accounting platforms including QuickBooks, Xero, NetSuite, Sage Intacct, and Microsoft Dynamics. Integration capabilities include invoice export that creates accounting system invoices automatically, payment import that updates TrackNexus when payments are received, customer and project synchronization that maintains data consistency, and chart of accounts mapping that ensures transactions post to correct general ledger accounts. This bidirectional integration eliminates duplicate data entry and ensures financial system records accurately reflect billing activity without manual reconciliation and data transfer that consumes finance team time while introducing errors.`,
-        `General ledger integration automates the complex accounting entries required for professional services revenue recognition. TrackNexus generates journal entries that post revenue, accounts receivable, work in progress, and deferred revenue to appropriate general ledger accounts based on billing activity and revenue recognition policies. Multi-entity accounting supports organizations with multiple legal entities requiring separate books. Department and location tracking enables segment reporting. Project-based costing connects revenue to project costs for job costing and profitability analysis. Intercompany transaction handling manages complex scenarios where service delivery and billing involve multiple entities. For ${targetAudience}, these general ledger integration capabilities ensure financial statements accurately reflect business performance while eliminating the manual journal entry preparation that traditionally consumes significant monthly close time and introduces reconciliation challenges between operational and financial systems.`,
-        `Tax calculation and compliance management handles the complex sales tax, VAT, and GST requirements that apply to service billing. TrackNexus integrates with tax calculation engines like Avalara and TaxJar that determine appropriate tax rates based on service location, client location, service type, and applicable tax rules. Automated tax calculation applies correct rates to invoices based on jurisdictional requirements. Tax exemption management handles clients with tax-exempt status. Tax reporting generates the returns and remittance documentation required for tax compliance. Multi-jurisdiction support accommodates organizations operating across multiple tax authorities. For ${targetAudience}, these tax capabilities ensure billing compliance with complex and constantly changing tax requirements while eliminating the manual tax research and calculation that consumes time and creates compliance risk from errors in rapidly evolving tax treatment of services across jurisdictions.`,
-        `Payment processing integration enables accepting client payments directly through the billing platform. TrackNexus integrates with payment processors including Stripe, PayPal, Square, and Authorize.net to support credit card, ACH, and digital wallet payments. Online payment portals allow clients to view invoices and submit payments without manual checks or bank transfers. Automated payment application matches received payments to invoices and updates accounts receivable balances. Payment plan support enables installment arrangements for large invoices. Failed payment handling automatically retries declined transactions and notifies clients. Payment analytics reveal payment method preferences and processing costs. For ${targetAudience}, integrated payment processing accelerates cash collection by removing friction from payment process while reducing manual payment application effort that traditionally requires finance team matching of payments to invoices and manual system updates.`,
-        `Financial reporting and business intelligence capabilities provide the insights executives and financial stakeholders need to understand business performance. TrackNexus provides comprehensive financial dashboards showing key metrics—revenue by period, outstanding receivables, billing backlog, collection performance, and profitability trends. Revenue forecasting projects future income based on pipeline, contracted work, and historical patterns. Cash flow forecasting predicts collections timing based on billing plans and historical payment patterns. Budget variance analysis compares actual performance to financial plans. Segment reporting shows performance across dimensions like service lines, offices, or client industries. Custom financial reports support specific stakeholder information needs. For ${targetAudience}, these financial reporting capabilities provide the visibility needed for data-driven financial management and strategic planning while generating the metrics and reports boards, investors, and lenders expect from well-managed professional services organizations, supporting fundraising, valuation, and strategic decision-making with comprehensive financial intelligence.`
-      ]
-    }],
-    'Workforce Management': [{
-      heading: 'Comprehensive Platform for Total Workforce Optimization',
-      paragraphs: [
-        `Workforce management encompasses the full spectrum of activities required to deploy, coordinate, and optimize human capital across the organization. ${title} provides ${targetAudience} with a unified platform that addresses every dimension of workforce management—from recruiting and onboarding through scheduling, time tracking, performance management, and compliance reporting. This comprehensive approach eliminates the complexity and inefficiency of managing workforce operations across multiple disconnected systems, creating a single source of truth for all workforce data and a consistent experience for both employees and managers. The result is more efficient operations, better compliance, and improved employee experiences that drive engagement and retention.`,
-        `Scheduling represents one of the most complex and consequential workforce management challenges, particularly for organizations with hourly workers, shift operations, or variable demand patterns. TrackNexus provides intelligent scheduling capabilities that optimize shift assignments based on employee skills and certifications, availability and preferences, labor costs and budget constraints, demand forecasts and coverage requirements, and regulatory compliance rules for breaks, rest periods, and overtime. The platform generates optimal schedules automatically while allowing manual adjustments when business realities require flexibility. Employees access schedules through mobile apps, can request time off or shift swaps subject to manager approval, and receive notifications about schedule changes. This modern approach to scheduling reduces the administrative burden on managers while giving employees the flexibility and visibility they expect.`,
-        `Attendance and absence management requires tracking not just when employees work but also managing various leave types, accrual policies, and approval workflows. TrackNexus automatically tracks attendance through time clock integration, monitoring compliance with scheduled shifts and flagging tardiness or no-shows. Leave management handles vacation requests, sick time, personal days, FMLA leave, and other absence types according to your organization's policies. Accrual engines automatically calculate available time off based on tenure, employment status, and accrual rules. Approval workflows route requests to appropriate managers while ensuring adequate coverage. Integration with payroll systems ensures leave is correctly reflected in compensation. This comprehensive approach to attendance management gives ${targetAudience} complete visibility into workforce availability while simplifying administration of complex absence policies.`,
-        `Compliance management has become increasingly complex as labor regulations multiply and penalties for violations escalate. TrackNexus helps ${targetAudience} navigate this regulatory landscape by automating compliance monitoring across multiple dimensions. Overtime tracking ensures compliance with FLSA and state overtime rules. Break enforcement monitors compliance with required meal and rest breaks. Minor work restrictions prevent violations of child labor laws. Certification tracking ensures employees maintain required licenses and credentials. Reporting capabilities generate the documentation needed for audits and regulatory inquiries. Automated alerts notify administrators of potential violations before they occur, enabling corrective action. This proactive approach to compliance protection saves organizations from costly penalties while demonstrating commitment to fair labor practices and regulatory adherence.`,
-        `Workforce analytics and optimization capabilities transform administrative workforce data into strategic business intelligence. TrackNexus reveals patterns in absenteeism, overtime utilization, scheduling efficiency, and labor cost allocation that inform workforce planning and optimization initiatives. Predictive analytics forecast future staffing needs based on historical patterns and business growth projections. Scenario planning tools model the impact of workforce changes on costs and coverage. Benchmarking compares your workforce metrics against industry standards and historical performance. These insights enable ${targetAudience} to make data-driven decisions about staffing levels, scheduling practices, and workforce investments that improve operational efficiency while controlling labor costs—transforming workforce management from administrative function to strategic capability that drives competitive advantage.`
-      ]
-    },
-    {
-      heading: 'Advanced Scheduling Optimization and Demand Forecasting',
-      paragraphs: [
-        `Effective scheduling requires balancing competing priorities—ensuring adequate coverage to meet customer needs, controlling labor costs by avoiding overstaffing, respecting employee preferences and work-life balance, and complying with complex labor regulations. ${title} provides ${targetAudience} with AI-powered scheduling optimization that considers all these factors simultaneously to generate schedules that achieve business objectives while supporting employee satisfaction. The platform analyzes historical data to understand staffing requirements across different times, days, and seasons. Demand forecasting predicts future staffing needs based on sales projections, appointment bookings, historical patterns, and external factors like weather and events. Skills-based scheduling ensures shifts are staffed with employees possessing required certifications, training, and experience. The result is optimal schedules that meet operational needs with minimum labor cost while maximizing schedule fairness and employee satisfaction.`,
-        `Schedule automation dramatically reduces the time managers spend creating and adjusting schedules while producing better results than manual scheduling. TrackNexus generates optimal schedules automatically based on demand forecasts, employee availability, labor budgets, and fairness constraints. The platform can create schedules weeks or months in advance, providing employees with advance notice that supports work-life planning. Automated schedule updates adjust for unexpected changes—employee call-outs, demand surges, or operational disruptions—and notify affected employees immediately. Template scheduling accelerates schedule creation for predictable patterns while allowing customization for special circumstances. For ${targetAudience}, schedule automation eliminates hours of manual scheduling work each week while producing schedules that better balance all stakeholder needs than managers can achieve manually with limited time and cognitive capacity for complex multivariable optimization.`,
-        `Employee self-service capabilities empower workers to participate in scheduling while reducing manager administrative burden. TrackNexus provides mobile apps where employees declare availability and preferences, request specific shifts or time off, offer shifts to colleagues when plans change, and swap shifts subject to manager approval. Bid-based scheduling allows employees to bid for desirable shifts, with assignments based on seniority, performance, or rotation systems. Shift marketplace functionality creates internal gig economy where employees can pick up extra shifts or cover for colleagues. Automatic approval rules allow routine schedule requests to be approved automatically based on coverage requirements and policy compliance. These self-service capabilities give ${targetAudience} workforce flexibility while engaging employees as active participants in scheduling rather than passive recipients of manager-imposed schedules, improving satisfaction and reducing schedule-related conflicts.`,
-        `Multi-location and cross-site scheduling addresses the complexity organizations face managing workforce across multiple locations with varying staffing requirements and employee pools. TrackNexus provides centralized scheduling visibility across all locations while enabling location-specific schedule management. Cross-location scheduling allows deploying employees across sites based on where needs are greatest. Travel time and mileage tracking captures costs when employees work at multiple locations. Location-specific labor rules ensure compliance with varying regulations across jurisdictions. Regional reporting aggregates scheduling metrics across location groups. For ${targetAudience} operating across multiple sites, these capabilities ensure optimal workforce deployment across the enterprise while maintaining local scheduling flexibility and compliance with location-specific requirements, transforming scattered location-by-location scheduling into coordinated workforce optimization across the entire operation.`,
-        `Scheduling analytics and continuous improvement capabilities enable refining scheduling practices over time based on performance data. TrackNexus reveals schedule effectiveness across multiple dimensions—labor cost efficiency, coverage adequacy, schedule stability, employee satisfaction, and compliance performance. Schedule adherence tracking shows how actual attendance compares to scheduled shifts. Schedule change frequency analysis identifies whether excessive schedule volatility undermines employee satisfaction and attendance. Cost analysis compares scheduled versus actual labor costs, revealing whether overtime and premium pay align with expectations. Employee feedback on schedules provides qualitative insights complementing quantitative metrics. These analytics enable ${targetAudience} to continuously refine scheduling practices based on empirical evidence of what works, transforming scheduling from reactive task to strategic capability that improves systematically over time through data-driven optimization of policies, practices, and tools that balance business needs with employee preferences and regulatory requirements.`
-      ]
-    },
-    {
-      heading: 'Leave Management and Time-Off Administration',
-      paragraphs: [
-        `Leave and time-off administration represents one of the most complex and consequential workforce management responsibilities, with organizations managing multiple leave types, varying accrual rules, complex eligibility criteria, and stringent legal requirements. ${title} provides ${targetAudience} with comprehensive leave management that automates policy administration while ensuring compliance and maintaining accurate records. The platform supports unlimited leave types—vacation, sick time, personal days, bereavement leave, jury duty, military leave, parental leave, FMLA, and custom leave categories matching organizational policies. Each leave type can have unique accrual rules, carryover policies, usage restrictions, documentation requirements, and approval workflows. Policy engines automatically apply appropriate rules based on employee status, location, tenure, and other factors. This comprehensive leave management eliminates manual tracking while ensuring consistent policy application and compliance with legal requirements across all employee populations.`,
-        `Accrual automation calculates available time off precisely based on complex rules without manual tracking or calculations. TrackNexus supports diverse accrual methods—hours per pay period, days per month, annual grants, tenure-based accruals, and unlimited policies. Accrual caps prevent balances from exceeding limits. Negative balance policies control whether employees can use time before earning it. Waiting periods delay accrual eligibility for new hires. Proration adjusts accruals for part-time employees or partial periods. Carryover rules determine how unused time transfers between years. Payout calculations determine financial value when employees leave. For ${targetAudience}, accrual automation ensures accuracy while eliminating the spreadsheet tracking and manual calculations that consume HR administrative time and create errors that anger employees when their expected time off isn't available or they're underpaid for unused balances at separation.`,
-        `Time-off request and approval workflows streamline the process while ensuring adequate coverage and manager awareness. TrackNexus enables employees to submit time-off requests through web or mobile interfaces, with real-time visibility into available balances. Coverage checking prevents approving requests that would leave shifts uncovered. Blackout date enforcement prevents time off during critical periods. Approval routing sends requests to appropriate managers with configurable escalation for delayed responses. Bulk approval capabilities enable reviewing multiple requests efficiently. Automatic denials handle requests violating policies. Calendar integration blocks time in employee calendars when approved. Notifications keep employees informed of request status. These workflow capabilities give ${targetAudience} confidence that time-off administration balances employee needs with operational requirements while maintaining manager control and ensuring employees receive timely responses to requests rather than uncertainty from delayed approvals.`,
-        `FMLA and accommodation leave administration automates complex compliance requirements for protected leave. TrackNexus tracks FMLA eligibility based on tenure and hours worked, automatically determining when employees qualify for protection. Leave designation workflows classify absences as FMLA-protected when appropriate. Hour tracking monitors intermittent FMLA usage against twelve-week entitlements. Recertification management schedules required medical documentation updates. Notice and documentation requirements ensure employees receive required communications. Accommodation leave supports disabilities and religious accommodations with appropriate tracking and documentation. Return to work planning coordinates leave endings with operational needs. For ${targetAudience}, these specialized leave management capabilities ensure compliance with complex legal requirements that impose significant penalties for violations while protecting organizations from disputes by maintaining complete documentation and consistent policy application across all eligible employees.`,
-        `Leave analytics and reporting provide insights into absence patterns and policy effectiveness while generating compliance documentation. TrackNexus reveals absence rates across teams, departments, and employee demographics. Unplanned absence analysis identifies attendance issues requiring intervention. Leave cost analysis quantifies financial impact of time off. Accrual liability reporting shows financial obligations for earned but unused time off. Trend analysis reveals whether absences are increasing or decreasing. FMLA and protected leave reporting documents compliance. Predictive analytics forecast future leave usage for staffing planning. These analytics enable ${targetAudience} to understand workforce availability patterns, identify potential attendance problems before they impact operations, optimize leave policies based on actual usage and cost data, and maintain comprehensive documentation demonstrating legal compliance with leave and accommodation requirements that protect organizations during audits and litigation while supporting data-driven decisions about leave policies that balance employee benefits with operational needs and financial constraints.`
-      ]
-    },
-    {
-      heading: 'Labor Cost Management and Budget Control',
-      paragraphs: [
-        `Labor represents the largest cost category for most organizations, yet many lack the real-time visibility and control needed to manage these costs effectively. ${title} provides ${targetAudience} with comprehensive labor cost management capabilities that transform cost control from periodic budget review to continuous monitoring and proactive management. The platform calculates fully-loaded labor costs including base wages, overtime premiums, shift differentials, benefits, payroll taxes, and other employment costs. Real-time cost tracking shows cumulative spending against budgets across teams, departments, projects, and the entire organization. Cost allocation distributes labor expenses across appropriate cost centers based on time allocation. Variance analysis compares actual costs to budgets, identifying overruns requiring attention. This comprehensive cost visibility enables proactive management that keeps labor spending aligned with budgets rather than discovering overruns after the fact when corrective action is no longer possible.`,
-        `Budget management and cost controls help prevent overspending through proactive monitoring and automated enforcement. TrackNexus enables defining labor budgets at any organizational level—company-wide, department, team, project, or location. Configurable alerts notify managers when spending approaches or exceeds budget thresholds at percentages you define. Spending authorization can require approval before scheduling or allowing time entry when budgets are exhausted. Budget reallocation enables moving funds between categories when business needs change. Forecast-to-complete projections estimate whether remaining budget will be adequate based on current spending rates and future schedules. For ${targetAudience}, these budget management capabilities prevent the common scenario where labor overspending is discovered long after the fact when budget periods are mostly complete, enabling proactive management through early warning and decision support that keeps spending aligned with financial plans.`,
-        `Overtime management and premium pay optimization reduce unnecessary labor cost premiums. TrackNexus tracks overtime accrual in real-time, showing when employees approach weekly or daily overtime thresholds defined by federal and state regulations. Overtime alerts notify managers before thresholds are crossed, enabling schedule adjustments that avoid overtime premiums. Alternative staffing suggestions identify employees who can complete work without triggering overtime. Historical overtime analysis reveals whether overtime is occasional response to unpredictable demands or chronic problem indicating understaffing. Shift differential tracking monitors premium pay for evening, night, and weekend work. These overtime management capabilities give ${targetAudience} visibility and control to minimize premium pay costs while maintaining operational coverage, reducing labor costs by preventing the overtime and premium pay that occurs not from genuine business need but from poor visibility into accrual status and inadequate schedule optimization.`,
-        `Productivity and efficiency metrics connect labor costs to output, enabling true cost-per-unit understanding. TrackNexus calculates productivity metrics appropriate for your industry—units produced per labor hour, customers served per FTE, revenue per employee, or custom metrics matching your business model. Labor efficiency ratios compare actual labor consumption to engineered standards or historical benchmarks. Cost efficiency analysis shows labor cost as percentage of revenue or other scaling factors. Comparative analysis reveals which teams, locations, or operational approaches deliver best productivity and efficiency. These productivity metrics enable ${targetAudience} to manage not just total labor costs but labor efficiency, understanding whether workforce is delivering expected output for cost incurred and identifying opportunities to improve productivity that deliver same or better results with less labor investment, fundamentally transforming cost management from simple expense reduction to productivity optimization.`,
-        `Labor cost forecasting and scenario planning support strategic workforce decisions and budgeting. TrackNexus projects future labor costs based on current staffing, scheduled wage increases, anticipated hiring, and growth plans. Scenario modeling enables comparing cost implications of different staffing strategies—hiring additional full-time staff versus using more overtime, restructuring teams, changing shift patterns, or outsourcing functions. Headcount planning tools model workforce changes needed to support business growth targets. Competitive benchmarking shows how your labor costs compare to industry norms for similar organizations. These planning capabilities give ${targetAudience} forward-looking insight into workforce financial implications, supporting annual budgeting and strategic planning with data-driven workforce cost projections that account for all cost factors and enable exploring alternative approaches before committing to specific strategies, reducing the risk of workforce strategies that prove financially unsustainable or operationally inadequate when implemented.`
-      ]
-    },
-    {
-      heading: 'Employee Experience and Workforce Engagement Optimization',
-      paragraphs: [
-        `Traditional workforce management systems optimize for organizational efficiency but often create negative employee experiences through rigid policies, poor communication, and lack of transparency or control. ${title} recognizes that workforce management must serve both organizational and employee needs, providing ${targetAudience} with capabilities that deliver operational excellence while enhancing employee experience and engagement. The platform provides intuitive mobile-first interfaces that give employees easy access to schedules, time-off balances, and personal information from anywhere. Self-service capabilities enable employees to manage routine tasks without manager intervention—requesting time off, swapping shifts, updating personal information, and viewing pay information. Transparent communication keeps employees informed about schedules, policy changes, and important updates. This employee-centric approach to workforce management recognizes that engaged employees deliver better customer service and operational performance, making employee experience not just nice-to-have but strategic imperative.`,
-        `Work-life balance support helps employees manage personal and professional commitments successfully. TrackNexus provides advance schedule visibility that allows employees to plan personal lives around work commitments. Schedule stability tracking monitors whether employees receive consistent schedules or face disruptive volatility. Preference accommodation enables employees to indicate shift preferences, availability constraints, and time-off needs. Schedule fairness metrics ensure desirable and undesirable shifts are distributed equitably. Split shift and clopening protection prevents scheduling practices that create hardship. For ${targetAudience}, these work-life balance capabilities reduce turnover and absenteeism by demonstrating respect for employee lives outside work, improving retention particularly in industries where scheduling practices are major factors in employee satisfaction and employment decisions, transforming workforce management from source of employee frustration to competitive advantage in talent attraction and retention.`,
-        `Communication and transparency features ensure employees stay informed without communication overload. TrackNexus provides centralized communication hubs where important announcements, policy updates, and organizational news are posted. Targeted communications ensure employees receive relevant information without noise from irrelevant messages. Schedule notifications alert employees to schedule changes, shift reminders, and upcoming time-off. Policy acknowledgment workflows ensure employees confirm receipt and understanding of important policies. Feedback mechanisms enable employees to raise concerns, ask questions, or provide input on workforce policies and practices. These communication capabilities give ${targetAudience} consistent channels to keep workforce informed and engaged while providing employees voice in workforce management rather than being passive recipients of top-down policies and schedules, building trust and engagement through transparent communication and opportunities for input.`,
-        `Recognition and reward integration connects workforce performance to acknowledgment and incentives. TrackNexus enables tracking performance metrics like attendance reliability, schedule flexibility, productivity achievements, and tenure milestones. Recognition programs celebrate achievements through public acknowledgment, points systems, or rewards. Perfect attendance bonuses incentivize reliability. Flexible scheduling access can be earned through performance. Priority shift selection rewards seniority or performance. These recognition capabilities give ${targetAudience} mechanisms to acknowledge and reward workforce behaviors supporting organizational goals, driving engagement and motivation through demonstrated appreciation while reinforcing desired behaviors and creating positive culture where employees feel valued for their contributions beyond just compensation, improving retention and discretionary effort that distinguishes good from great organizational performance.`,
-        `Workforce feedback and continuous improvement mechanisms ensure employee voice informs workforce management evolution. TrackNexus provides pulse surveys that gather employee feedback on scheduling satisfaction, policy fairness, manager effectiveness, and overall workforce experience. Suggestion boxes enable employees to propose improvements to policies, practices, or tools. Policy impact analysis evaluates how workforce management changes affect employee satisfaction. Comparative analytics show how different teams, locations, or managers perform on employee experience metrics. Action planning tools help managers address identified issues and track improvement initiatives. For ${targetAudience}, these feedback and improvement capabilities transform workforce management from static policies implemented uniformly across the organization to dynamic, continuously improving practices that adapt based on employee input and performance data, building employee engagement through demonstrated responsiveness to concerns while systematically optimizing workforce management approaches to achieve both organizational efficiency and employee satisfaction simultaneously rather than treating them as competing priorities.`
-      ]
-    }],
-    'Productivity': [{
-      heading: 'Data-Driven Productivity Enhancement for Modern Teams',
-      paragraphs: [
-        `Productivity optimization has evolved from simplistic time-and-motion studies to sophisticated data science that understands the nuances of knowledge work. ${title} provides ${targetAudience} with comprehensive productivity intelligence that goes far beyond measuring activity to understand outcomes, identify improvement opportunities, and implement changes that drive sustainable performance gains. The platform recognizes that productivity isn't just about working more hours—it's about working smarter, eliminating friction, focusing effort on high-value activities, and creating work environments where people can perform at their best. This modern approach to productivity management delivers measurable results while maintaining the employee trust and engagement that sustains long-term performance.`,
-        `Understanding current productivity requires capturing accurate data about how time is spent and how work flows through your organization. TrackNexus automatically tracks application usage, website activity, document work, communication time, and task completion without requiring manual time entries that burden employees and produce incomplete data. Smart categorization algorithms classify activities as productive, neutral, or unproductive based on role-specific definitions that understand context. Project and client attribution connects time investment to business outcomes. Collaboration patterns reveal how work flows between team members. This comprehensive activity data provides the foundation for productivity analysis, revealing how teams actually work rather than how they should work according to process documentation or management assumptions.`,
-        `Analysis transforms raw activity data into actionable productivity insights that drive improvement initiatives. TrackNexus identifies peak performance periods when individuals and teams produce their best work, enabling strategic scheduling of critical activities during these high-productivity windows. Time allocation analysis reveals whether effort is distributed according to business priorities or consumed by low-value activities. Distraction patterns identify the interruptions and context switches that fragment attention and reduce deep work. Meeting analytics quantify time spent in meetings and identify opportunities to reduce meeting load. Application efficiency metrics reveal whether teams have the right tools for their work. These insights give ${targetAudience} a clear picture of productivity obstacles and improvement opportunities, moving beyond generic productivity advice to specific, data-driven recommendations tailored to your organization's actual work patterns.`,
-        `Implementation of productivity improvements requires buy-in from team members who might view monitoring as surveillance rather than support. TrackNexus facilitates this buy-in by providing employees with access to their own productivity data, goal-setting tools that let individuals define personal productivity targets, and achievement tracking that celebrates progress. This employee-centric approach to productivity monitoring transforms it from a management control tool into a personal development resource. When employees can see their own patterns—how much time goes to meetings versus focused work, when they're most productive, how interruptions impact their effectiveness—they become active participants in productivity improvement rather than passive subjects of monitoring. This shift from surveillance to partnership fundamentally changes the productivity equation, driving sustainable improvement rather than short-term gaming of metrics.`,
-        `Measuring productivity improvement impact requires controlled experiments and longitudinal tracking that connects interventions to outcomes. TrackNexus provides A/B testing capabilities that allow ${targetAudience} to pilot productivity initiatives with subset of teams before broad rollout, measuring impact against control groups. Time series analysis tracks productivity metrics over extended periods, revealing seasonal patterns and long-term trends. Correlation analysis identifies factors associated with high productivity, from team composition to work location to tool usage. ROI calculations connect productivity improvements to business outcomes like faster project delivery, reduced labor costs, or increased billable utilization. This rigorous approach to productivity measurement ensures improvement initiatives deliver real business value rather than making metrics look better while actual performance stagnates or declines. The result is continuous, data-driven productivity optimization that compounds over time to deliver substantial competitive advantage.`
-      ]
-    },
-    {
-      heading: 'Focus Time Protection and Deep Work Optimization',
-      paragraphs: [
-        `Modern knowledge work requires sustained periods of uninterrupted concentration to tackle complex problems, create innovative solutions, and produce high-quality output. Yet most work environments fragment attention through constant meetings, notifications, and interruptions that prevent the deep work essential for value creation. ${title} helps ${targetAudience} protect and optimize focus time by providing visibility into how interruptions impact productivity and tools to create protected time for deep work. The platform identifies natural focus patterns showing when individuals typically engage in concentrated work versus collaborative activities. Interruption tracking quantifies how meetings, messages, and context switches fragment workdays. Focus time protection features enable blocking calendars for deep work, silencing notifications during focus periods, and signaling availability status to colleagues. This systematic approach to focus time protection helps teams reclaim the uninterrupted blocks essential for creative and analytical work that drives innovation and competitive advantage.`,
-        `Meeting load optimization addresses one of the most common productivity drains in modern organizations—excessive time spent in meetings that could be better spent on productive work. TrackNexus provides comprehensive meeting analytics that reveal how much time individuals and teams spend in meetings, how meeting load compares to industry benchmarks, and whether meeting time is increasing or decreasing over time. Meeting effectiveness scoring based on participant feedback identifies which meetings deliver value versus which waste time. Recurring meeting audits prompt regular review of standing meetings to determine if they remain necessary. Meeting-free time blocks protect specific periods for focused work. For ${targetAudience}, these meeting optimization capabilities help restore balance between necessary collaboration and protected productivity time, reducing meeting overhead while ensuring essential coordination continues, freeing time for the actual work that meetings are meant to coordinate.`,
-        `Context switching reduction minimizes the productivity penalty from constantly shifting between different tasks, tools, and projects. TrackNexus measures task switching frequency and duration, revealing how often individuals change contexts and how much time is lost to these transitions. Application switching patterns show whether work requires constantly moving between disconnected tools. Project fragmentation analysis reveals whether work is concentrated on few initiatives or scattered across many. Batch processing recommendations suggest grouping similar tasks to minimize context switches. Time blocking support enables scheduling dedicated periods for specific work types. These context switching insights give ${targetAudience} visibility into a major but often invisible productivity drain, enabling interventions that create more sustained focus on individual tasks and projects rather than the scattered attention that characterizes many modern work environments where constant multitasking creates illusion of productivity while actually undermining effectiveness.`,
-        `Distraction management and notification optimization help employees control the constant stream of alerts, messages, and interruptions that fragment attention. TrackNexus tracks notification volume from different sources—email, messaging apps, collaboration tools, and business applications. Notification impact analysis correlates interruptions with productivity declines. Communication norms education helps teams establish expectations about response times, allowing asynchronous communication rather than immediate responses. Do not disturb automation can silence notifications during focus periods while allowing urgent messages through. Notification batching groups alerts for periodic review rather than constant interruption. For ${targetAudience}, these distraction management capabilities help teams move from constant interruption to intentional communication patterns that respect focus time while ensuring urgent matters receive timely attention, creating work environments where deep work can occur without the cognitive cost of constant vigilance for incoming messages.`,
-        `Energy and attention management recognizes that productivity varies throughout the day based on cognitive energy levels, personal rhythms, and external factors. TrackNexus identifies individual productivity patterns showing when people do their best creative work, analytical thinking, routine tasks, and collaborative activities. Energy-aware scheduling recommendations suggest assigning complex work during high-energy periods and routine tasks during low-energy times. Workload pacing monitors whether work intensity is sustainable or heading toward burnout. Break encouragement prompts periodic breaks that restore focus and prevent exhaustion. Recovery time tracking ensures adequate time between high-intensity periods. These energy management capabilities enable ${targetAudience} to optimize not just time allocation but cognitive resource deployment, ensuring complex work receives the mental energy it requires while preventing burnout from unsustainable intensity, transforming productivity from maximizing hours worked to optimizing cognitive performance across sustainable work patterns that maintain long-term effectiveness.`
-      ]
-    },
-    {
-      heading: 'Workflow Efficiency and Process Optimization',
-      paragraphs: [
-        `Beyond individual productivity, organizational effectiveness depends on efficient workflows where work flows smoothly through defined processes without bottlenecks, handoff delays, or rework. ${title} provides ${targetAudience} with workflow analysis capabilities that reveal how work actually moves through your organization versus how process documentation says it should. Process mining technology reconstructs actual workflows from activity data, showing all the steps, handoffs, delays, and variations in how work gets done. Bottleneck identification pinpoints where work accumulates and waits for processing. Handoff analysis measures delays when work transfers between people or teams. Variation analysis reveals inconsistent process execution that creates inefficiency and quality issues. These workflow insights enable systematic process improvement based on empirical evidence of how work flows rather than assumptions or outdated process maps, identifying specific inefficiencies to address for measurable productivity gains.`,
-        `Cycle time reduction focuses on accelerating how long work takes from initiation to completion. TrackNexus measures cycle times across different work types, projects, and processes, establishing baselines and tracking improvement over time. Comparative analysis reveals which teams, approaches, or conditions deliver faster cycle times. Delay analysis identifies where time is spent waiting versus actively working. Parallel processing opportunities suggest work that could occur simultaneously rather than sequentially. Fast-track procedures identify routine cases that could bypass review steps. For ${targetAudience}, cycle time reduction delivers multiple benefits—faster customer delivery, higher throughput from same resources, and improved competitiveness from speed advantages. These cycle time insights enable systematic acceleration through targeted interventions addressing specific delays rather than generic exhortations to work faster that ignore systemic inefficiencies causing delays.`,
-        `Automation opportunity identification reveals repetitive tasks suitable for automation investment. TrackNexus identifies high-volume repetitive activities that consume significant time—data entry, report generation, status updates, routine approvals, and file management. Standardization assessment evaluates whether activities follow consistent patterns suitable for automation or require customization precluding automated approaches. ROI calculation estimates automation value based on time savings, error reduction, and redeployment of staff to higher-value work. Automation prioritization ranks opportunities by return on investment and implementation complexity. For ${targetAudience}, these automation insights guide technology investment toward highest-value opportunities where automation delivers rapid payback through eliminating routine work that consumes expensive human time better deployed on creative and strategic activities requiring human judgment that automation cannot replace.`,
-        `Quality and rework reduction addresses productivity drains from defects, errors, and rework. TrackNexus tracks rework time spent correcting mistakes, revising deliverables, or redoing work that didn't meet standards initially. Error pattern analysis identifies common mistakes suggesting process improvements, additional training, or tool enhancements. Quality gate effectiveness evaluates whether review processes catch problems or allow defects to proceed downstream where they're more expensive to fix. First-time quality metrics measure work completed correctly initially versus requiring revision. These quality insights enable ${targetAudience} to implement improvements that prevent errors rather than just detecting them, eliminating the rework that wastes time and frustrates workers while damaging customer satisfaction, transforming quality from inspection-based detection to prevention-based excellence that eliminates waste at its source.`,
-        `Tool and technology optimization ensures employees have effective software and systems for their work. TrackNexus reveals which applications teams actually use versus which sit idle despite licensing costs. Application switching patterns show whether workflows require inefficient movement between disconnected tools. Learning curve analysis measures time to productivity with different tools. Performance issue detection identifies applications with slow load times or frequent errors that reduce productivity. Alternative tool recommendations suggest more efficient options for common tasks. These technology insights enable ${targetAudience} to optimize tool portfolios—eliminating unused software that wastes budget, improving integration between frequently-used tools, and investing in better alternatives where current tools create friction. The result is technology stack aligned with actual work patterns rather than assumptions about how work gets done, delivering better user experiences and productivity while potentially reducing costs through eliminating unused or underutilized software licenses.`
-      ]
-    },
-    {
-      heading: 'Remote and Hybrid Work Productivity Excellence',
-      paragraphs: [
-        `The shift to remote and hybrid work arrangements has fundamentally changed productivity dynamics, introducing new challenges around communication, collaboration, visibility, and work-life boundaries while offering benefits like eliminating commutes and enabling flexible schedules. ${title} provides ${targetAudience} with specialized capabilities for managing productivity across distributed teams where traditional in-office management approaches fail. The platform provides visibility into distributed team activity without requiring surveillance, measuring outcomes and contributions rather than physical presence. Communication pattern analysis reveals whether remote teams maintain adequate coordination or face collaboration gaps. Work schedule flexibility tracking accommodates varying schedules while ensuring adequate overlap for real-time collaboration. Remote work effectiveness benchmarking compares productivity across work locations and arrangements. These remote work capabilities enable managing distributed teams effectively while respecting the autonomy and flexibility that make remote work attractive to employees, supporting both organizational effectiveness and employee satisfaction in hybrid work environments.`,
-        `Asynchronous collaboration optimization recognizes that distributed teams often work different schedules across time zones, requiring effective asynchronous communication and coordination. TrackNexus measures asynchronous versus synchronous collaboration patterns, revealing whether teams have found effective ways to work across time zones or struggle with coordination. Documentation completeness tracking evaluates whether teams maintain the written records essential for asynchronous work. Response time analysis shows whether asynchronous communication delivers timely coordination or creates delays. Handoff quality measurement evaluates whether work transfers between team members include adequate context and information. For ${targetAudience} managing global or flexible-schedule teams, these asynchronous collaboration insights enable optimizing coordination approaches that don't require simultaneous availability, expanding talent pools beyond commuting distance while accommodating employee preferences for flexible schedules without sacrificing collaboration effectiveness.`,
-        `Remote engagement and connection monitoring addresses the isolation and disconnection risks of remote work. TrackNexus tracks collaboration frequency showing whether remote employees maintain adequate connection with colleagues or become isolated. Team cohesion metrics reveal whether distributed teams develop strong relationships or remain collections of disconnected individuals. Virtual event participation shows engagement with team-building and social activities. Communication reciprocity analysis identifies whether interactions are balanced or one-directional. These engagement insights enable ${targetAudience} to identify remote employees at risk of isolation and implement interventions—encouraging collaboration, facilitating virtual coffee chats, organizing online team events, or adjusting team structures to improve connection. The result is distributed teams that maintain cohesion and belonging despite physical separation, preventing the engagement deterioration and eventual turnover that can result from prolonged isolation in remote work arrangements.`,
-        `Work-life boundary management helps remote employees maintain separation between work and personal life when both occur in the same physical location. TrackNexus monitors work hour patterns identifying employees who consistently work excessive hours or fail to disconnect after normal business hours. After-hours work tracking quantifies evening and weekend activity. Vacation disconnect monitoring evaluates whether employees truly disconnect during time off or continue working. Boundary coaching provides personalized recommendations for improving work-life separation. Manager escalation alerts supervisors when boundary issues suggest burnout risk. These work-life boundary insights give ${targetAudience} early warning of remote work burnout risks, enabling proactive interventions that help employees maintain sustainable work patterns, preventing the exhaustion and turnover that can result from blurred boundaries where work expands to fill all available time in the absence of physical office departure that signaled work ending in traditional office environments.`,
-        `Hybrid work optimization balances in-office and remote work to maximize benefits of both arrangements. TrackNexus tracks office attendance patterns showing which days have highest and lowest presence. Collaboration impact analysis reveals whether in-office days enable more effective collaboration or show no productivity difference from remote days. Space utilization data informs office design and capacity planning for hybrid environments. Team alignment tools help coordinate in-office schedules so team members are present simultaneously when needed. Hybrid work policy effectiveness measurement evaluates whether hybrid arrangements deliver expected benefits. These hybrid work insights enable ${targetAudience} to optimize hybrid arrangements based on actual performance data rather than assumptions—determining optimal office attendance frequencies, identifying which activities benefit from in-person presence versus which work remotely, and continuously refining hybrid policies to deliver both organizational productivity and employee flexibility, creating work arrangements that combine the best aspects of office and remote work while minimizing limitations of each.`
-      ]
-    },
-    {
-      heading: 'Productivity Coaching and Performance Development',
-      paragraphs: [
-        `Traditional productivity management often focuses on measurement and accountability, creating adversarial dynamics where employees view monitoring as surveillance and managers as enforcers. ${title} enables transforming productivity management into developmental coaching where data informs supportive interventions helping employees improve. The platform provides managers with productivity insights to guide coaching conversations—identifying specific improvement opportunities, recognizing achievements, and understanding contextual factors affecting performance. Coaching recommendations suggest productive framing for performance discussions focused on development rather than criticism. Performance trends show whether coaching interventions are working or require different approaches. This coaching-oriented approach to productivity management builds employee capabilities while maintaining accountability, creating positive improvement cycles where employees actively engage in productivity enhancement because they experience it as supportive development rather than punitive oversight.`,
-        `Personalized productivity recommendations provide actionable guidance tailored to individual work patterns and roles. TrackNexus analyzes individual productivity data to identify specific improvement opportunities—reducing meeting load, protecting focus time, minimizing context switching, or adopting more efficient workflows. AI-powered recommendations suggest concrete actions based on proven best practices and successful patterns from high performers. Recommendation tracking monitors whether suggestions are implemented and whether they deliver expected benefits. Recommendation evolution refines suggestions over time based on what works for specific individuals and roles. For ${targetAudience}, personalized productivity guidance scales expert coaching across entire workforce, ensuring every employee receives insights and suggestions tailored to their specific situations rather than generic productivity advice that may not apply to their particular work patterns and constraints.`,
-        `Peer learning and best practice sharing accelerates productivity improvement by propagating successful approaches across teams. TrackNexus identifies high performers using objective productivity metrics, then analyzes their work patterns to understand what differentiates them from average performers. Best practice documentation captures successful approaches in shareable formats. Productivity communities enable employees to discuss challenges and share solutions. Mentor matching connects struggling employees with high performers for guidance. Success story sharing celebrates productivity improvements to motivate others. These peer learning mechanisms give ${targetAudience} channels to scale productivity knowledge across organizations, ensuring insights from top performers benefit entire workforce rather than remaining isolated individual achievements, accelerating collective capability development through structured knowledge transfer.`,
-        `Productivity goal setting and tracking provides structure for continuous improvement. TrackNexus enables employees to set personal productivity goals aligned with organizational priorities—increasing billable utilization, reducing meeting time, improving project completion velocity, or achieving better work-life balance. Goal tracking shows progress toward targets with appropriate visualizations and milestones. Achievement recognition celebrates goal attainment through notifications, badges, or rewards. Goal adjustment allows refining targets based on experience and changing circumstances. Team goal aggregation rolls up individual goals to collective targets. These goal-setting capabilities give ${targetAudience} frameworks for channeling productivity improvement energy into structured pursuits with clear targets and progress visibility, maintaining motivation through visible advancement toward meaningful goals rather than diffuse improvement efforts without clear direction or measurable progress.`,
-        `Productivity skill development addresses capability gaps through targeted learning. TrackNexus identifies skill deficiencies based on productivity analysis—time management challenges, tool proficiency gaps, process knowledge deficits, or collaboration effectiveness issues. Learning recommendations suggest specific training to address identified gaps—time management workshops, software training, process documentation, or communication skills development. Training effectiveness measurement evaluates whether learning interventions improve productivity metrics. Certification tracking monitors completion of recommended development. Skill inventory maintains current view of individual and team capabilities. For ${targetAudience}, connecting productivity measurement to skill development transforms productivity monitoring from simple performance evaluation to diagnostic tool identifying development needs, ensuring productivity improvement efforts address root causes in capability gaps rather than just measuring and reporting performance, creating sustainable improvement through building skills that enable long-term excellence rather than short-term compliance motivated by measurement and oversight.`
-      ]
-    }],
-    'Reports': [{
-      heading: 'Comprehensive Reporting Intelligence for Every Stakeholder',
-      paragraphs: [
-        `Reports transform operational data into business intelligence that drives decisions at every organizational level. ${title} provides ${targetAudience} with a comprehensive reporting platform that eliminates hours of manual report compilation while delivering more accurate, timely, and relevant insights than traditional reporting approaches. The platform recognizes that different stakeholders need different information presented in different formats—executives want strategic summaries, managers need operational details, analysts require raw data for further analysis, and compliance officers need audit-ready documentation. This stakeholder-centric approach to reporting ensures everyone gets the information they need without being overwhelmed by irrelevant data or forcing IT teams to create custom reports for every request.`,
-        `Report automation represents the most immediate and measurable benefit of modern reporting platforms. TrackNexus allows ${targetAudience} to define report templates once and then schedule automatic generation and distribution on any cadence—daily, weekly, monthly, quarterly, or event-triggered. Recipients receive reports automatically in their preferred format—PDF for presentation, Excel for analysis, CSV for data import, or interactive dashboards for drill-down exploration. Distribution lists ensure reports reach all stakeholders without manual forwarding. Version control maintains report history for trend analysis and audit trails. This automation eliminates the recurring burden of report generation, freeing analysts and managers to focus on interpretation and action rather than data compilation and formatting.`,
-        `Customization capabilities ensure reports provide exactly the insights each stakeholder needs rather than generic information that requires manual filtering and reformatting. TrackNexus provides drag-and-drop report builders that allow non-technical users to create custom reports without writing code or submitting IT requests. Filter capabilities let reports focus on specific teams, projects, time periods, or other dimensions relevant to the question being answered. Calculation engines support custom metrics derived from raw data. Visualization options present data as tables, charts, graphs, or dashboards depending on what best communicates the insight. Template libraries provide starting points that can be customized rather than building from scratch. This self-service approach to reporting democratizes business intelligence, enabling ${targetAudience} to answer questions as they arise rather than waiting for scheduled reports or IT support.`,
-        `Interactive reporting takes static reports to the next level by allowing readers to explore data dynamically, drilling down from summary views to detailed records, adjusting filters and time periods, and asking follow-up questions without generating new reports. TrackNexus provides interactive dashboards that present high-level metrics with the ability to click through to underlying details. Parameter controls let users adjust report filters and immediately see updated results. Comparative views show how current performance compares to previous periods, targets, or benchmarks. Export capabilities allow users to extract filtered data for further analysis. This interactivity transforms reports from one-way information broadcasts into two-way data exploration tools that facilitate deeper understanding and more informed decision-making.`,
-        `Compliance reporting deserves special attention given the significant consequences of inadequate documentation during audits or regulatory inquiries. TrackNexus provides pre-built compliance report templates for common regulatory frameworks—SOC 2 audit documentation, GDPR data processing records, HIPAA access logs, labor law compliance reports, and financial audit trails. These templates ensure reports include all required information in formats auditors and regulators expect. Complete audit trails connect every reported data point back to source records, providing the documentation needed to substantiate compliance claims. Scheduled compliance reporting ensures documentation is generated regularly rather than scrambled together during audit preparation. For ${targetAudience} in regulated industries, these compliance reporting capabilities provide essential protection while simplifying ongoing governance and audit preparation that would otherwise consume significant time and resources.`
-      ]
-    },
-    {
-      heading: 'Executive Dashboards and Strategic Performance Visibility',
-      paragraphs: [
-        `Executive leadership requires high-level visibility into organizational performance without drowning in operational details. ${title} provides ${targetAudience} with executive dashboards that present key performance indicators, strategic metrics, and exception alerts in formats designed for quick comprehension and strategic decision-making. Customizable dashboard layouts allow executives to configure views showing the metrics most relevant to their responsibilities and strategic priorities. Multi-level drill-down enables investigating concerning trends without requiring separate detailed reports. Real-time data ensures dashboards always reflect current performance rather than outdated snapshots. Mobile optimization enables monitoring performance from any location on any device. Automated exception highlighting draws attention to metrics requiring intervention—targets at risk, anomalous trends, or performance outside acceptable ranges. These executive dashboards give leadership the visibility needed for informed strategic decisions without requiring time-consuming report review or reliance on filtered summaries that might miss important signals.`,
-        `Key performance indicator tracking and trending provide longitudinal visibility into whether the organization is moving in the right direction. TrackNexus enables defining KPIs aligned with strategic objectives—revenue growth, profitability, customer satisfaction, employee engagement, operational efficiency, or custom metrics specific to organizational goals. Historical trending shows KPI evolution over time with appropriate visualizations—line charts for trends, gauges for current status against targets, and comparative views showing performance versus goals, budgets, or prior periods. Leading and lagging indicator relationships reveal whether leading indicators predict future performance in lagging metrics. Benchmark comparisons show organizational performance against industry standards or competitor data. For ${targetAudience}, systematic KPI tracking ensures strategic priorities receive ongoing attention rather than episodic focus during planning cycles, enabling course corrections based on performance data before small variances become strategic failures.`,
-        `Board reporting and investor communication require presenting organizational performance in formats appropriate for governance and stakeholder oversight. TrackNexus provides board report templates that present performance summaries, strategic initiative progress, risk indicators, and compliance status in professional formats appropriate for board review. Narrative explanations provide context for metrics, explaining variances and outliers. Year-over-year comparisons show long-term performance trends. Segment reporting breaks down performance across business units, geographies, or product lines. Export capabilities enable generating presentation-ready reports for board meetings and investor updates. For ${targetAudience}, automated board reporting ensures governance stakeholders receive consistent, comprehensive performance visibility while eliminating manual compilation of board materials that traditionally consumed executive and finance team time before each board meeting, enabling more frequent and higher-quality governance reporting.`,
-        `Predictive analytics and forecasting capabilities provide forward-looking insights complementing historical performance reporting. TrackNexus applies statistical models and machine learning to historical data to forecast future performance—revenue projections, resource requirements, capacity constraints, and risk probabilities. Scenario modeling enables exploring how different strategic choices or external conditions might affect outcomes. Confidence intervals quantify forecast uncertainty, helping leaders understand prediction reliability. Forecast accuracy tracking monitors how predictions compare to actual results, continuously refining models. Early warning indicators flag emerging risks before they impact results. These predictive capabilities give ${targetAudience} forward visibility that complements historical reporting, supporting proactive management based on likely future states rather than reactive responses to problems that have already occurred, transforming reporting from rear-view mirror describing where the organization has been to forward-looking intelligence about where it's heading.`,
-        `Strategic initiative tracking connects reporting to organizational change and improvement efforts. TrackNexus provides project portfolio views showing progress across all strategic initiatives—digital transformation programs, process improvement projects, market expansion efforts, or operational excellence initiatives. Milestone tracking shows whether projects are on schedule or behind plan. Budget tracking compares actual spending to project budgets. Benefits realization monitoring measures whether completed initiatives deliver expected value. Resource allocation shows staff deployment across strategic priorities. For ${targetAudience}, strategic initiative reporting ensures transformation and improvement efforts receive appropriate visibility and accountability, preventing the common scenario where strategic initiatives are launched with enthusiasm but fade into operational obscurity without sustained attention and accountability for delivering promised results, ensuring strategy execution receives the ongoing oversight needed to translate strategic plans into realized improvements and competitive advantages.`
-      ]
-    },
-    {
-      heading: 'Operational Analytics and Management Reporting',
-      paragraphs: [
-        `Operational management requires detailed visibility into day-to-day performance across teams, projects, and business processes. ${title} provides ${targetAudience} with operational reporting that goes beyond high-level summaries to provide the detailed insights managers need for effective oversight and continuous improvement. Daily, weekly, and monthly operational reports track performance against operational targets—productivity metrics, quality indicators, customer service levels, and resource utilization. Exception reporting highlights anomalies requiring attention—missed deadlines, quality issues, resource constraints, or performance degradation. Comparative reporting reveals performance variance across teams, locations, or time periods. Drill-down capabilities enable investigating issues from summary metrics to individual transactions or activities. These operational reports give managers the visibility needed for informed decision-making and proactive problem-solving, ensuring operational excellence through data-driven management rather than reactive crisis response when problems become severe enough to demand attention.`,
-        `Team and individual performance reporting provides managers with insights needed for effective people management. TrackNexus generates performance reports showing productivity, quality, attendance, and goal achievement across teams and individuals. Comparative analysis reveals high and low performers requiring recognition or support respectively. Trend analysis shows whether performance is improving, stable, or declining over time. Performance distribution analysis reveals whether teams show normal variation or concerning patterns like consistently low performance or bimodal distributions suggesting subgroups with very different effectiveness. Peer comparisons provide context for individual performance relative to similar roles. For ${targetAudience}, these performance reports enable data-driven people management—recognizing achievements, identifying development needs, and having objective conversations about performance based on evidence rather than subjective impressions, improving fairness and effectiveness of performance management while providing documentation supporting personnel decisions.`,
-        `Project and portfolio reporting provides visibility into work progress, resource consumption, and delivery performance. TrackNexus tracks project status across all active initiatives—completion percentage, schedule adherence, budget consumption, and quality metrics. Portfolio views aggregate across all projects to show overall delivery capacity and performance. Resource allocation reports show staff deployment across project portfolio. Project profitability analysis compares actual costs and revenue to projections. Risk and issue tracking monitors project challenges requiring escalation or intervention. For ${targetAudience} managing project-based work, these reporting capabilities ensure comprehensive visibility into delivery pipeline, enabling proactive resource allocation, risk management, and client communication based on actual project data rather than optimistic status reports that hide problems until they become crises, improving delivery predictability and client satisfaction through transparent, data-driven project oversight.`,
-        `Process performance and efficiency reporting reveals how well operational processes are performing and where improvement opportunities exist. TrackNexus measures process metrics including cycle times, throughput volumes, error rates, and resource consumption. Process compliance tracking monitors adherence to defined procedures. Bottleneck identification pinpoints process steps where work accumulates. Quality metrics track defect rates and rework. Service level achievement measures performance against committed delivery standards. These process reports enable ${targetAudience} to manage processes systematically based on performance data, implementing continuous improvement through targeted interventions addressing specific inefficiencies rather than generic improvement efforts without clear focus on highest-impact opportunities, transforming process management from periodic improvement initiatives to ongoing optimization driven by regular performance measurement and analysis.`,
-        `Customer and client reporting provides visibility into client engagement, satisfaction, and relationship health. TrackNexus generates client-level reports showing project activity, billing and revenue, service delivery performance, and satisfaction metrics. Client portfolio analysis shows relationship distribution across size, profitability, and strategic importance. Service level performance reports track delivery against committed standards. Client health scoring identifies at-risk relationships requiring attention. Usage and engagement metrics reveal which clients are fully leveraging services versus which show declining engagement suggesting churn risk. For ${targetAudience} in client-facing businesses, these client reporting capabilities enable proactive relationship management based on comprehensive client intelligence, identifying both expansion opportunities with satisfied clients and intervention needs with at-risk relationships, supporting customer success strategies that maximize lifetime value while preventing churn through early identification and response to warning signals indicating relationship deterioration.`
-      ]
-    },
-    {
-      heading: 'Financial and Business Intelligence Reporting',
-      paragraphs: [
-        `Financial reporting connects operational data to business outcomes, providing the financial intelligence needed for strategic planning, performance management, and stakeholder communication. ${title} provides ${targetAudience} with comprehensive financial reports that bridge operations and finance—showing how operational activities translate to revenue, costs, profitability, and cash flow. Revenue reports track income across dimensions like clients, projects, service lines, and time periods. Profitability analysis shows margins at various organizational levels from overall business down to individual projects or clients. Cost allocation distributes expenses across appropriate business segments. Variance analysis compares actual financial performance to budgets and forecasts. These financial reports give leadership complete visibility into business economics, supporting data-driven financial management and strategic decisions based on comprehensive understanding of how different activities and segments contribute to overall financial performance.`,
-        `Budget management and variance reporting helps organizations maintain financial discipline through the fiscal year. TrackNexus tracks actual spending and revenue against approved budgets across all organizational levels—departments, teams, projects, and expense categories. Variance reporting highlights areas over or under budget with appropriate thresholds and alerts. Trend analysis projects whether variances will persist or are temporary fluctuations. Explanatory workflows enable budget owners to document variance causes and corrective actions. Reforecast support facilitates updating projections when circumstances change. For ${targetAudience}, budget reporting transforms financial planning from annual exercise to ongoing financial management discipline, enabling proactive budget control through early identification of variances and systematic tracking of corrective actions, preventing the budget overruns that result from inadequate visibility and delayed responses to emerging variances.`,
-        `Profitability and margin analysis reveals which parts of the business deliver the best financial returns and which might require strategic attention. TrackNexus calculates profitability across multiple dimensions—by client, project, service line, market segment, geographic region, or custom business segments. Contribution margin analysis shows segment profitability before allocated overhead. Fully-loaded profitability includes overhead allocation showing true net margins. Waterfall analysis shows how gross revenue flows through various costs to net profit. Profitability trending reveals whether margins are improving or eroding. Benchmark comparisons show how profitability compares to industry standards. These profitability insights enable ${targetAudience} to make strategic decisions about resource allocation, pricing, service offerings, and market focus based on empirical evidence of what drives financial performance, optimizing business portfolio for maximum profitability rather than managing by revenue alone without visibility into which revenue is profitable versus which actually destroys value after full cost accounting.`,
-        `Cash flow and working capital reporting provides visibility into liquidity and financial health beyond profitability. TrackNexus tracks accounts receivable aging showing outstanding invoices and collection performance. Days sales outstanding measures average collection period. Unbilled revenue shows work completed but not yet invoiced. Billing backlog quantifies contracted work not yet delivered or billed. Cash flow forecasting projects future cash positions based on expected billings, collections, and expenses. Working capital analysis shows capital tied up in receivables versus payables. These cash flow reports give ${targetAudience} visibility into financial health and liquidity, enabling proactive cash management that prevents cash crunches despite profitable operations, supporting working capital optimization that funds growth without excessive external financing while identifying collection issues and billing delays that tie up capital in receivables rather than converting revenue to cash available for business operations and investment.`,
-        `Business intelligence and data warehouse integration extends reporting beyond TrackNexus data to comprehensive business analytics. TrackNexus integrates with business intelligence platforms like Tableau, Power BI, Looker, and QlikView, making workforce data available alongside financial, customer, and operational data from other systems. Data warehouse export provides regular data feeds for analytical databases. SQL access enables custom queries and analysis. API access supports programmatic data retrieval for custom analytics. Cross-system reporting combines workforce data with CRM, ERP, and other business systems for holistic business intelligence. For ${targetAudience} with sophisticated analytics requirements, these BI integration capabilities ensure workforce data contributes to comprehensive business intelligence rather than remaining siloed in workforce systems, enabling analyses that connect workforce performance to business outcomes and revealing insights that emerge only from analyzing relationships across operational, financial, and workforce data together rather than separately.`
-      ]
-    },
-    {
-      heading: 'Specialized and Industry-Specific Reporting',
-      paragraphs: [
-        `Different industries and business models have unique reporting requirements beyond generic workforce reports. ${title} provides ${targetAudience} with industry-specific reporting templates and capabilities designed for specialized needs. Professional services firms get utilization reporting showing billable versus non-billable time allocation, realization reports comparing billed amounts to standard rates, and leverage analysis showing team composition across experience levels. Healthcare organizations receive productivity reports using industry-standard metrics like patients per hour, encounters per FTE, or other clinical productivity measures. Call centers get agent performance reports including average handle time, first call resolution, and customer satisfaction scores. These industry-specific reports ensure ${targetAudience} can measure performance using metrics meaningful for their specific business rather than generic reports requiring extensive customization to provide industry-relevant insights.`,
-        `Regulatory and statutory reporting addresses industry-specific compliance requirements beyond general labor law compliance. TrackNexus provides pre-built reports for industry regulations—clinical staffing reports for healthcare, SOX compliance documentation for public companies, government contractor reporting for defense and federal contracts, apprenticeship tracking for skilled trades, and licensed staff monitoring for regulated professions. These regulatory reports include all required data elements in formats regulators expect, with audit trails supporting compliance claims. Automated generation ensures reports are available when needed without manual compilation. For ${targetAudience} in regulated industries, these specialized compliance reports transform regulatory reporting from burdensome manual exercises to automated capabilities that ensure ongoing compliance while minimizing administrative burden, reducing compliance costs while improving compliance quality through systematic, automated reporting rather than periodic scrambles to compile required documentation.`,
-        `Diversity, equity, and inclusion reporting provides visibility into workforce composition and equity that supports DEI initiatives and regulatory requirements. TrackNexus generates demographic reports showing workforce composition across dimensions like gender, race, ethnicity, age, and veteran status. Pay equity analysis reveals compensation patterns across demographic groups, identifying potential equity issues. Promotion and advancement tracking shows career progression across populations. Hiring and retention metrics reveal whether diverse candidates are recruited, hired, and retained at appropriate rates. EEO-1 reporting automates required federal reporting for large employers. For ${targetAudience}, DEI reporting capabilities provide the data needed to measure progress toward diversity and equity goals, identify gaps requiring intervention, and demonstrate commitment to inclusive workplace practices through transparent reporting on workforce demographics, compensation equity, and career advancement opportunities across all employee populations.`,
-        `Grant-funded and cost-reimbursable project reporting addresses unique requirements of government contracts, research grants, and cost-plus arrangements. TrackNexus provides effort reporting showing actual time allocation across funding sources, essential for grant compliance and indirect cost rate calculations. Allowable cost reporting separates compliant expenses from unallowable costs based on funding source rules—FAR for federal contracts, sponsor requirements for research grants, or client agreements for cost-reimbursable commercial work. Certification workflows collect required effort certifications from employees and supervisors. Audit documentation generates the records auditors require for contract and grant audits. For ${targetAudience} with grant or government contract funding, these specialized reporting capabilities ensure compliance with unique funding source requirements while simplifying the complex administrative burden that grant-funded and cost-reimbursable work imposes, reducing audit risk while minimizing staff time consumed by compliance administration.`,
-        `Custom report development and advanced analytics support unique reporting requirements beyond pre-built templates. TrackNexus provides professional services support for developing custom reports meeting specific organizational needs. Report development tools enable building sophisticated reports combining multiple data sources with custom calculations and specialized visualizations. Scheduled custom reports enable automating complex analytical reporting without manual work. Report consulting helps optimize reporting strategy to balance standardization with customization. Training and enablement ensure staff can maintain and evolve custom reports independently. For ${targetAudience} with unique reporting requirements not served by standard templates, these custom reporting capabilities ensure the platform can deliver whatever reporting is needed regardless of how specialized or unique requirements may be, preventing reporting limitations from constraining business value while ensuring reporting infrastructure scales with organizational evolution and changing stakeholder information needs over time.`
-      ]
-    }],
-    'Integration': [{
-      heading: 'Seamless Integration Ecosystem for Connected Operations',
-      paragraphs: [
-        `Modern businesses operate on complex technology stacks comprising dozens of specialized applications, each optimized for specific functions but often creating data silos that fragment information and duplicate effort. ${title} eliminates these silos by providing ${targetAudience} with comprehensive integration capabilities that connect TrackNexus to your entire technology ecosystem. The platform doesn't replace your existing tools—it makes them work together seamlessly, ensuring data flows freely between systems, workflows span multiple platforms, and your team can use the specialized tools they need without sacrificing integration. This connected approach to technology management multiplies the value of your existing investments while eliminating the friction and inefficiency of disconnected systems.`,
-        `Pre-built integrations provide immediate connectivity to the most popular business applications without custom development or IT involvement. TrackNexus offers over 100 certified integrations for applications spanning every business function—communication platforms like Slack and Microsoft Teams, project management tools like Jira and Asana, CRM systems like Salesforce and HubSpot, accounting software like QuickBooks and Xero, HR platforms like BambooHR and Workday, and development tools like GitHub and GitLab. Each integration is pre-built, tested, and maintained by TrackNexus, ensuring reliable operation without ongoing integration maintenance burden. Setup typically requires just a few clicks to authenticate and configure sync settings. For ${targetAudience}, this means integration projects that traditionally took weeks of development work can now be completed in minutes without technical resources or development expertise.`,
-        `Custom integration capabilities extend connectivity beyond pre-built integrations to encompass proprietary systems, legacy applications, and specialized tools unique to your industry or organization. TrackNexus provides a comprehensive REST API with extensive documentation that enables developers to build custom integrations that meet specific requirements. Webhook support allows real-time event notifications that trigger actions across integrated systems. OAuth authentication ensures secure connections that protect sensitive data. Rate limiting and error handling provide robust, production-ready integration infrastructure. API versioning protects custom integrations from breaking changes. For organizations with custom applications or unique integration requirements, this extensibility ensures TrackNexus can connect to any system regardless of age, vendor support, or technical architecture.`,
-        `Workflow automation represents the highest value integration capability, enabling sophisticated processes that span multiple systems without manual intervention. TrackNexus allows ${targetAudience} to define automation rules that trigger actions across integrated platforms based on events and conditions—automatically creating invoices in your accounting system when projects are completed, syncing employee data between HR and time tracking systems when records are updated, triggering notifications in Slack when productivity metrics cross defined thresholds, creating support tickets when system errors occur, or updating project management tools when time entries are submitted. These automations eliminate manual data entry and process handoffs that consume time and introduce errors, allowing teams to focus on value-creating work while systems handle routine information flow and process coordination.`,
-        `Integration monitoring and management capabilities ensure connected systems remain synchronized and healthy. TrackNexus provides real-time status dashboards showing integration health, sync statistics, and error rates. Automated alerts notify administrators of synchronization failures, authentication issues, or performance degradation before users encounter problems. Error logs provide detailed information for troubleshooting integration issues. Sync histories show when data was transferred between systems, supporting audit requirements and troubleshooting. Manual sync controls allow administrators to trigger immediate synchronization when needed rather than waiting for scheduled syncs. This comprehensive approach to integration management gives ${targetAudience} confidence that integrated systems remain reliable and synchronized, eliminating the data inconsistencies and sync failures that erode trust in connected systems and force teams to maintain manual backup processes.`
-      ]
-    },
-    {
-      heading: 'Enterprise Application Integration and Data Synchronization',
-      paragraphs: [
-        `Enterprise organizations rely on sophisticated business applications for critical functions—ERP systems managing finances and operations, HRIS platforms handling employee records, CRM systems tracking customer relationships, and project management tools coordinating work. ${title} provides ${targetAudience} with deep integration capabilities for these enterprise applications, ensuring workforce data synchronizes seamlessly with core business systems. Employee data synchronization keeps personnel records consistent across HR and time tracking systems, automatically updating TrackNexus when employees are hired, transferred, or terminated. Project and client data flows from project management and CRM systems into time tracking, ensuring teams can allocate time to appropriate projects without manual data entry. Financial data syncs to accounting systems, posting labor costs and billable time to correct general ledger accounts. This comprehensive enterprise integration eliminates manual data reconciliation while ensuring consistency across all business systems.`,
-        `Bidirectional synchronization ensures data flows in both directions, keeping all systems current without manual updates. TrackNexus can both read data from integrated systems and write data back—importing employee records from HR systems while exporting time and attendance data for payroll processing, pulling project budgets from project management tools while pushing actual time to update project tracking, retrieving client information from CRM while updating engagement records with service delivery details. Conflict resolution handles situations where data changes in multiple systems simultaneously, applying configurable rules to determine authoritative sources. Sync scheduling controls when synchronization occurs—real-time for immediate consistency, scheduled batches for efficiency, or event-triggered for specific circumstances. For ${targetAudience}, bidirectional integration ensures all systems reflect current reality without the data staleness that characterizes unidirectional integrations or manual update processes.`,
-        `Master data management ensures consistency for key data entities across integrated systems. TrackNexus supports defining master data sources for critical entities—employees, clients, projects, and departments. Master data governance rules determine which systems can create, update, or delete master records. Data validation ensures records meet quality standards before syncing. Duplicate detection prevents creating multiple records for the same entity. Data enrichment augments records with additional information from multiple sources. Reference data management maintains consistent codes and classifications across systems. These master data capabilities give ${targetAudience} confidence that foundational business data remains consistent across the technology ecosystem, preventing the data quality issues and reconciliation challenges that plague organizations with inconsistent master data across disconnected systems, ensuring everyone works from the same understanding of fundamental business entities.`,
-        `Legacy system integration addresses the reality that many organizations rely on older systems that lack modern integration capabilities. TrackNexus provides multiple integration approaches for legacy systems—database integration that reads and writes directly to legacy databases, file-based integration using CSV or fixed-width file formats, screen scraping for systems without APIs or database access, and middleware integration through enterprise service buses or iPaaS platforms. Legacy integration adapters handle format conversions, data mapping, and protocol translation needed to connect modern and legacy technologies. Scheduled batch processing accommodates systems that cannot support real-time integration. For ${targetAudience} with legacy systems that remain critical despite age, these integration capabilities ensure TrackNexus can integrate with existing technology investments regardless of age or integration sophistication, preventing integration limitations from forcing premature replacement of systems that still deliver business value.`,
-        `Integration scalability and performance optimization ensure connected systems remain responsive as data volumes and transaction rates grow. TrackNexus implements efficient integration architectures—change data capture that syncs only modified records rather than full datasets, incremental sync that processes changes since last sync, parallel processing that handles multiple records simultaneously, and intelligent throttling that manages API rate limits. Caching reduces load on integrated systems by storing frequently-accessed data locally. Batch optimization groups multiple operations for efficiency. Performance monitoring identifies integration bottlenecks requiring optimization. For ${targetAudience} with high-volume operations or large datasets, these scalability capabilities ensure integrations remain fast and reliable as the organization grows, preventing the performance degradation that forces organizations to disable or limit integrations when growth strains integration infrastructure not designed for scale, ensuring integration value grows with the organization rather than becoming bottleneck limiting growth.`
-      ]
-    },
-    {
-      heading: 'Communication and Collaboration Platform Integration',
-      paragraphs: [
-        `Modern work happens through communication and collaboration platforms where teams coordinate, share information, and make decisions. ${title} brings workforce data into these collaboration environments, enabling ${targetAudience} to access time tracking, approval workflows, and workforce information without leaving their primary work platforms. Slack and Microsoft Teams integrations allow submitting time entries, requesting time off, approving timesheets, and receiving notifications directly within chat interfaces. Email integration sends notifications, approval requests, and reports to employee inboxes. Calendar integration blocks approved time off, displays work schedules, and prevents meeting conflicts with scheduled shifts. Video conferencing integration tracks meeting time automatically for productivity analysis. These collaboration integrations meet employees where they already work, reducing friction and improving adoption by embedding workforce management into daily workflows rather than requiring switching to separate applications.`,
-        `Bot and virtual assistant capabilities provide conversational interfaces for workforce management tasks. TrackNexus chatbots understand natural language commands—"I worked 8 hours on Project Alpha today", "What is my time off balance?", "Submit my timesheet for approval"—eliminating form-based interfaces for routine tasks. Conversational approval workflows present pending actions with one-click approval or denial. Automated reminders prompt employees about missing timesheets, upcoming time off, or approaching deadlines. Q&A capabilities answer common questions about policies, balances, and procedures without human intervention. For ${targetAudience}, bot-based interactions reduce administrative friction while scaling workforce management support across large employee populations without proportional increase in HR and administrative staff, making workforce management more accessible while reducing support burden through automation of routine questions and transactions.`,
-        `Notification and alerting integration ensures stakeholders stay informed through their preferred channels. TrackNexus sends notifications through multiple channels—Slack messages, Teams notifications, email, SMS text messages, and mobile push notifications—based on urgency and recipient preferences. Event-based notifications alert stakeholders when actions are required—timesheets ready for approval, time-off requests pending, schedule changes, or policy violations detected. Escalation workflows increase notification urgency when time-sensitive actions remain incomplete. Notification preferences allow individuals to control which alerts they receive through which channels. Digest options batch multiple notifications to prevent alert fatigue. For ${targetAudience}, intelligent notification distribution ensures important information reaches stakeholders promptly through channels they monitor without overwhelming everyone with constant alerts, balancing information needs with respect for attention and focus.`,
-        `Document and file system integration connects workforce data to document repositories where policies, handbooks, and records are stored. TrackNexus integrates with platforms like SharePoint, Google Drive, Dropbox, and Box—linking policy documents to relevant workflows, attaching supporting documentation to time-off requests, storing compliance certifications and licenses, and archiving workforce records. Document generation creates PDFs and reports stored directly to document repositories. Version control tracks document revisions over time. Access control ensures sensitive workforce documents are appropriately secured. Search capabilities find relevant documents across integrated repositories. For ${targetAudience}, document integration ensures workforce documentation lives within enterprise content management systems rather than siloed in workforce applications, maintaining comprehensive record-keeping while leveraging existing document management infrastructure and governance processes.`,
-        `Mobile device management and productivity tool integration supports modern mobile workforces. TrackNexus integrates with mobile device management platforms to enable secure workforce management from any device while maintaining security. Productivity tool integration connects to applications like Trello, Notion, Evernote, and Todoist—syncing tasks, tracking time against action items, and connecting individual productivity tools to organizational workforce systems. Browser extension integration adds workforce management capabilities directly to web browsers—quick time entry, productivity tracking, and meeting time capture without switching applications. Desktop application integration embeds workforce functionality into desktop tools employees use daily. These productivity integrations ensure ${targetAudience} can leverage workforce management capabilities within the varied tools and devices employees prefer, accommodating diverse work styles and tool preferences rather than forcing standardization on single platforms that may not match all users' preferences and work patterns.`
-      ]
-    },
-    {
-      heading: 'Industry-Specific and Specialized System Integration',
-      paragraphs: [
-        `Different industries rely on specialized software systems that require industry-specific integration approaches. ${title} provides ${targetAudience} with integration capabilities designed for industry-specific platforms. Professional services firms get integrations with PSA platforms like Kimble, FinancialForce, and Certinia—syncing projects, clients, and resource assignments. Healthcare organizations connect to EMR systems like Epic and Cerner—tracking clinical time for productivity analysis while maintaining HIPAA compliance. Financial services firms integrate with compliance and trading platforms—capturing time for regulatory reporting and client billing. Manufacturing operations connect to ERP systems like SAP and Oracle—tracking labor against production orders and work centers. Retail organizations integrate with workforce management platforms like Kronos and Deputy—coordinating scheduling with time tracking. These industry-specific integrations ensure TrackNexus works seamlessly within your industry's technology ecosystem rather than requiring costly customization or forcing workarounds.`,
-        `Vertical market platform integration addresses needs of businesses using industry-tailored software rather than generic business applications. TrackNexus integrates with construction management software like Procore and Buildertrend—tracking labor costs by job and construction phase. Legal practice management systems like Clio and PracticePanther connect for matter-based time tracking and billing. Marketing agency tools like HubSpot and Marketo integrate for campaign time allocation. Software development platforms like GitHub, GitLab, and Azure DevOps sync for development time tracking by repository and issue. Education management systems integrate for faculty and staff time tracking. Healthcare scheduling platforms connect for clinical and administrative time tracking. These vertical platform integrations give ${targetAudience} in specialized industries the deep integration with industry-standard platforms that generic integrations cannot provide, ensuring workforce management works naturally within industry-specific business processes and terminology.`,
-        `Payroll and benefits administration integration automates the complex data flows between time tracking and compensation systems. TrackNexus integrates with payroll providers like ADP, Paychex, Gusto, and Paylocity—exporting regular hours, overtime, paid time off, and shift differentials for payroll processing while importing employee records and pay rates. Benefits administration platform integration with systems like Benefitfocus and bswift connects time tracking to benefits eligibility and accrual. Retirement plan integration exports hours for 401k eligibility and matching calculations. Workers compensation integration provides hour data for premium calculations and risk classification. For ${targetAudience}, payroll integration eliminates manual time data entry into payroll systems while ensuring compensation accuracy through automated data transfer that prevents the transcription errors that create paycheck mistakes and employee dissatisfaction, improving payroll accuracy while reducing processing time and administrative burden.`,
-        `Compliance and risk management system integration supports organizations with specialized compliance technology. TrackNexus integrates with GRC platforms like ServiceNow, OneTrust, and LogicGate—providing workforce data for compliance monitoring and risk assessment. Labor compliance solutions like LaborSoft integrate for leave tracking and accommodation management. Background check systems connect for ongoing monitoring of certifications and clearances. Training and learning management systems like Cornerstone and Workday Learning sync to track required training completion. Audit management platforms integrate for compliance evidence collection. For ${targetAudience} in highly regulated industries, these compliance platform integrations ensure workforce data supports comprehensive compliance and risk management programs, providing the workforce dimension of enterprise risk management while eliminating manual data compilation for compliance reporting.`,
-        `Business intelligence and analytics platform integration extends workforce analytics beyond TrackNexus to comprehensive business intelligence. TrackNexus provides pre-built connectors for BI platforms including Tableau, Power BI, Qlik, Looker, and Domo—enabling workforce data analysis alongside financial, operational, and customer data. Data warehouse integration exports to Snowflake, Redshift, BigQuery, and Azure Synapse for enterprise analytics. Data lake integration supports Hadoop and cloud storage for big data analytics. ETL tool integration with Informatica, Talend, and Alteryx enables complex data transformations. Custom analytics integration supports R, Python, and Jupyter notebooks for advanced statistical analysis. For ${targetAudience} with sophisticated analytics requirements, these BI integrations ensure workforce data contributes to enterprise analytics and data science initiatives, enabling advanced analyses that connect workforce patterns to business outcomes and competitive advantage through comprehensive business intelligence that integrates workforce dimension with other critical business data for holistic understanding.`
-      ]
-    },
-    {
-      heading: 'Integration Platform and Ecosystem Development',
-      paragraphs: [
-        `Organizations with complex integration requirements often adopt integration platform as a service (iPaaS) solutions to manage numerous connections between business applications. ${title} provides ${targetAudience} with native integration to leading iPaaS platforms including Zapier, Make (Integromat), Workato, MuleSoft, Dell Boomi, and Tray.io. These iPaaS integrations enable building sophisticated workflow automations that combine TrackNexus with hundreds of other business applications through visual workflow builders without custom coding. Pre-built templates provide starting points for common integration patterns. Workflow libraries enable sharing successful integrations across teams and organizations. Version control tracks workflow changes over time. For organizations with extensive integration needs, iPaaS connectivity enables unlimited integration possibilities through low-code platforms that democratize integration development beyond specialized integration developers, enabling business analysts and power users to create sophisticated integrations connecting TrackNexus to entire technology ecosystems.`,
-        `Developer tools and API management support organizations building custom integrations and applications on top of TrackNexus. The platform provides comprehensive REST APIs documented through interactive API explorers using OpenAPI/Swagger standards. Client libraries for popular programming languages including JavaScript, Python, Java, C#, and Ruby accelerate development. API sandbox environments enable development and testing without affecting production data. Rate limiting, request throttling, and usage monitoring ensure API performance and security. API versioning maintains backward compatibility while enabling platform evolution. Webhook management enables registering endpoints for real-time event notifications. For ${targetAudience} with development resources, these developer-friendly API capabilities enable building custom applications, integrations, and extensions that extend TrackNexus capabilities to meet unique requirements, fostering innovation and customization while maintaining platform stability and supportability.`,
-        `Integration marketplace and partner ecosystem provide access to third-party integrations and extensions beyond TrackNexus-built integrations. The marketplace features integrations built by technology partners, system integrators, and independent developers—expanding integration coverage to long-tail applications and specialized systems. Integration reviews and ratings help evaluate quality and reliability. Integration documentation and support resources enable successful deployment. Certified partner program ensures quality standards for marketplace integrations. Revenue sharing supports ecosystem development by compensating integration developers. For ${targetAudience}, the integration marketplace provides access to integrations for specialized tools and industry-specific platforms that TrackNexus may not offer as built-in integrations, ensuring connectivity to entire technology stack through combination of native integrations, marketplace offerings, and custom development, preventing integration gaps that limit platform value.`,
-        `Migration and data import capabilities support transitioning from legacy systems and competing platforms. TrackNexus provides data migration tools that import historical data from previous systems—employee records, time entries, project history, and organizational structures. Data mapping capabilities handle differences in data models between systems. Validation ensures imported data meets quality standards. Staged migration supports phased transitions by maintaining connections to legacy systems during transition periods. Rollback capabilities provide safety net if migration issues are discovered. For ${targetAudience} switching from legacy systems or competitor platforms, these migration capabilities ensure successful transitions that preserve historical data while minimizing disruption to operations, preventing the common scenario where transitions to new systems lose historical information or create extended transition periods where teams must use multiple systems during cutover, enabling clean transitions that maintain data continuity.`,
-        `Integration best practices and implementation support help organizations achieve successful integration outcomes. TrackNexus provides integration consulting services that assess technology stacks, recommend optimal integration approaches, and design integration architectures. Implementation services handle complex integration projects requiring specialized expertise. Training programs educate staff on integration capabilities, tools, and best practices. Documentation libraries provide detailed technical references, integration patterns, and troubleshooting guides. Community forums connect customers for peer support and knowledge sharing. Regular webinars showcase new integration capabilities and use cases. For ${targetAudience}, these enablement resources ensure successful integration implementations that deliver intended value while avoiding common pitfalls, accelerating time to value while reducing the risk of integration projects that consume excessive time and resources without delivering expected benefits, transforming integration from technical challenge requiring specialized expertise to manageable capability that business teams can leverage to optimize technology value and operational efficiency.`
-      ]
-    }],
-  };
-
-  const defaultDetailedContent = [{
-    heading: `Why ${title} Delivers Results`,
-    paragraphs: [
-      `Success in today's competitive business environment requires more than good intentions and hard work—it demands intelligent systems that maximize efficiency, optimize resource allocation, and provide the insights needed for data-driven decision making. ${title} delivers these capabilities for ${targetAudience} through a comprehensive platform that combines powerful functionality with intuitive user experience. Our solution addresses real operational challenges with proven approaches that deliver measurable results, not theoretical benefits that sound good in presentations but fail in practice.`,
-      `Implementation success depends on adoption, and adoption depends on user experience. TrackNexus provides an intuitive interface that requires minimal training while supporting sophisticated workflows that scale with your organization's complexity. Mobile applications ensure access from any location on any device. Responsive design adapts to different screen sizes and usage contexts. Configurable workflows match your organization's specific processes rather than forcing process changes to accommodate software limitations. This focus on usability means teams actually use the system rather than finding workarounds that undermine your workforce management initiatives.`,
-      `Integration capabilities ensure TrackNexus fits into your existing technology ecosystem rather than requiring wholesale replacement of working systems. Pre-built integrations connect to dozens of popular business applications. APIs enable custom integrations with proprietary systems. Data import and export capabilities facilitate migration and reporting. This connectivity means you can implement TrackNexus without disrupting operations or forcing teams to abandon tools that work well for specific functions. The platform becomes the central hub that connects your technology stack rather than another isolated silo that fragments information and duplicates effort.`,
-      `Support and enablement resources ensure ${targetAudience} extract maximum value from the platform throughout your relationship with TrackNexus. Implementation support guides initial setup and configuration. Training resources help teams understand features and best practices. Documentation provides detailed reference information for advanced use cases. Customer success managers proactively identify optimization opportunities. Technical support resolves issues quickly when they arise. This comprehensive support ecosystem means you're never alone in your workforce management journey, benefiting from our experience helping thousands of organizations optimize their operations.`,
-      `Continuous improvement ensures the platform grows more valuable over time rather than becoming stagnant or obsolete. TrackNexus releases new features regularly based on customer feedback and market evolution. Security updates protect against emerging threats. Performance optimizations ensure the system remains fast as your organization and data grow. Integration updates add connectivity to new platforms as your technology stack evolves. This commitment to continuous improvement means your investment in TrackNexus delivers increasing returns over time as the platform becomes more capable, more integrated, and more tailored to your specific needs and workflows.`
-    ]
-  }];
-
-  return detailedCategoryContent[category] || defaultDetailedContent;
-}
-
-function getHowItWorksSteps(category: string): Array<{ title: string; description: string }> {
-  const categorySteps: Record<string, Array<{ title: string; description: string }>> = {
-    'Time & Attendance': [
-      { title: 'Quick Setup & Integration', description: 'Connect TrackNexus with your existing payroll, HR, and project management tools in minutes. Our guided onboarding process ensures your team is configured and ready to track time from day one with zero disruption to existing workflows.' },
-      { title: 'Automated Time Capture', description: 'Employees track time effortlessly through desktop apps, mobile devices, or browser extensions. Smart detection automatically logs hours, while GPS and geofencing verify on-site attendance. Manual entries are flagged for review to maintain data accuracy.' },
-      { title: 'Insights & Optimization', description: 'Access real-time dashboards showing attendance trends, overtime patterns, and productivity metrics. Automated reports flow directly to payroll systems, reducing processing time by up to 80%. Use historical data to forecast staffing needs and optimize scheduling.' },
+      { icon: Gauge, value: '95%', label: 'Payroll Accuracy' },
+      { icon: Zap, value: '80%', label: 'Faster Processing' },
+      { icon: BarChart3, value: 'Real-time', label: 'Attendance Visibility' },
+      { icon: FileCheck, value: '100%', label: 'Labor Compliance' },
     ],
     'Monitoring': [
-      { title: 'Deploy & Configure', description: 'Install lightweight monitoring agents across your organization with customizable privacy settings. Define what gets tracked, set monitoring schedules, and configure alert thresholds. Transparent deployment ensures employees understand and trust the system.' },
-      { title: 'Real-Time Monitoring', description: 'Track application usage, website activity, and productivity metrics in real time across all devices. AI-powered categorization automatically classifies activities, while anomaly detection identifies unusual patterns that may indicate security risks or workflow bottlenecks.' },
-      { title: 'Actionable Analytics', description: 'Transform monitoring data into productivity insights with automated scoring, trend analysis, and benchmark comparisons. Generate detailed reports for compliance audits, performance reviews, and strategic planning without manual data compilation.' },
+      { icon: Gauge, value: '32%', label: 'Productivity Boost' },
+      { icon: Zap, value: '24/7', label: 'Continuous Monitoring' },
+      { icon: BarChart3, value: 'Real-time', label: 'Activity Tracking' },
+      { icon: FileCheck, value: '100%', label: 'Data Protection' },
     ],
     'Analytics': [
-      { title: 'Connect Your Data', description: 'Integrate with your existing tools and data sources through our extensive API library. TrackNexus automatically aggregates data from multiple systems, creating a unified analytics foundation that eliminates data silos and ensures consistency across all reports.' },
-      { title: 'Analyze & Discover', description: 'Explore your data through intuitive dashboards, custom reports, and AI-powered insights. Our analytics engine identifies trends, anomalies, and opportunities that would take hours to discover manually. Drill down from high-level overviews to granular details with a single click.' },
-      { title: 'Act & Optimize', description: 'Turn insights into action with automated recommendations, alert-based workflows, and collaborative decision-making tools. Track the impact of changes over time and continuously optimize your operations based on data-driven feedback loops.' },
+      { icon: Gauge, value: '40%', label: 'Better Insights' },
+      { icon: Zap, value: '60%', label: 'Faster Decisions' },
+      { icon: BarChart3, value: 'AI-Powered', label: 'Predictions' },
+      { icon: FileCheck, value: '100%', label: 'Data Accuracy' },
     ],
     'Security': [
-      { title: 'Security Assessment', description: 'Our team conducts a comprehensive security assessment of your current environment, identifying gaps and configuring TrackNexus to address your specific compliance requirements. Policies are customized to match your industry regulations and organizational standards.' },
-      { title: 'Continuous Protection', description: 'Once deployed, TrackNexus provides 24/7 monitoring of access patterns, data movements, and user activities. Automated threat detection identifies potential security incidents in real time, while role-based access controls ensure sensitive data remains protected.' },
-      { title: 'Compliance & Reporting', description: 'Generate audit-ready compliance reports with a single click. Our platform maintains complete audit trails, tracks policy adherence, and automatically flags deviations. Stay ahead of regulatory changes with built-in compliance frameworks for SOC 2, GDPR, HIPAA, and more.' },
+      { icon: Gauge, value: 'Zero-Trust', label: 'Architecture' },
+      { icon: Zap, value: '99.9%', label: 'Threat Detection' },
+      { icon: BarChart3, value: 'Real-time', label: 'Monitoring' },
+      { icon: FileCheck, value: '100%', label: 'Compliance' },
     ],
     'Billing': [
-      { title: 'Connect Time to Billing', description: 'Integrate TrackNexus with your invoicing and accounting systems to automatically capture billable hours. Set up custom billing rates for different clients, projects, or team members. Define which activities are billable and establish approval workflows to ensure accuracy before invoices are generated.' },
-      { title: 'Automated Invoice Generation', description: 'Transform tracked time into professional invoices with a single click. Customizable invoice templates include detailed breakdowns of work performed, hourly rates, and project milestones. Automated reminders ensure timely billing while tracking payment status keeps your cash flow healthy.' },
-      { title: 'Financial Insights & Optimization', description: 'Monitor project profitability in real time with budget tracking, cost analysis, and revenue forecasting. Identify which projects and clients are most profitable, spot potential budget overruns before they happen, and make data-driven pricing decisions that improve your margins over time.' },
+      { icon: Gauge, value: '40%', label: 'Faster Billing' },
+      { icon: Zap, value: '95%', label: 'Revenue Capture' },
+      { icon: BarChart3, value: 'Real-time', label: 'Profitability' },
+      { icon: FileCheck, value: '100%', label: 'Invoice Accuracy' },
     ],
     'Team Management': [
-      { title: 'Centralized Team Overview', description: 'Get complete visibility into your team with a unified dashboard showing who is working on what, current workloads, and availability. Import team members from your existing systems, define roles and responsibilities, and organize teams by department, project, or function for easy management.' },
-      { title: 'Smart Resource Allocation', description: 'Assign tasks and projects based on team member skills, availability, and workload capacity. Our intelligent scheduling engine recommends optimal assignments to balance workloads and prevent burnout. Track progress in real time and get automated alerts when projects need attention or resources need reallocation.' },
-      { title: 'Collaboration & Performance', description: 'Foster team collaboration with built-in communication tools, shared calendars, and project timelines. Monitor team performance with productivity metrics, goal tracking, and achievement recognition. Conduct data-driven performance reviews and identify opportunities for training and development.' },
+      { icon: Gauge, value: '35%', label: 'Better Utilization' },
+      { icon: Zap, value: '50%', label: 'Faster Onboarding' },
+      { icon: BarChart3, value: 'Real-time', label: 'Team Insights' },
+      { icon: FileCheck, value: '100%', label: 'Workload Balance' },
     ],
     'Workforce Management': [
-      { title: 'Unified Workforce Platform', description: 'Consolidate all workforce management functions into a single platform. Import employee data, set up organizational hierarchies, and configure work schedules that accommodate remote, hybrid, and on-site arrangements. Integration with HRIS systems ensures employee information stays synchronized across all systems.' },
-      { title: 'Automated Scheduling & Attendance', description: 'Create optimized schedules based on employee skills, availability, labor laws, and business needs. Employees can view schedules, request time off, and swap shifts through mobile apps. Automated attendance tracking eliminates manual timecards while ensuring compliance with overtime and break regulations.' },
-      { title: 'Performance & Compliance', description: 'Track workforce productivity, monitor performance metrics, and ensure compliance with labor regulations. Automated alerts notify managers of potential compliance issues, overtime thresholds, or scheduling conflicts. Generate comprehensive reports for audits, strategic planning, and workforce optimization.' },
+      { icon: Gauge, value: '30%', label: 'Cost Reduction' },
+      { icon: Zap, value: '60%', label: 'Schedule Efficiency' },
+      { icon: BarChart3, value: 'Real-time', label: 'Workforce View' },
+      { icon: FileCheck, value: '100%', label: 'Compliance Ready' },
     ],
     'Productivity': [
-      { title: 'Establish Productivity Baselines', description: 'Deploy TrackNexus across your organization to begin capturing productivity data. Our smart categorization automatically classifies activities as productive, neutral, or unproductive based on your industry and role definitions. Customize productivity rules to match your organization\'s specific workflow and goals.' },
-      { title: 'Monitor & Analyze Patterns', description: 'Track productivity metrics in real time across individuals, teams, and departments. Identify peak performance hours, common distractions, and workflow bottlenecks. AI-powered insights highlight opportunities for improvement and recognize top performers who can mentor others.' },
-      { title: 'Optimize & Improve', description: 'Implement data-driven strategies to boost productivity based on insights from your workforce data. Share productivity insights with employees to foster self-improvement, set achievable goals, and track progress over time. Measure the impact of changes and continuously refine your approach to maximize team performance.' },
+      { icon: Gauge, value: '32%', label: 'Output Increase' },
+      { icon: Zap, value: '45%', label: 'Less Time Wasted' },
+      { icon: BarChart3, value: 'AI-Driven', label: 'Optimization' },
+      { icon: FileCheck, value: '100%', label: 'Goal Tracking' },
     ],
     'Reports': [
-      { title: 'Configure Report Templates', description: 'Choose from dozens of pre-built report templates or create custom reports tailored to your specific needs. Define which metrics to track, set up filters for different teams or time periods, and customize layouts for different stakeholders. Save report configurations for easy reuse and consistent reporting.' },
-      { title: 'Automate Report Generation', description: 'Schedule reports to be generated and delivered automatically on daily, weekly, or monthly intervals. Set up distribution lists to ensure the right stakeholders receive relevant reports. Configure alert thresholds so you are notified immediately when key metrics exceed or fall below defined targets.' },
-      { title: 'Analyze & Share Insights', description: 'Access your reports through interactive dashboards that allow drill-down analysis from summary views to granular details. Export reports in multiple formats including PDF, Excel, and CSV for further analysis or presentation. Share reports with stakeholders through secure links or integrate with business intelligence tools for advanced analytics.' },
+      { icon: Gauge, value: '80%', label: 'Time Saved' },
+      { icon: Zap, value: 'Instant', label: 'Report Generation' },
+      { icon: BarChart3, value: 'Custom', label: 'Dashboards' },
+      { icon: FileCheck, value: '100%', label: 'Audit Ready' },
     ],
     'Integration': [
-      { title: 'Discover Available Integrations', description: 'Browse our integration marketplace featuring 100+ pre-built connectors for popular business applications. Search by category, tool name, or workflow need to find integrations that match your technology stack. Each integration includes detailed documentation, setup instructions, and use case examples to get you started quickly.' },
-      { title: 'Connect & Configure', description: 'Authenticate with your existing tools using secure OAuth connections or API keys. Configure data synchronization settings, define which information flows between systems, and set up automated triggers that initiate actions across your integrated platforms. Test integrations in a sandbox environment before deploying to production.' },
-      { title: 'Automate & Extend', description: 'Build sophisticated workflows that span multiple integrated systems without writing code. Create custom integrations using our REST API, webhooks, and extensive developer documentation. Monitor integration health with real-time status dashboards and automated alerts that notify you of any synchronization issues.' },
+      { icon: Gauge, value: '100+', label: 'Connectors' },
+      { icon: Zap, value: '50%', label: 'Less Manual Work' },
+      { icon: BarChart3, value: 'Real-time', label: 'Data Sync' },
+      { icon: FileCheck, value: '100%', label: 'Data Accuracy' },
     ],
   };
+  return cards[category] || cards['Productivity'];
+}
 
-  return categorySteps[category] || [
-    { title: 'Quick Setup', description: 'Get started in minutes with our guided onboarding process. Connect your existing tools, invite your team, and configure your workspace to match your organization\'s unique requirements. Our implementation team is available to assist with complex deployments.' },
-    { title: 'Customize & Configure', description: 'Tailor TrackNexus to your workflows with customizable dashboards, automated rules, and role-based permissions. Set up alerts, reporting schedules, and integration triggers that automate routine tasks and keep your team focused on high-value work.' },
-    { title: 'Grow & Optimize', description: 'As your organization evolves, TrackNexus scales with you. Access advanced features, expand to new teams, and leverage AI-powered recommendations to continuously improve your operations. Our dedicated support team ensures you get maximum value at every stage.' },
+// ── Get "Why Choose" checklist items ───────────────────────────────
+function getWhyChooseItems(category: string): string[] {
+  const items: Record<string, string[]> = {
+    'Time & Attendance': [
+      'Automated time capture via desktop, mobile, and browser extensions',
+      'Manager approval workflows with automated reminders',
+      'Direct payroll integration reducing processing time by 80%',
+      'GPS and geofencing for on-site attendance verification',
+      'Overtime and break compliance tracking built-in',
+    ],
+    'Monitoring': [
+      'Lightweight monitoring agents with customizable privacy settings',
+      'AI-powered activity categorization and anomaly detection',
+      'Real-time dashboards with productivity scoring',
+      'Automated compliance reports and audit trails',
+      'Cross-platform support for desktop, web, and mobile',
+    ],
+    'Analytics': [
+      'Unified analytics aggregating data from multiple systems',
+      'AI-powered trend detection and predictive insights',
+      'Custom dashboards with drill-down capabilities',
+      'Automated report generation and scheduled delivery',
+      'Industry benchmarking and cross-team comparisons',
+    ],
+    'Security': [
+      'Zero-trust architecture with continuous verification',
+      'Automated threat detection and incident response',
+      'SOC 2, GDPR, HIPAA, and ISO 27001 compliance',
+      'Data loss prevention and access governance',
+      'Real-time security monitoring and alert escalation',
+    ],
+    'Billing': [
+      'Automatic capture of billable hours from time tracking',
+      'One-click professional invoice generation',
+      'Multi-currency support for global clients',
+      'Real-time project profitability tracking',
+      'Integration with accounting systems and payment platforms',
+    ],
+    'Team Management': [
+      'Unified dashboard showing team workloads and availability',
+      'Skill-based task assignment with AI recommendations',
+      'Burnout prevention through workload monitoring',
+      'Data-driven performance reviews and recognition',
+      'Collaborative tools for distributed teams',
+    ],
+    'Workforce Management': [
+      'Single platform for remote, hybrid, and on-site teams',
+      'Intelligent scheduling based on skills and availability',
+      'Automated labor law and overtime compliance',
+      'Employee self-service for schedules and time-off requests',
+      'Scalable from small teams to enterprise workforces',
+    ],
+    'Productivity': [
+      'Smart activity categorization with customizable rules',
+      'Peak performance period identification per team member',
+      'Personal productivity dashboards for self-improvement',
+      'Automated alerts for productivity pattern changes',
+      'Industry benchmarking for competitive context',
+    ],
+    'Reports': [
+      'Dozens of pre-built report templates ready to use',
+      'Automated report generation on daily/weekly/monthly schedules',
+      'Interactive dashboards with drill-down analysis',
+      'Proactive alerts when metrics cross defined thresholds',
+      'Export in PDF, Excel, and CSV for any stakeholder',
+    ],
+    'Integration': [
+      '100+ pre-built connectors for popular business tools',
+      'Secure OAuth and API key authentication',
+      'No-code workflow builder for cross-system automation',
+      'Real-time data synchronization and health monitoring',
+      'REST APIs with comprehensive developer documentation',
+    ],
+  };
+  return items[category] || [
+    `Comprehensive ${category.toLowerCase()} capabilities built for enterprises`,
+    'AI-powered automation that saves hours every week',
+    'Real-time dashboards and actionable insights',
+    'Enterprise-grade security and compliance',
+    'Seamless integration with your existing tech stack',
   ];
 }
 
-function getBenefits(category: string): Array<{ title: string; description: string }> {
-  const categoryBenefits: Record<string, Array<{ title: string; description: string }>> = {
+// ── Get modules per category ───────────────────────────────────────
+function getModules(category: string): Array<{ title: string; description: string; tags: string[]; icon: React.ElementType }> {
+  const modules: Record<string, Array<{ title: string; description: string; tags: string[]; icon: React.ElementType }>> = {
     'Time & Attendance': [
-      { title: 'Eliminate Payroll Errors', description: 'Automated time capture and validation reduces payroll errors by up to 95%, saving your finance team hours of reconciliation work every pay period.' },
-      { title: 'Ensure Labor Compliance', description: 'Stay compliant with FLSA, overtime regulations, and industry-specific labor laws with automated tracking and configurable compliance rules.' },
-      { title: 'Reduce Time Theft', description: 'GPS verification, geofencing, and biometric authentication prevent buddy punching and unauthorized overtime, protecting your bottom line.' },
-      { title: 'Empower Remote Teams', description: 'Track time accurately regardless of where employees work with cross-platform support for desktop, mobile, and web-based time entry.' },
-      { title: 'Streamline Approvals', description: 'Automated approval workflows route timesheets to the right managers, send reminders for pending approvals, and escalate overdue submissions.' },
-      { title: 'Real-Time Visibility', description: 'Know exactly who is working, where they are, and what they are working on at any moment with live dashboards and instant notifications.' },
+      { title: 'Time Tracking', description: 'Automated time capture across desktop, mobile, and web with smart detection and manual entry support.', tags: ['Auto-Capture', 'Multi-Device', 'Smart Detection'], icon: Clock },
+      { title: 'Attendance Management', description: 'GPS-verified attendance with geofencing, biometric support, and real-time presence tracking.', tags: ['GPS Tracking', 'Geofencing', 'Biometrics'], icon: MapPin },
+      { title: 'Payroll Integration', description: 'Direct data flow to payroll systems with validation, overtime calculations, and compliance checks.', tags: ['Auto-Sync', 'Overtime Calc', 'Validation'], icon: CreditCard },
+      { title: 'Leave Management', description: 'Self-service leave requests, approval workflows, balance tracking, and holiday calendar management.', tags: ['Self-Service', 'Approvals', 'Balance Tracking'], icon: CalendarDays },
+      { title: 'Compliance Engine', description: 'Automated monitoring of labor laws, break requirements, overtime rules, and industry regulations.', tags: ['FLSA', 'Overtime Rules', 'Audit Trails'], icon: Shield },
+      { title: 'Scheduling', description: 'Smart shift planning based on skills, availability, and demand with employee self-service swaps.', tags: ['Shift Planning', 'Smart Assign', 'Self-Service'], icon: Settings },
     ],
     'Monitoring': [
-      { title: 'Boost Team Productivity', description: 'Identify productivity patterns and bottlenecks across your organization, enabling targeted interventions that improve output by an average of 32%.' },
-      { title: 'Protect Sensitive Data', description: 'Monitor data access patterns and detect potential insider threats before they become security incidents, keeping your intellectual property safe.' },
-      { title: 'Support Remote Work', description: 'Maintain visibility into distributed team activities while respecting privacy, ensuring accountability and productivity regardless of location.' },
-      { title: 'Improve Resource Allocation', description: 'Understand how teams spend their time to make smarter decisions about project staffing, tool investments, and process improvements.' },
-      { title: 'Simplify Compliance', description: 'Maintain comprehensive audit trails and activity logs that simplify regulatory compliance and reduce the risk of costly violations.' },
-      { title: 'Drive Engagement', description: 'Use productivity insights to recognize top performers, identify employees who need support, and create a culture of continuous improvement.' },
+      { title: 'Activity Tracking', description: 'Real-time monitoring of application usage, website visits, and task activity across all devices.', tags: ['App Usage', 'Web Tracking', 'Real-time'], icon: Monitor },
+      { title: 'Screen Monitoring', description: 'Configurable screenshot capture and screen recording with privacy-first settings.', tags: ['Screenshots', 'Recording', 'Privacy Controls'], icon: Layers },
+      { title: 'Productivity Scoring', description: 'AI-powered productivity analysis with automatic activity categorization and trend detection.', tags: ['AI Scoring', 'Categorization', 'Trends'], icon: BarChart3 },
+      { title: 'Security Monitoring', description: 'Anomaly detection, data access tracking, and insider threat prevention capabilities.', tags: ['Threat Detection', 'Access Logs', 'DLP'], icon: Shield },
+      { title: 'Remote Work Tools', description: 'Visibility into distributed team activities with balanced privacy and accountability.', tags: ['Remote Teams', 'Privacy Balance', 'Accountability'], icon: Globe },
+      { title: 'Compliance Reports', description: 'Automated audit trail generation, regulatory reports, and policy adherence tracking.', tags: ['Audit Trails', 'Regulatory', 'Policy Tracking'], icon: FileCheck },
     ],
     'Analytics': [
-      { title: 'Data-Driven Culture', description: 'Transform your organization into a data-driven powerhouse where decisions are backed by real-time insights and predictive analytics.' },
-      { title: 'Predictive Intelligence', description: 'Anticipate trends, forecast resource needs, and identify potential issues before they impact your operations with AI-powered predictions.' },
-      { title: 'Custom Dashboards', description: 'Build personalized dashboards that surface the metrics that matter most to your role, from executive summaries to granular operational data.' },
-      { title: 'Automated Reporting', description: 'Eliminate hours of manual report generation with automated, scheduled reports that deliver insights directly to stakeholders.' },
-      { title: 'Cross-Team Insights', description: 'Break down data silos and gain visibility across departments, projects, and teams to identify organization-wide optimization opportunities.' },
-      { title: 'ROI Measurement', description: 'Track the business impact of your initiatives with built-in ROI tracking, cost analysis, and value realization metrics.' },
+      { title: 'Custom Dashboards', description: 'Build personalized analytics views with drag-and-drop widgets and real-time data refresh.', tags: ['Drag & Drop', 'Real-time', 'Personalized'], icon: PieChart },
+      { title: 'Predictive Analytics', description: 'AI-powered forecasting for resource needs, budget projections, and trend predictions.', tags: ['AI Forecasting', 'Trend Analysis', 'Predictions'], icon: TrendingUp },
+      { title: 'Cross-Team Insights', description: 'Break down data silos with unified analytics spanning departments and projects.', tags: ['Unified View', 'Cross-Team', 'Benchmarks'], icon: Users },
+      { title: 'Automated Reports', description: 'Scheduled report delivery to stakeholders with customizable templates and filters.', tags: ['Scheduling', 'Templates', 'Distribution'], icon: FileCheck },
+      { title: 'ROI Tracking', description: 'Measure business impact with cost analysis, value realization, and performance KPIs.', tags: ['Cost Analysis', 'KPIs', 'Value Tracking'], icon: LineChart },
+      { title: 'Data Integration', description: 'Connect multiple data sources through APIs for a unified analytics foundation.', tags: ['API Library', 'Data Sync', 'Unified Data'], icon: Layers },
     ],
     'Security': [
-      { title: 'Zero-Trust Architecture', description: 'Every access request is verified, authenticated, and authorized before granting access to sensitive resources, regardless of network location.' },
-      { title: 'Automated Threat Detection', description: 'AI-powered monitoring continuously scans for anomalies, suspicious behavior, and potential threats across your entire digital infrastructure.' },
-      { title: 'Compliance Automation', description: 'Automatically enforce security policies, generate compliance reports, and maintain audit trails required by SOC 2, GDPR, HIPAA, and ISO 27001.' },
-      { title: 'Incident Response', description: 'Rapidly detect, contain, and remediate security incidents with automated response playbooks and real-time alert escalation.' },
-      { title: 'Data Loss Prevention', description: 'Monitor and control data movement across your organization to prevent unauthorized sharing, exfiltration, or accidental exposure of sensitive information.' },
-      { title: 'Access Governance', description: 'Implement least-privilege access controls with automated provisioning, periodic access reviews, and comprehensive entitlement management.' },
+      { title: 'Access Control', description: 'Zero-trust access management with role-based permissions and continuous verification.', tags: ['Zero-Trust', 'RBAC', 'Verification'], icon: Lock },
+      { title: 'Threat Detection', description: 'AI-powered monitoring that identifies anomalies and potential security incidents in real time.', tags: ['AI Detection', 'Anomalies', 'Real-time'], icon: Shield },
+      { title: 'Compliance Management', description: 'Automated enforcement and reporting for SOC 2, GDPR, HIPAA, and ISO 27001.', tags: ['SOC 2', 'GDPR', 'HIPAA'], icon: FileCheck },
+      { title: 'Incident Response', description: 'Automated response playbooks with escalation workflows and remediation tracking.', tags: ['Playbooks', 'Escalation', 'Remediation'], icon: Zap },
+      { title: 'Data Protection', description: 'Data loss prevention with encryption, movement monitoring, and exposure alerts.', tags: ['DLP', 'Encryption', 'Monitoring'], icon: Lock },
+      { title: 'Audit Management', description: 'Complete audit trails, entitlement reviews, and access governance capabilities.', tags: ['Audit Trails', 'Reviews', 'Governance'], icon: Settings },
     ],
     'Billing': [
-      { title: 'Maximize Revenue Capture', description: 'Capture every billable hour automatically with integrated time tracking, ensuring you never lose revenue due to forgotten or unrecorded work.' },
-      { title: 'Reduce Payment Delays', description: 'Professional, detailed invoices with clear breakdowns reduce client questions and payment disputes, accelerating your cash collection cycle by up to 40%.' },
-      { title: 'Improve Project Profitability', description: 'Real-time budget tracking and profitability analysis help you identify which projects and clients deliver the best margins, informing strategic pricing decisions.' },
-      { title: 'Eliminate Manual Billing', description: 'Automated invoice generation and delivery saves your finance team dozens of hours each month, reducing administrative overhead and human error.' },
-      { title: 'Flexible Rate Management', description: 'Support complex billing scenarios with custom rate cards for different clients, projects, team members, and time periods, all managed from a single platform.' },
-      { title: 'Financial Forecasting', description: 'Predict future revenue based on work in progress, track accounts receivable aging, and forecast cash flow to make informed financial decisions.' },
+      { title: 'Time-to-Invoice', description: 'Automatically transform tracked billable hours into professional invoices with one click.', tags: ['Auto-Generate', 'One-Click', 'Accurate'], icon: CreditCard },
+      { title: 'Rate Management', description: 'Flexible rate cards for clients, projects, team members, and time periods.', tags: ['Custom Rates', 'Multi-tier', 'Flexible'], icon: Settings },
+      { title: 'Project Profitability', description: 'Real-time budget tracking, cost analysis, and margin monitoring per project.', tags: ['Budget Tracking', 'Cost Analysis', 'Margins'], icon: LineChart },
+      { title: 'Payment Tracking', description: 'Accounts receivable management with aging reports and automated payment reminders.', tags: ['AR Tracking', 'Reminders', 'Aging Reports'], icon: FileCheck },
+      { title: 'Revenue Forecasting', description: 'Predict future revenue based on WIP, backlog, and historical billing patterns.', tags: ['WIP Analysis', 'Forecasting', 'Cash Flow'], icon: TrendingUp },
+      { title: 'Multi-Currency', description: 'Support international clients with multi-currency billing, tax calculations, and compliance.', tags: ['Multi-Currency', 'Tax', 'Global'], icon: Globe },
     ],
     'Team Management': [
-      { title: 'Optimize Team Performance', description: 'Data-driven insights into team productivity, workload distribution, and performance patterns enable you to get the best results from every team member.' },
-      { title: 'Prevent Team Burnout', description: 'Automatically identify team members at risk of burnout based on workload, overtime patterns, and productivity trends, enabling proactive intervention.' },
-      { title: 'Improve Resource Utilization', description: 'Smart workload balancing ensures team capacity is fully utilized without overloading individuals, maximizing output while maintaining team health.' },
-      { title: 'Enhance Collaboration', description: 'Integrated communication tools, shared visibility, and collaborative workflows break down silos and foster teamwork across distributed teams.' },
-      { title: 'Accelerate Onboarding', description: 'Streamlined team setup, role templates, and automated workflows help new team members become productive faster with less manual management overhead.' },
-      { title: 'Data-Driven Reviews', description: 'Objective performance data supports fair, comprehensive performance reviews and helps identify top performers for recognition and advancement.' },
+      { title: 'Team Dashboard', description: 'Unified view of all team members, workloads, availability, and current assignments.', tags: ['Overview', 'Workloads', 'Availability'], icon: Users },
+      { title: 'Resource Allocation', description: 'AI-powered task assignment based on skills, capacity, and workload balance.', tags: ['AI Matching', 'Skills Matrix', 'Balance'], icon: Target },
+      { title: 'Performance Tracking', description: 'Objective metrics for reviews, goal tracking, and top performer recognition.', tags: ['Reviews', 'Goals', 'Recognition'], icon: BarChart3 },
+      { title: 'Collaboration Hub', description: 'Built-in communication, shared calendars, and project timelines for distributed teams.', tags: ['Communication', 'Calendars', 'Timelines'], icon: Briefcase },
+      { title: 'Burnout Prevention', description: 'Automated workload monitoring with alerts for at-risk team members.', tags: ['Workload Monitor', 'Alerts', 'Wellness'], icon: Shield },
+      { title: 'Onboarding', description: 'Streamlined new member setup with role templates and automated workflows.', tags: ['Templates', 'Automation', 'Quick Setup'], icon: Settings },
     ],
     'Workforce Management': [
-      { title: 'Unified Workforce View', description: 'Manage your entire workforce from a single platform, eliminating the complexity and inefficiency of juggling multiple disconnected workforce management tools.' },
-      { title: 'Ensure Labor Compliance', description: 'Automated compliance monitoring for overtime rules, break requirements, and labor laws protects your organization from costly violations and penalties.' },
-      { title: 'Optimize Labor Costs', description: 'Intelligent scheduling and capacity planning reduce unnecessary overtime, minimize overstaffing, and ensure you have the right people in place at the right time.' },
-      { title: 'Support Flexible Work', description: 'Seamlessly manage remote, hybrid, and on-site workers with tools designed for the modern, distributed workforce, maintaining productivity regardless of location.' },
-      { title: 'Improve Employee Satisfaction', description: 'Self-service scheduling, transparent policies, and mobile access empower employees and reduce administrative friction, leading to higher engagement and retention.' },
-      { title: 'Scale Effortlessly', description: 'From small teams to enterprise workforces, our platform scales to match your growth without requiring complex reconfigurations or migrations.' },
+      { title: 'Unified Platform', description: 'Manage remote, hybrid, and on-site employees from a single workforce management hub.', tags: ['All-in-One', 'Multi-Location', 'Unified'], icon: Building2 },
+      { title: 'Smart Scheduling', description: 'AI-optimized schedules based on skills, availability, demand, and labor regulations.', tags: ['AI Scheduling', 'Demand-Based', 'Compliance'], icon: CalendarDays },
+      { title: 'Attendance Automation', description: 'Eliminate manual timecards with automated tracking, break monitoring, and overtime alerts.', tags: ['Auto-Track', 'Break Monitor', 'OT Alerts'], icon: Clock },
+      { title: 'Compliance Engine', description: 'Automated labor law compliance with alerts for overtime, breaks, and scheduling violations.', tags: ['Labor Laws', 'Violations', 'Alerts'], icon: Shield },
+      { title: 'Employee Self-Service', description: 'Mobile-first portal for schedules, time-off requests, shift swaps, and pay information.', tags: ['Mobile App', 'Self-Service', 'Time-Off'], icon: Users },
+      { title: 'Workforce Analytics', description: 'Productivity metrics, performance tracking, and strategic planning dashboards.', tags: ['Metrics', 'Planning', 'Strategy'], icon: BarChart3 },
     ],
     'Productivity': [
-      { title: 'Increase Output by 30%+', description: 'Organizations using TrackNexus productivity features report an average 32% improvement in team output within the first six months of deployment.' },
-      { title: 'Identify Time Wasters', description: 'Automatically detect and quantify unproductive activities, enabling targeted interventions that eliminate the biggest drains on team productivity.' },
-      { title: 'Foster Self-Improvement', description: 'Empower employees with personal productivity insights and goal tracking that turns productivity monitoring into a tool for individual growth rather than surveillance.' },
-      { title: 'Optimize Work Schedules', description: 'Identify peak productivity periods for individuals and teams, then schedule critical work during these high-performance windows to maximize results.' },
-      { title: 'Recognize Top Performers', description: 'Objective productivity data helps you identify and reward your highest performers, creating a culture of excellence and motivating continuous improvement.' },
-      { title: 'Benchmark & Compete', description: 'Compare productivity metrics across teams, departments, and industry benchmarks to understand where you excel and where improvement opportunities exist.' },
+      { title: 'Activity Monitoring', description: 'Smart categorization of work activities as productive, neutral, or unproductive.', tags: ['Smart Categories', 'Auto-Classify', 'Custom Rules'], icon: Monitor },
+      { title: 'Performance Dashboard', description: 'Real-time productivity scores across individuals, teams, and departments.', tags: ['Real-time', 'Team View', 'Individual'], icon: BarChart3 },
+      { title: 'Peak Hours Analysis', description: 'Identify high-performance periods to schedule critical work at optimal times.', tags: ['Peak Detection', 'Scheduling', 'Optimization'], icon: TrendingUp },
+      { title: 'Distraction Analysis', description: 'Quantify unproductive activities and provide targeted recommendations to reduce them.', tags: ['Time Wasters', 'Recommendations', 'Reduction'], icon: Target },
+      { title: 'Goal Tracking', description: 'Set, monitor, and celebrate productivity goals for individuals and teams.', tags: ['Goal Setting', 'Progress', 'Achievements'], icon: Sparkles },
+      { title: 'Benchmarking', description: 'Compare productivity across teams, departments, and industry standards.', tags: ['Cross-Team', 'Industry', 'Comparisons'], icon: LineChart },
     ],
     'Reports': [
-      { title: 'Save Hours Weekly', description: 'Automated report generation eliminates manual data compilation, saving managers and analysts dozens of hours each week previously spent on spreadsheets.' },
-      { title: 'Always-Current Data', description: 'Real-time reporting ensures stakeholders always have access to the latest information, eliminating decisions based on outdated or incomplete data.' },
-      { title: 'Compliance-Ready Reports', description: 'Generate audit-ready compliance reports instantly, with complete audit trails and documentation required for regulatory reviews and certifications.' },
-      { title: 'Customizable for Every Role', description: 'Build role-specific reports that surface exactly the metrics each stakeholder needs, from executive summaries to detailed operational analytics.' },
-      { title: 'Proactive Alerts', description: 'Automated alerts notify you immediately when key metrics cross defined thresholds, enabling rapid response to emerging issues or opportunities.' },
-      { title: 'Data-Driven Decisions', description: 'Comprehensive reporting transforms your organization into a data-driven operation where every decision is backed by accurate, timely insights.' },
+      { title: 'Report Builder', description: 'Create custom reports with drag-and-drop builders, filters, and visualization options.', tags: ['Drag & Drop', 'Custom', 'Visual'], icon: PieChart },
+      { title: 'Automated Delivery', description: 'Schedule reports for automatic generation and distribution to stakeholders.', tags: ['Scheduling', 'Distribution', 'Automated'], icon: Zap },
+      { title: 'Interactive Dashboards', description: 'Drill-down from summaries to granular details with interactive chart capabilities.', tags: ['Drill-Down', 'Interactive', 'Charts'], icon: BarChart3 },
+      { title: 'Compliance Reports', description: 'Audit-ready reports with complete documentation for regulatory reviews.', tags: ['Audit Ready', 'Regulatory', 'Documentation'], icon: FileCheck },
+      { title: 'Alert System', description: 'Proactive notifications when metrics cross thresholds requiring immediate attention.', tags: ['Thresholds', 'Notifications', 'Proactive'], icon: Shield },
+      { title: 'Export & Share', description: 'Export in PDF, Excel, and CSV formats or share via secure links and BI integrations.', tags: ['PDF', 'Excel', 'BI Integration'], icon: Globe },
     ],
     'Integration': [
-      { title: 'Eliminate Data Silos', description: 'Seamless integration ensures data flows freely between all your business systems, creating a single source of truth and eliminating duplicate data entry.' },
-      { title: 'Increase Team Efficiency', description: 'Automated workflows that span multiple integrated systems eliminate manual handoffs and reduce the time spent switching between different tools.' },
-      { title: 'Extend Tool Value', description: 'Integration multiplies the value of your existing technology investments by making them work together seamlessly rather than operating in isolation.' },
-      { title: 'Reduce Training Time', description: 'Teams can continue using the tools they know while TrackNexus handles data synchronization behind the scenes, minimizing disruption and training requirements.' },
-      { title: 'Ensure Data Accuracy', description: 'Automated data synchronization eliminates the errors and inconsistencies that occur when information is manually copied between different systems.' },
-      { title: 'Scale Without Limits', description: 'As your technology stack grows and evolves, our flexible integration platform adapts to new tools and workflows without requiring platform migrations.' },
+      { title: 'Connector Library', description: '100+ pre-built connectors for popular business applications and platforms.', tags: ['100+ Tools', 'Pre-Built', 'One-Click'], icon: Layers },
+      { title: 'Workflow Builder', description: 'No-code automation builder for cross-system workflows and data pipelines.', tags: ['No-Code', 'Automation', 'Pipelines'], icon: Settings },
+      { title: 'API Platform', description: 'Comprehensive REST APIs with interactive documentation and client libraries.', tags: ['REST API', 'Documentation', 'SDKs'], icon: Monitor },
+      { title: 'Data Sync', description: 'Real-time bidirectional data synchronization between all connected systems.', tags: ['Real-time', 'Bi-directional', 'Reliable'], icon: Zap },
+      { title: 'Migration Tools', description: 'Import historical data from legacy systems with mapping, validation, and rollback.', tags: ['Data Import', 'Validation', 'Rollback'], icon: FileCheck },
+      { title: 'Marketplace', description: 'Third-party integrations and extensions from technology partners and developers.', tags: ['Third-Party', 'Extensions', 'Partners'], icon: Globe },
     ],
   };
+  return modules[category] || modules['Productivity'];
+}
 
-  return categoryBenefits[category] || [
-    { title: 'Increased Efficiency', description: 'Automate manual processes and eliminate redundant tasks, freeing your team to focus on high-impact work that drives business growth.' },
-    { title: 'Better Decision Making', description: 'Access real-time data and actionable insights that enable faster, more informed decisions at every level of your organization.' },
-    { title: 'Seamless Integration', description: 'Connect with 100+ popular business tools including Slack, Microsoft Teams, Jira, and Salesforce for a unified workflow experience.' },
-    { title: 'Enterprise Scalability', description: 'Start with the features you need today and scale effortlessly as your organization grows, from small teams to global enterprises.' },
-    { title: 'Dedicated Support', description: 'Get access to priority support, dedicated account management, and comprehensive onboarding resources to ensure your success.' },
-    { title: 'Proven ROI', description: 'Join thousands of organizations that have achieved measurable improvements in productivity, efficiency, and cost savings with TrackNexus.' },
-  ];
+// ── Get industry/audience types ────────────────────────────────────
+function getIndustryTypes(category: string): Array<{ emoji: string; label: string }> {
+  const types: Record<string, Array<{ emoji: string; label: string }>> = {
+    'Time & Attendance': [
+      { emoji: '🏢', label: 'Enterprises' },
+      { emoji: '🏥', label: 'Healthcare' },
+      { emoji: '🏭', label: 'Manufacturing' },
+      { emoji: '🏗️', label: 'Construction' },
+      { emoji: '🛒', label: 'Retail' },
+      { emoji: '📚', label: 'Education' },
+      { emoji: '🏦', label: 'Financial Services' },
+      { emoji: '🚚', label: 'Logistics' },
+    ],
+    'Monitoring': [
+      { emoji: '💻', label: 'Software Teams' },
+      { emoji: '🎯', label: 'IT Services' },
+      { emoji: '📞', label: 'Call Centers' },
+      { emoji: '🏦', label: 'Financial Services' },
+      { emoji: '⚖️', label: 'Legal Firms' },
+      { emoji: '🏥', label: 'Healthcare' },
+      { emoji: '🏢', label: 'Enterprises' },
+      { emoji: '🌐', label: 'Remote Teams' },
+    ],
+    'Analytics': [
+      { emoji: '💻', label: 'Tech Companies' },
+      { emoji: '📊', label: 'Data Teams' },
+      { emoji: '🏦', label: 'Finance' },
+      { emoji: '🏥', label: 'Healthcare' },
+      { emoji: '🛒', label: 'E-Commerce' },
+      { emoji: '🏢', label: 'Enterprises' },
+      { emoji: '🎓', label: 'EdTech' },
+      { emoji: '📱', label: 'SaaS Companies' },
+    ],
+    'Security': [
+      { emoji: '🏦', label: 'Banking' },
+      { emoji: '🏥', label: 'Healthcare' },
+      { emoji: '⚖️', label: 'Legal' },
+      { emoji: '🏛️', label: 'Government' },
+      { emoji: '💻', label: 'Technology' },
+      { emoji: '🏢', label: 'Enterprises' },
+      { emoji: '🔐', label: 'Cybersecurity' },
+      { emoji: '☁️', label: 'Cloud Services' },
+    ],
+    'Billing': [
+      { emoji: '⚖️', label: 'Law Firms' },
+      { emoji: '💼', label: 'Consulting' },
+      { emoji: '💻', label: 'IT Services' },
+      { emoji: '🎨', label: 'Creative Agencies' },
+      { emoji: '📐', label: 'Architecture' },
+      { emoji: '🔧', label: 'Engineering' },
+      { emoji: '📊', label: 'Accounting' },
+      { emoji: '🏢', label: 'Professional Services' },
+    ],
+    'Team Management': [
+      { emoji: '💻', label: 'Software Teams' },
+      { emoji: '🎯', label: 'Product Teams' },
+      { emoji: '📈', label: 'Sales Teams' },
+      { emoji: '📣', label: 'Marketing Teams' },
+      { emoji: '🔧', label: 'Engineering' },
+      { emoji: '🎨', label: 'Design Teams' },
+      { emoji: '📞', label: 'Support Teams' },
+      { emoji: '🌐', label: 'Remote Teams' },
+    ],
+    'Workforce Management': [
+      { emoji: '🏢', label: 'Enterprises' },
+      { emoji: '🏭', label: 'Manufacturing' },
+      { emoji: '🛒', label: 'Retail Chains' },
+      { emoji: '🏥', label: 'Healthcare' },
+      { emoji: '🚚', label: 'Logistics' },
+      { emoji: '🏗️', label: 'Construction' },
+      { emoji: '🍽️', label: 'Hospitality' },
+      { emoji: '📚', label: 'Education' },
+    ],
+    'Productivity': [
+      { emoji: '💻', label: 'Tech Startups' },
+      { emoji: '🏢', label: 'Enterprises' },
+      { emoji: '🌐', label: 'Remote Teams' },
+      { emoji: '💼', label: 'Consulting' },
+      { emoji: '🎨', label: 'Creative Teams' },
+      { emoji: '📈', label: 'Growth Teams' },
+      { emoji: '🔧', label: 'Engineering' },
+      { emoji: '📱', label: 'Product Teams' },
+    ],
+    'Reports': [
+      { emoji: '📊', label: 'Data Analysts' },
+      { emoji: '💼', label: 'Executives' },
+      { emoji: '🏦', label: 'Finance Teams' },
+      { emoji: '⚖️', label: 'Compliance' },
+      { emoji: '👥', label: 'HR Teams' },
+      { emoji: '📈', label: 'Operations' },
+      { emoji: '🎯', label: 'Project Managers' },
+      { emoji: '🏢', label: 'Enterprises' },
+    ],
+    'Integration': [
+      { emoji: '💻', label: 'Dev Teams' },
+      { emoji: '🔧', label: 'IT Operations' },
+      { emoji: '🏢', label: 'Enterprises' },
+      { emoji: '📱', label: 'SaaS Companies' },
+      { emoji: '☁️', label: 'Cloud-First Orgs' },
+      { emoji: '🌐', label: 'Global Teams' },
+      { emoji: '🏭', label: 'Manufacturing' },
+      { emoji: '🏥', label: 'Healthcare' },
+    ],
+  };
+  return types[category] || types['Productivity'];
+}
+
+// ── Fade-in animation variants ─────────────────────────────────────
+const fadeInUp = {
+  initial: { opacity: 0, y: 30 },
+  whileInView: { opacity: 1, y: 0 },
+  viewport: { once: true },
+  transition: { duration: 0.5 },
+};
+
+// ── Extract location from title or field ───────────────────────────
+function extractLocation(title: string, locationField?: string): string {
+  // Priority 1: Use explicit location field
+  if (locationField) return locationField;
+
+  // Priority 2: Extract from title (pattern: "Product Name - Location")
+  const parts = title.split(' - ');
+  if (parts.length >= 2) {
+    return parts[parts.length - 1].trim();
+  }
+
+  return '';
+}
+
+// ── Extract clean product name from title ─────────────────────────
+function extractProductName(title: string): string {
+  // Remove location suffix like " - US", " - Enterprise", " - Kolkata"
+  const parts = title.split(' - ');
+  if (parts.length >= 2) {
+    return parts.slice(0, -1).join(' - ').trim();
+  }
+  return title;
 }
 
 export default function MarketingPageContent({ page }: { page: MarketingPage }) {
   const [isContactOpen, setIsContactOpen] = useState(false);
+  const [openFaq, setOpenFaq] = useState<string | null>(null);
 
-  const overviewContent = getOverviewContent(page.category, page.title, page.targetAudience);
-  const detailedContent = getDetailedContent(page.category, page.title, page.targetAudience);
-  const howItWorksSteps = getHowItWorksSteps(page.category);
-  const benefits = getBenefits(page.category);
+  // Extract location from title or use explicit field
+  const location = extractLocation(page.title, page.location);
+  const productName = extractProductName(page.title);
 
-  const stepIcons = [Settings, Clock, BarChart3];
+  const transformationCards = getTransformationCards(page.category);
+  const whyChooseItems = getWhyChooseItems(page.category);
+  const modules = getModules(page.category);
+  const industryTypes = getIndustryTypes(page.category);
+  const CategoryIcon = categoryIcons[page.category] || BarChart3;
+  const sectionImages = getPageImages(page.id);
+
+  // Build FAQ Schema for SEO
+  const faqSchema = page.faqs && page.faqs.length > 0 ? {
+    '@context': 'https://schema.org',
+    '@type': 'FAQPage',
+    mainEntity: page.faqs.map(faq => ({
+      '@type': 'Question',
+      name: faq.question,
+      acceptedAnswer: {
+        '@type': 'Answer',
+        text: faq.answer,
+      },
+    })),
+  } : null;
+
+  // Build Breadcrumb Schema
+  const breadcrumbSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Home', item: 'https://tracknexus.com' },
+      { '@type': 'ListItem', position: 2, name: page.category, item: `https://tracknexus.com/product` },
+      { '@type': 'ListItem', position: 3, name: page.title, item: `https://tracknexus.com${page.url}` },
+    ],
+  };
+
+  // Build Software Application Schema
+  const softwareSchema = {
+    '@context': 'https://schema.org',
+    '@type': 'SoftwareApplication',
+    name: `TrackNexus - ${page.title}`,
+    applicationCategory: 'BusinessApplication',
+    operatingSystem: 'Web, Windows, macOS, iOS, Android',
+    description: page.description,
+    offers: {
+      '@type': 'Offer',
+      price: '0',
+      priceCurrency: 'USD',
+      description: 'Free trial available',
+    },
+    aggregateRating: page.testimonials && page.testimonials.length > 0 ? {
+      '@type': 'AggregateRating',
+      ratingValue: (page.testimonials.reduce((sum, t) => sum + t.rating, 0) / page.testimonials.length).toFixed(1),
+      reviewCount: page.testimonials.length,
+      bestRating: '5',
+    } : undefined,
+  };
 
   return (
     <div className="min-h-screen bg-white">
+      {/* SEO Structured Data */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(softwareSchema) }}
+      />
+      {faqSchema && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+        />
+      )}
+
       {/* Contact Popup for Free Trial */}
       <ContactPopup
         isOpen={isContactOpen}
         onClose={() => setIsContactOpen(false)}
         context={{ type: 'free-trial' }}
       />
-      {/* Hero Section */}
-      <motion.section
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        className="bg-gradient-to-b from-gray-50 to-white py-8 sm:py-12 lg:py-16"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 1: HERO — Two-column with badge, headline, CTAs
+         ═══════════════════════════════════════════════════════════ */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-gray-50 via-white to-cyan-50">
+        {/* Subtle grid pattern overlay */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0iIzA2QjZENCIgc3Ryb2tlLW9wYWNpdHk9IjAuMDUiIHN0cm9rZS13aWR0aD0iMSIvPjwvcGF0dGVybj48L2RlZnM+PHJlY3Qgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgZmlsbD0idXJsKCNncmlkKSIvPjwvc3ZnPg==')] opacity-60" />
+
+        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 lg:py-16">
+          {/* Breadcrumb */}
+          <nav className="mb-6 text-sm text-gray-500 flex items-center gap-1.5 flex-wrap" aria-label="Breadcrumb">
+            <a href="/" className="hover:text-cyan-600 transition-colors">Home</a>
+            <ChevronRight className="w-3 h-3" />
+            <a href="/product" className="hover:text-cyan-600 transition-colors">Products</a>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-gray-900 font-medium">{page.title}</span>
+          </nav>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-12 items-start">
             {/* Left Content */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={{ opacity: 0, x: -30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.1 }}
-              className="space-y-5"
+              transition={{ duration: 0.6 }}
+              className="space-y-5 pt-4"
             >
-              {/* Industry Label */}
-              {page.category && (
-                <div>
-                  <span className="inline-block bg-orange-50 text-orange-700 px-4 py-2 rounded-full text-xs font-semibold">
-                    {page.category}
-                  </span>
-                </div>
-              )}
+              {/* Category Badge */}
+              <span className="inline-flex items-center gap-2 bg-cyan-50 text-cyan-700 px-4 py-2 rounded-full text-sm font-semibold border border-cyan-200">
+                <CategoryIcon className="w-4 h-4" />
+                {productName}{location ? ` ${location}` : ''}
+              </span>
 
               {/* Headline */}
-              <h1 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-gray-900 leading-tight">
-                {page.heroHeadline || page.title}
+              <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 leading-tight">
+                {location ? (
+                  <>
+                    <span className="text-cyan-600">{productName}</span>{' '}
+                    in {location}
+                  </>
+                ) : (
+                  page.heroHeadline || page.title
+                )}
               </h1>
 
-              {/* Subheadline */}
-              <p className="text-lg sm:text-xl text-gray-600 leading-relaxed">
-                {page.heroSubheadline || page.description}
+              {/* Description below headline */}
+              <p className="text-base sm:text-lg text-gray-600 leading-relaxed max-w-xl">
+                {location
+                  ? `Cloud-based ${productName.toLowerCase()} solutions for ${location} businesses. Industry-specific modules with local implementation support.`
+                  : (page.heroSubheadline || page.description)}
               </p>
 
               {/* CTA Buttons */}
-              <div className="flex flex-wrap gap-3 pt-2">
+              <div className="flex flex-wrap gap-4 pt-2">
                 <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileHover={{ scale: 1.03 }}
+                  whileTap={{ scale: 0.97 }}
                   onClick={() => setIsContactOpen(true)}
-                  className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold inline-flex items-center gap-2 transition-all shadow-lg text-sm cursor-pointer"
+                  className="bg-gradient-to-r from-cyan-500 to-blue-600 text-white px-8 py-3.5 rounded-lg font-bold text-base hover:from-cyan-600 hover:to-blue-700 transition-all shadow-lg hover:shadow-xl inline-flex items-center gap-2 cursor-pointer"
                 >
-                  Start Your Free Trial
-                  <ChevronRight className="w-4 h-4" />
+                  Get Free Demo
+                  <ArrowRight className="w-5 h-5" />
                 </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={() => document.getElementById('faqs')?.scrollIntoView({ behavior: 'smooth' })}
-                  className="border-2 border-gray-300 hover:border-gray-400 text-gray-700 px-6 py-3 rounded-lg font-semibold transition-all hover:bg-gray-50 text-sm cursor-pointer"
+                <a
+                  href="/contact"
+                  className="border-2 border-gray-300 text-gray-700 hover:border-cyan-500 hover:text-cyan-600 px-8 py-3.5 rounded-lg font-bold text-base transition-all inline-flex items-center gap-2"
                 >
-                  Learn More
-                </motion.button>
+                  {location ? `Contact ${location} Team` : 'Contact Sales'}
+                </a>
               </div>
 
-              {/* Trust Badges - Show all 6 stats */}
-              {page.industryStats && page.industryStats.length > 0 && (
-                <div className="pt-5 mt-5 border-t border-gray-200">
-                  <p className="text-xs text-gray-600 font-semibold mb-4 tracking-wide">TRUSTED BY INDUSTRY LEADERS</p>
-                  <div className="grid grid-cols-3 gap-4">
-                    {page.industryStats.slice(0, 6).map((stat, idx) => (
-                      <div key={idx} className="space-y-1">
-                        <p className="text-xl sm:text-2xl font-bold text-gray-900">{stat.value}</p>
-                        <p className="text-xs text-gray-600 leading-tight">{stat.label}</p>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
+              {/* Trust badges */}
+              <div className="flex flex-wrap gap-x-6 gap-y-2 pt-4">
+                <span className="inline-flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                  {location ? `300+ ${location} Customers` : '57,000+ Companies'}
+                </span>
+                <span className="inline-flex items-center gap-2 text-sm text-gray-600">
+                  <CheckCircle2 className="w-4 h-4 text-green-500 flex-shrink-0" />
+                  {location ? 'Local Support Team' : '24/7 Support'}
+                </span>
+              </div>
             </motion.div>
 
-            {/* Right Image */}
+            {/* Right - Contact Form */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
+              initial={{ opacity: 0, x: 30 }}
               animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: 0.2 }}
+              transition={{ duration: 0.6, delay: 0.15 }}
               className="relative"
             >
-              <div className="relative bg-gradient-to-br from-blue-100 to-indigo-100 rounded-xl overflow-hidden shadow-xl aspect-[16/10] max-h-[400px]">
-                <img
-                  src={page.heroImage || 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=800&fit=crop&auto=format&q=80'}
-                  alt={page.title}
-                  className="w-full h-full object-cover"
-                  loading="eager"
-                  onError={(e) => {
-                    const target = e.target as HTMLImageElement;
-                    target.src = 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=1200&h=800&fit=crop&auto=format&q=80';
-                  }}
-                />
-              </div>
+              <HeroContactForm location={location} category={page.category} />
             </motion.div>
           </div>
         </div>
-      </motion.section>
+      </section>
 
-      {/* Overview Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-        className="py-10 sm:py-14 bg-white"
-      >
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-8">
-            {overviewContent.heading}
-          </h2>
-          <div className="space-y-5">
-            {overviewContent.paragraphs.map((paragraph, idx) => (
-              <p key={idx} className="text-base sm:text-lg text-gray-700 leading-relaxed">
-                {paragraph}
-              </p>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Detailed Content Sections - Comprehensive Information */}
-      {detailedContent.map((section, sectionIdx) => (
-        <motion.section
-          key={sectionIdx}
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className={`py-10 sm:py-14 ${sectionIdx % 2 === 0 ? 'bg-gradient-to-b from-gray-50 to-white' : 'bg-white'}`}
-        >
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-8">
-              {section.heading}
-            </h2>
-            <div className="space-y-6">
-              {section.paragraphs.map((paragraph, idx) => (
-                <p key={idx} className="text-base sm:text-lg text-gray-700 leading-relaxed">
-                  {paragraph}
-                </p>
-              ))}
-            </div>
-          </div>
-        </motion.section>
-      ))}
-
-      {/* Key Features Section */}
-      {page.keyFeatures && page.keyFeatures.length > 0 && (
-        <motion.section
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="py-10 sm:py-14 bg-gray-50"
-        >
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 2: METRICS — 4-column stats grid
+         ═══════════════════════════════════════════════════════════ */}
+      {page.industryStats && page.industryStats.length > 0 && (
+        <motion.section {...fadeInUp} className="py-12 sm:py-16 bg-white border-b border-gray-100">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center mb-10 space-y-3">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Key Features</h2>
-              <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-                Powerful capabilities designed to transform how your team works, built for {page.targetAudience} who demand the best.
-              </p>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {page.keyFeatures.map((feature) => (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
+              {page.industryStats.slice(0, 4).map((stat, idx) => (
                 <motion.div
-                  key={feature.id}
-                  whileHover={{ y: -4 }}
-                  className="p-6 bg-white rounded-lg border border-gray-100 hover:border-blue-200 hover:shadow-md transition-all"
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.1 }}
+                  viewport={{ once: true }}
+                  className="space-y-1"
                 >
-                  <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mb-4">
-                    <Zap className="w-6 h-6 text-blue-600" />
-                  </div>
-                  <h3 className="text-lg font-bold text-gray-900 mb-3">{feature.name}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">{feature.description}</p>
+                  <p className="text-3xl sm:text-4xl font-bold text-cyan-600">{stat.value}</p>
+                  <p className="text-sm text-gray-600 font-medium">{stat.label}</p>
                 </motion.div>
               ))}
             </div>
@@ -1074,50 +744,39 @@ export default function MarketingPageContent({ page }: { page: MarketingPage }) 
         </motion.section>
       )}
 
-      {/* How It Works Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-        className="py-10 sm:py-14 bg-white"
-      >
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 3: TRANSFORMATION CARDS — 4-column grid
+         ═══════════════════════════════════════════════════════════ */}
+      <motion.section {...fadeInUp} className="py-12 sm:py-16 bg-gray-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-12 space-y-3">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">How It Works</h2>
-            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-              Get up and running in three simple steps. Our streamlined process ensures you see value from day one.
+          <div className="text-center mb-10 space-y-3">
+            <span className="inline-flex items-center gap-2 bg-cyan-50 text-cyan-700 px-4 py-1.5 rounded-full text-xs font-semibold border border-cyan-200">
+              Proven Results
+            </span>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+              Transform Your {page.category} Operations
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              See the measurable impact TrackNexus delivers for {page.targetAudience || 'your team'} from day one.
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {howItWorksSteps.map((step, idx) => {
-              const StepIcon = stepIcons[idx] || Settings;
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+            {transformationCards.map((card, idx) => {
+              const Icon = card.icon;
               return (
                 <motion.div
                   key={idx}
                   initial={{ opacity: 0, y: 20 }}
                   whileInView={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.15 }}
+                  transition={{ delay: idx * 0.1 }}
                   viewport={{ once: true }}
-                  className="relative"
+                  className="bg-white rounded-xl p-6 text-center border border-gray-200 shadow-sm hover:shadow-md hover:border-cyan-200 transition-all"
                 >
-                  <div className="text-center space-y-4">
-                    <div className="relative mx-auto">
-                      <div className="w-16 h-16 bg-orange-100 rounded-full flex items-center justify-center mx-auto">
-                        <StepIcon className="w-8 h-8 text-orange-600" />
-                      </div>
-                      <span className="absolute -top-2 -right-2 w-8 h-8 bg-orange-600 text-white rounded-full flex items-center justify-center text-sm font-bold">
-                        {idx + 1}
-                      </span>
-                    </div>
-                    <h3 className="text-xl font-bold text-gray-900">{step.title}</h3>
-                    <p className="text-sm text-gray-600 leading-relaxed">{step.description}</p>
+                  <div className="w-12 h-12 bg-cyan-50 rounded-lg flex items-center justify-center mx-auto mb-4">
+                    <Icon className="w-6 h-6 text-cyan-600" />
                   </div>
-                  {idx < howItWorksSteps.length - 1 && (
-                    <div className="hidden md:block absolute top-8 left-[calc(50%+40px)] w-[calc(100%-80px)]">
-                      <ArrowRight className="w-6 h-6 text-gray-300 mx-auto" />
-                    </div>
-                  )}
+                  <p className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1">{card.value}</p>
+                  <p className="text-sm text-gray-600">{card.label}</p>
                 </motion.div>
               );
             })}
@@ -1125,20 +784,325 @@ export default function MarketingPageContent({ page }: { page: MarketingPage }) 
         </div>
       </motion.section>
 
-      {/* Value Proposition Section */}
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 4: "BUILT FOR" — Three-column images + content
+         ═══════════════════════════════════════════════════════════ */}
+      <motion.section {...fadeInUp} className="py-12 sm:py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Single Topic Image */}
+            <div className="relative">
+              <div className="rounded-2xl overflow-hidden shadow-xl aspect-[4/3] bg-gradient-to-br from-cyan-100 to-blue-100">
+                <img
+                  src={sectionImages.builtFor}
+                  alt={`${productName} ${page.category.toLowerCase()} solution for ${page.targetAudience || 'businesses'}${location ? ` in ${location}` : ''} - professional team collaboration`}
+                  className="w-full h-full object-cover"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              </div>
+              {/* Overlapping stat card */}
+              <div className="absolute -bottom-6 -right-2 sm:-right-6 bg-white rounded-xl p-4 shadow-lg border border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-green-100 rounded-full flex items-center justify-center">
+                    <TrendingUp className="w-5 h-5 text-green-600" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-gray-900">{page.industryStats?.[2]?.value || '149%'}</p>
+                    <p className="text-xs text-gray-500">{page.industryStats?.[2]?.label || 'Average ROI'}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Content */}
+            <div className="space-y-6">
+              <span className="inline-flex items-center gap-2 bg-cyan-50 text-cyan-700 px-4 py-1.5 rounded-full text-xs font-semibold border border-cyan-200">
+                Built for {location ? `${page.targetAudience || 'Teams'} in ${location}` : (page.targetAudience || 'Your Team')}
+              </span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                Powering {productName} Excellence{location ? ` in ${location}` : ''}
+              </h2>
+              <p className="text-gray-600 leading-relaxed">
+                {location
+                  ? `TrackNexus ${productName} is trusted by ${location}-based businesses across manufacturing, IT services, healthcare, retail, and more. Our platform provides industry-specific ${page.category.toLowerCase()} modules with GST compliance, local language support, and dedicated ${location} implementation teams to ensure rapid deployment and maximum ROI.`
+                  : page.description}
+              </p>
+
+              {/* Key benefits list */}
+              {location && (
+                <div className="space-y-3 pt-2">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-gray-700">Dedicated {location} support team with same-day response for enterprise clients</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-gray-700">On-site deployment assistance and hands-on training for {location} teams</p>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="w-5 h-5 text-green-500 flex-shrink-0 mt-0.5" />
+                    <p className="text-sm text-gray-700">Customizable workflows tailored to {location} industry regulations and compliance</p>
+                  </div>
+                </div>
+              )}
+
+              {/* Feature grid 2x2 from key features */}
+              {page.keyFeatures && page.keyFeatures.length >= 4 && (
+                <div className="grid grid-cols-2 gap-4 pt-2">
+                  {page.keyFeatures.slice(0, 4).map((feature) => (
+                    <div key={feature.id} className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg border border-gray-100">
+                      <div className="w-8 h-8 bg-cyan-100 rounded-lg flex items-center justify-center flex-shrink-0">
+                        <Zap className="w-4 h-4 text-cyan-600" />
+                      </div>
+                      <span className="text-sm font-medium text-gray-700">{feature.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 4B: HOW IT WORKS — Reversed three-column images + content
+         ═══════════════════════════════════════════════════════════ */}
+      <motion.section {...fadeInUp} className="py-12 sm:py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Content - Left side */}
+            <div className="space-y-6 order-2 lg:order-1">
+              <span className="inline-flex items-center gap-2 bg-cyan-50 text-cyan-700 px-4 py-1.5 rounded-full text-xs font-semibold border border-cyan-200">
+                How It Works{location ? ` in ${location}` : ''}
+              </span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                Streamline Your {productName} Workflow{location ? ` in ${location}` : ''}
+              </h2>
+              <p className="text-gray-600 leading-relaxed">
+                {location
+                  ? `Our ${productName} solution is specifically optimized for ${location} businesses. From initial setup to advanced automation, TrackNexus delivers a seamless experience with local data hosting, regional compliance tools, and a dedicated ${location} success manager to guide your team every step of the way.`
+                  : `TrackNexus ${productName} simplifies complex workflows with intelligent automation, real-time visibility, and actionable insights. Our platform adapts to your business processes—not the other way around—delivering measurable results from day one.`}
+              </p>
+
+              {/* Step-by-step process */}
+              <div className="space-y-4 pt-2">
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 bg-cyan-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">1</div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Quick Setup & Onboarding</p>
+                    <p className="text-sm text-gray-600">{location ? `Deploy in ${location} with our guided onboarding — go live in under 48 hours` : 'Deploy across your organization with guided onboarding in under 48 hours'}</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 bg-cyan-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">2</div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Automated Data Collection</p>
+                    <p className="text-sm text-gray-600">TrackNexus automatically captures {page.category.toLowerCase()} data across all devices with zero manual effort</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-8 h-8 bg-cyan-600 text-white rounded-full flex items-center justify-center flex-shrink-0 text-sm font-bold">3</div>
+                  <div>
+                    <p className="font-semibold text-gray-900">AI-Powered Insights & Reports</p>
+                    <p className="text-sm text-gray-600">Get real-time dashboards, automated alerts, and AI-driven recommendations to optimize operations</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Stats row */}
+              <div className="flex flex-wrap gap-6 pt-4">
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-cyan-600">{page.industryStats?.[0]?.value || '98%'}</p>
+                  <p className="text-xs text-gray-500">{page.industryStats?.[0]?.label || 'Customer Satisfaction'}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-cyan-600">{page.industryStats?.[1]?.value || '50+'}</p>
+                  <p className="text-xs text-gray-500">{page.industryStats?.[1]?.label || 'Integrations'}</p>
+                </div>
+                <div className="text-center">
+                  <p className="text-2xl font-bold text-cyan-600">24/7</p>
+                  <p className="text-xs text-gray-500">{location ? `${location} Support` : 'Global Support'}</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Single Topic Image - Right side */}
+            <div className="relative order-1 lg:order-2">
+              <div className="rounded-2xl overflow-hidden shadow-xl aspect-[4/3] bg-gradient-to-br from-blue-100 to-indigo-100">
+                <img
+                  src={sectionImages.howItWorks}
+                  alt={`How ${productName} ${page.category.toLowerCase()} works - step by step workflow${location ? ` for ${location} teams` : ''} - automated process visualization`}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              </div>
+              {/* Floating badge */}
+              <div className="absolute -bottom-4 -left-2 sm:-left-6 bg-white rounded-xl p-4 shadow-lg border border-gray-100">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-cyan-100 rounded-full flex items-center justify-center">
+                    <Sparkles className="w-5 h-5 text-cyan-600" />
+                  </div>
+                  <div>
+                    <p className="text-lg font-bold text-gray-900">AI-Powered</p>
+                    <p className="text-xs text-gray-500">Smart Automation</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 5: WHY CHOOSE — Three-column images with checklist
+         ═══════════════════════════════════════════════════════════ */}
+      <motion.section {...fadeInUp} className="py-12 sm:py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Content */}
+            <div className="space-y-6 order-2 lg:order-1">
+              <span className="inline-flex items-center gap-2 bg-cyan-50 text-cyan-700 px-4 py-1.5 rounded-full text-xs font-semibold border border-cyan-200">
+                Why Choose TrackNexus
+              </span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                From Setup to Results in Minutes
+              </h2>
+              <div className="space-y-4">
+                {whyChooseItems.map((item, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, x: -15 }}
+                    whileInView={{ opacity: 1, x: 0 }}
+                    transition={{ delay: idx * 0.08 }}
+                    viewport={{ once: true }}
+                    className="flex gap-3 items-start"
+                  >
+                    <div className="w-6 h-6 bg-green-100 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5">
+                      <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    </div>
+                    <p className="text-gray-700 leading-relaxed">{item}</p>
+                  </motion.div>
+                ))}
+              </div>
+            </div>
+
+            {/* Single Topic Image */}
+            <div className="order-1 lg:order-2">
+              <div className="rounded-2xl overflow-hidden shadow-xl aspect-[4/3] bg-gradient-to-br from-blue-100 to-cyan-100">
+                <img
+                  src={sectionImages.whyChoose}
+                  alt={`Why choose TrackNexus ${productName} for ${page.category.toLowerCase()}${location ? ` in ${location}` : ''} - enterprise features and benefits`}
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).style.display = 'none';
+                  }}
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </motion.section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 6: MODULES — 3-column card grid
+         ═══════════════════════════════════════════════════════════ */}
+      <motion.section {...fadeInUp} className="py-12 sm:py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10 space-y-3">
+            <span className="inline-flex items-center gap-2 bg-cyan-50 text-cyan-700 px-4 py-1.5 rounded-full text-xs font-semibold border border-cyan-200">
+              Core Modules
+            </span>
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+              Everything You Need for {page.category}
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              Powerful, integrated modules designed to cover every aspect of your {page.category.toLowerCase()} workflow.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {modules.map((mod, idx) => {
+              const ModIcon = mod.icon;
+              return (
+                <motion.div
+                  key={idx}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  transition={{ delay: idx * 0.08 }}
+                  viewport={{ once: true }}
+                  className="bg-white rounded-xl p-6 border border-gray-200 hover:border-cyan-200 hover:shadow-lg transition-all group"
+                >
+                  <div className="w-12 h-12 bg-cyan-50 group-hover:bg-cyan-100 rounded-xl flex items-center justify-center mb-4 transition-colors">
+                    <ModIcon className="w-6 h-6 text-cyan-600" />
+                  </div>
+                  <h3 className="text-lg font-bold text-gray-900 mb-2">{mod.title}</h3>
+                  <p className="text-sm text-gray-600 mb-4 leading-relaxed">{mod.description}</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {mod.tags.map((tag, i) => (
+                      <span key={i} className="text-xs bg-gray-100 text-gray-600 px-2.5 py-1 rounded-md">
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
+                </motion.div>
+              );
+            })}
+          </div>
+        </div>
+      </motion.section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 7: INDUSTRY TYPES — 8-column grid
+         ═══════════════════════════════════════════════════════════ */}
+      <motion.section {...fadeInUp} className="py-12 sm:py-16 bg-gray-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center mb-10 space-y-3">
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+              Built for Every Team
+            </h2>
+            <p className="text-gray-600 max-w-2xl mx-auto">
+              TrackNexus {page.category} solutions are trusted across industries and team types worldwide.
+            </p>
+          </div>
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-4">
+            {industryTypes.map((type, idx) => (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, scale: 0.9 }}
+                whileInView={{ opacity: 1, scale: 1 }}
+                transition={{ delay: idx * 0.05 }}
+                viewport={{ once: true }}
+                className="bg-white rounded-xl p-4 text-center border border-gray-200 hover:border-cyan-200 hover:shadow-md transition-all cursor-default"
+              >
+                <span className="text-2xl mb-2 block">{type.emoji}</span>
+                <p className="text-xs font-medium text-gray-700">{type.label}</p>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </motion.section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 8: VALUE PROPOSITION — Metrics cards
+         ═══════════════════════════════════════════════════════════ */}
       {page.valueProposition && page.valueProposition.length > 0 && (
-        <motion.section
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="py-10 sm:py-14 bg-gradient-to-b from-blue-50 to-white"
-        >
+        <motion.section {...fadeInUp} className="py-12 sm:py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10 space-y-3">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Why Choose TrackNexus</h2>
-              <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-                Real, measurable results that drive business growth and transform how your organization operates.
+              <span className="inline-flex items-center gap-2 bg-cyan-50 text-cyan-700 px-4 py-1.5 rounded-full text-xs font-semibold border border-cyan-200">
+                By The Numbers
+              </span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                Why {location ? `${location} ${page.targetAudience || 'Teams'}` : (page.targetAudience || 'Teams')} Choose TrackNexus
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Real, measurable results that drive business growth and operational excellence{location ? ` in ${location}` : ''}.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -1149,9 +1113,9 @@ export default function MarketingPageContent({ page }: { page: MarketingPage }) 
                   whileInView={{ opacity: 1, scale: 1 }}
                   transition={{ delay: idx * 0.1 }}
                   viewport={{ once: true }}
-                  className="text-center space-y-3 bg-white rounded-xl p-8 shadow-sm border border-gray-100"
+                  className="text-center space-y-3 bg-gradient-to-br from-gray-50 to-cyan-50 rounded-2xl p-8 border border-gray-100 hover:shadow-lg transition-all"
                 >
-                  <p className="text-4xl sm:text-5xl font-bold text-blue-600">{prop.value}</p>
+                  <p className="text-4xl sm:text-5xl font-bold text-cyan-600">{prop.value}</p>
                   <p className="text-lg font-semibold text-gray-900">{prop.metric}</p>
                   <p className="text-sm text-gray-600 leading-relaxed">{prop.description}</p>
                 </motion.div>
@@ -1161,57 +1125,18 @@ export default function MarketingPageContent({ page }: { page: MarketingPage }) 
         </motion.section>
       )}
 
-      {/* Benefits Section */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.6 }}
-        viewport={{ once: true }}
-        className="py-10 sm:py-14 bg-white"
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10 space-y-3">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Key Benefits</h2>
-            <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-              Discover how {page.title} delivers tangible value to your organization every day.
-            </p>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {benefits.map((benefit, idx) => (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 15 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.08 }}
-                viewport={{ once: true }}
-                className="flex gap-4 p-5 rounded-lg hover:bg-gray-50 transition-colors"
-              >
-                <div className="flex-shrink-0">
-                  <CheckCircle2 className="w-6 h-6 text-green-500 mt-0.5" />
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">{benefit.title}</h3>
-                  <p className="text-sm text-gray-600 leading-relaxed">{benefit.description}</p>
-                </div>
-              </motion.div>
-            ))}
-          </div>
-        </div>
-      </motion.section>
-
-      {/* Case Studies Section */}
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 9: CASE STUDIES — Success stories
+         ═══════════════════════════════════════════════════════════ */}
       {page.caseStudies && page.caseStudies.length > 0 && (
-        <motion.section
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="py-10 sm:py-14 bg-gray-50"
-        >
+        <motion.section {...fadeInUp} className="py-12 sm:py-16 bg-gray-50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10 space-y-3">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Success Stories</h2>
-              <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
+              <span className="inline-flex items-center gap-2 bg-cyan-50 text-cyan-700 px-4 py-1.5 rounded-full text-xs font-semibold border border-cyan-200">
+                Success Stories
+              </span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Proven Results Worldwide</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
                 See how leading organizations achieve remarkable results with TrackNexus.
               </p>
             </div>
@@ -1221,30 +1146,29 @@ export default function MarketingPageContent({ page }: { page: MarketingPage }) 
                   key={study.id}
                   initial={{ opacity: 0, x: -20 }}
                   whileInView={{ opacity: 1, x: 0 }}
-                  transition={{ duration: 0.5 }}
                   viewport={{ once: true }}
-                  className="bg-white rounded-lg p-6 border border-gray-200 hover:border-blue-300 hover:shadow-lg transition-all"
+                  className="bg-white rounded-xl p-6 sm:p-8 border border-gray-200 hover:border-cyan-200 hover:shadow-lg transition-all"
                 >
                   <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                     <div className="space-y-2">
-                      <p className="text-xs text-gray-600 font-semibold uppercase">Company</p>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Company</p>
                       <p className="text-lg font-bold text-gray-900">{study.company}</p>
-                      <p className="text-xs text-gray-600 flex items-center gap-1">
-                        <Globe className="w-3 h-3" />
+                      <p className="text-xs text-gray-500 flex items-center gap-1">
+                        <MapPin className="w-3 h-3" />
                         {study.location}
                       </p>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-xs text-gray-600 font-semibold uppercase">Challenge</p>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Challenge</p>
                       <p className="text-sm text-gray-700 leading-relaxed">{study.challenge}</p>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-xs text-gray-600 font-semibold uppercase">Solution</p>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Solution</p>
                       <p className="text-sm text-gray-700 leading-relaxed">{study.solution}</p>
                     </div>
                     <div className="space-y-2">
-                      <p className="text-xs text-gray-600 font-semibold uppercase">Result</p>
-                      <p className="text-lg font-bold text-green-600">{study.result}</p>
+                      <p className="text-xs text-gray-500 font-semibold uppercase tracking-wider">Result</p>
+                      <p className="text-xl font-bold text-green-600">{study.result}</p>
                     </div>
                   </div>
                 </motion.div>
@@ -1254,38 +1178,70 @@ export default function MarketingPageContent({ page }: { page: MarketingPage }) 
         </motion.section>
       )}
 
-      {/* Testimonials Section */}
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 10: TESTIMONIAL — Gradient full-width
+         ═══════════════════════════════════════════════════════════ */}
       {page.testimonials && page.testimonials.length > 0 && (
-        <motion.section
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="py-10 sm:py-14 bg-white"
-        >
+        <section className="py-16 sm:py-24 bg-gradient-to-r from-cyan-500 to-blue-600 relative overflow-hidden">
+          {/* Pattern overlay */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA4IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40" />
+
+          <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            {/* Quote Mark */}
+            <div className="text-6xl sm:text-8xl font-serif text-white/30 mb-6 leading-none">&ldquo;</div>
+
+            {/* Testimonial content - pick the highest rated or first */}
+            {(() => {
+              const topTestimonial = [...page.testimonials].sort((a, b) => b.rating - a.rating)[0];
+              return (
+                <>
+                  <blockquote className="text-xl sm:text-2xl lg:text-3xl text-white font-medium leading-relaxed mb-8">
+                    {topTestimonial.content}
+                  </blockquote>
+                  <div className="space-y-1">
+                    <p className="text-white font-bold text-lg">{topTestimonial.author}</p>
+                    <p className="text-white/80 text-sm">{topTestimonial.role}, {topTestimonial.company}</p>
+                  </div>
+                  <div className="flex justify-center gap-1 mt-4">
+                    {[...Array(Math.floor(topTestimonial.rating))].map((_, i) => (
+                      <Star key={i} className="w-5 h-5 fill-yellow-300 text-yellow-300" />
+                    ))}
+                  </div>
+                </>
+              );
+            })()}
+          </div>
+        </section>
+      )}
+
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 11: MORE TESTIMONIALS — Grid cards (if multiple)
+         ═══════════════════════════════════════════════════════════ */}
+      {page.testimonials && page.testimonials.length > 1 && (
+        <motion.section {...fadeInUp} className="py-12 sm:py-16 bg-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10 space-y-3">
               <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">What Our Customers Say</h2>
-              <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-                Trusted by industry leaders worldwide. Here is what real users have to say about their experience.
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Trusted by industry leaders worldwide. Here is what real users say.
               </p>
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {page.testimonials.map((testimonial) => (
+              {page.testimonials.slice(1).map((testimonial) => (
                 <motion.div
                   key={testimonial.id}
                   whileHover={{ y: -3 }}
-                  className="bg-gray-50 p-6 rounded-lg border border-gray-200 shadow-sm hover:shadow-lg transition-all"
+                  className="bg-gray-50 p-6 rounded-xl border border-gray-200 hover:border-cyan-200 hover:shadow-lg transition-all"
                 >
                   <div className="flex gap-1 mb-4">
                     {[...Array(Math.floor(testimonial.rating))].map((_, i) => (
                       <Star key={i} className="w-4 h-4 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
-                  <p className="text-base text-gray-700 mb-5 italic leading-relaxed">&ldquo;{testimonial.content}&rdquo;</p>
+                  <p className="text-gray-700 mb-5 italic leading-relaxed">&ldquo;{testimonial.content}&rdquo;</p>
                   <div className="space-y-1">
                     <p className="font-bold text-gray-900">{testimonial.author}</p>
-                    <p className="text-xs text-gray-600">{testimonial.role} at {testimonial.company}</p>
+                    <p className="text-xs text-gray-500">{testimonial.role} at {testimonial.company}</p>
                   </div>
                 </motion.div>
               ))}
@@ -1294,74 +1250,174 @@ export default function MarketingPageContent({ page }: { page: MarketingPage }) 
         </motion.section>
       )}
 
-      {/* FAQ Section */}
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 12: FAQ — Accordion style
+         ═══════════════════════════════════════════════════════════ */}
       {page.faqs && page.faqs.length > 0 && (
-        <motion.section
-          id="faqs"
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="py-10 sm:py-14 bg-gray-50"
-        >
+        <motion.section id="faqs" {...fadeInUp} className="py-12 sm:py-16 bg-gray-50">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center mb-10 space-y-3">
-              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">Frequently Asked Questions</h2>
-              <p className="text-base sm:text-lg text-gray-600 max-w-2xl mx-auto">
-                Get detailed answers to the most common questions about {page.title} and how TrackNexus can help your team.
+              <span className="inline-flex items-center gap-2 bg-cyan-50 text-cyan-700 px-4 py-1.5 rounded-full text-xs font-semibold border border-cyan-200">
+                FAQs
+              </span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                Frequently Asked Questions
+              </h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Get detailed answers to common questions about {page.title}.
               </p>
             </div>
             <div className="space-y-3">
               {page.faqs.map((faq) => (
-                <details
+                <div
                   key={faq.id}
-                  className="group bg-white border border-gray-200 rounded-lg p-5 hover:shadow-md transition-all cursor-pointer"
+                  className="bg-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-md transition-all"
                 >
-                  <summary className="flex items-center justify-between font-semibold text-base text-gray-900 select-none">
-                    <span className="pr-6">{faq.question}</span>
-                    <ChevronRight className="w-4 h-4 text-gray-600 group-open:rotate-90 transition-transform flex-shrink-0" />
-                  </summary>
-                  <p className="text-sm text-gray-600 mt-4 leading-relaxed">{faq.answer}</p>
-                </details>
+                  <button
+                    onClick={() => setOpenFaq(openFaq === faq.id ? null : faq.id)}
+                    className="w-full flex items-center justify-between p-5 text-left cursor-pointer"
+                  >
+                    <h3 className="font-semibold text-gray-900 pr-6">{faq.question}</h3>
+                    <ChevronDown
+                      className={`w-5 h-5 text-gray-500 flex-shrink-0 transition-transform duration-200 ${
+                        openFaq === faq.id ? 'rotate-180' : ''
+                      }`}
+                    />
+                  </button>
+                  {openFaq === faq.id && (
+                    <motion.div
+                      initial={{ opacity: 0, height: 0 }}
+                      animate={{ opacity: 1, height: 'auto' }}
+                      className="px-5 pb-5"
+                    >
+                      <p className="text-gray-600 leading-relaxed">{faq.answer}</p>
+                    </motion.div>
+                  )}
+                </div>
               ))}
             </div>
           </div>
         </motion.section>
       )}
 
-      {/* CTA Section */}
-      {page.ctaText && (
-        <motion.section
-          initial={{ opacity: 0, y: 40 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
-          viewport={{ once: true }}
-          className="py-12 sm:py-16 bg-gradient-to-r from-orange-600 via-orange-600 to-orange-700"
-        >
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-6">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-white leading-tight">{page.ctaText}</h2>
-            <p className="text-orange-100 text-base max-w-2xl mx-auto">
-              Join thousands of organizations that have transformed their {page.category.toLowerCase()} operations with TrackNexus. Start your free trial today and see results within the first week.
-            </p>
-            <div className="flex flex-wrap justify-center gap-4">
-              <motion.button
-                whileHover={{ scale: 1.03 }}
-                whileTap={{ scale: 0.97 }}
-                onClick={() => setIsContactOpen(true)}
-                className="bg-white text-orange-600 px-8 py-4 rounded-lg font-bold text-base hover:bg-gray-50 transition-all shadow-xl inline-flex items-center gap-2 cursor-pointer"
-              >
-                {page.ctaButtonText || 'Get Started Now'}
-                <ChevronRight className="w-5 h-5" />
-              </motion.button>
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 13: SUPPORT — Contact & support info
+         ═══════════════════════════════════════════════════════════ */}
+      <motion.section {...fadeInUp} className="py-12 sm:py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            {/* Content */}
+            <div className="space-y-6">
+              <span className="inline-flex items-center gap-2 bg-cyan-50 text-cyan-700 px-4 py-1.5 rounded-full text-xs font-semibold border border-cyan-200">
+                Dedicated Support
+              </span>
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900">
+                {productName} Experts {location ? `in ${location}` : 'at Your Side'}
+              </h2>
+              <p className="text-gray-600 leading-relaxed">
+                Our dedicated {productName.toLowerCase()} specialists provide personalized support to ensure your team gets maximum value from TrackNexus. From implementation to optimization, we are here every step of the way.
+              </p>
+
+              <div className="space-y-4">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-cyan-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Mail className="w-5 h-5 text-cyan-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Email Support</p>
+                    <p className="text-sm text-gray-600">{page.officeEmail || 'support@tracknexus.com'}</p>
+                  </div>
+                </div>
+                {page.officeAddress && location && (
+                  <div className="flex items-start gap-4">
+                    <div className="w-10 h-10 bg-cyan-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <Building2 className="w-5 h-5 text-cyan-600" />
+                    </div>
+                    <div>
+                      <p className="font-semibold text-gray-900">{location} Office</p>
+                      <p className="text-sm text-gray-600">{page.officeAddress}</p>
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-cyan-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Building2 className="w-5 h-5 text-cyan-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Enterprise Support</p>
+                    <p className="text-sm text-gray-600">Dedicated account manager & priority response</p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-cyan-50 rounded-lg flex items-center justify-center flex-shrink-0">
+                    <Globe className="w-5 h-5 text-cyan-600" />
+                  </div>
+                  <div>
+                    <p className="font-semibold text-gray-900">Global Coverage</p>
+                    <p className="text-sm text-gray-600">24/7 support across all time zones</p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div className="flex flex-wrap justify-center gap-6 pt-4 text-orange-100 text-sm">
-              <span className="flex items-center gap-2"><Shield className="w-4 h-4" /> Enterprise Security</span>
-              <span className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> No Credit Card Required</span>
-              <span className="flex items-center gap-2"><Users className="w-4 h-4" /> 24/7 Support</span>
+
+            {/* Map / Visual */}
+            <div className="rounded-2xl overflow-hidden border border-gray-200 shadow-lg">
+              <iframe
+                title={`TrackNexus ${location || 'Office'} Location`}
+                src={`https://www.google.com/maps?q=${encodeURIComponent(location ? `${location}, India` : 'Hyderabad, India')}&output=embed`}
+                width="100%"
+                height="350"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+              />
             </div>
           </div>
-        </motion.section>
-      )}
+        </div>
+      </motion.section>
+
+      {/* ═══════════════════════════════════════════════════════════
+          SECTION 14: FINAL CTA — Gradient full-width
+         ═══════════════════════════════════════════════════════════ */}
+      <section className="relative py-16 sm:py-24 bg-gradient-to-r from-cyan-500 to-blue-600 overflow-hidden">
+        {/* Pattern overlay */}
+        <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGRlZnM+PHBhdHRlcm4gaWQ9ImdyaWQiIHdpZHRoPSI2MCIgaGVpZ2h0PSI2MCIgcGF0dGVyblVuaXRzPSJ1c2VyU3BhY2VPblVzZSI+PHBhdGggZD0iTSAxMCAwIEwgMCAwIDAgMTAiIGZpbGw9Im5vbmUiIHN0cm9rZT0id2hpdGUiIHN0cm9rZS1vcGFjaXR5PSIwLjA4IiBzdHJva2Utd2lkdGg9IjEiLz48L3BhdHRlcm4+PC9kZWZzPjxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9InVybCgjZ3JpZCkiLz48L3N2Zz4=')] opacity-40" />
+
+        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 text-center space-y-8">
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white leading-tight">
+            {page.ctaText || `Ready to Transform Your ${page.category} Operations?`}
+          </h2>
+          <p className="text-xl text-white/90 max-w-3xl mx-auto leading-relaxed">
+            Join thousands of {page.targetAudience || 'teams'} who have streamlined their {page.category.toLowerCase()} with TrackNexus. Start your free trial today.
+          </p>
+
+          <div className="flex flex-wrap justify-center gap-4">
+            <motion.button
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.97 }}
+              onClick={() => setIsContactOpen(true)}
+              className="bg-white text-cyan-600 px-10 py-4 rounded-lg font-bold text-base hover:bg-gray-50 transition-all shadow-xl inline-flex items-center gap-2 cursor-pointer"
+            >
+              {page.ctaButtonText || 'Start Free Trial'}
+              <ArrowRight className="w-5 h-5" />
+            </motion.button>
+            <a
+              href="/product"
+              className="border-2 border-white/50 text-white hover:bg-white/10 px-10 py-4 rounded-lg font-bold text-base transition-all inline-flex items-center gap-2"
+            >
+              View All Solutions
+            </a>
+          </div>
+
+          {/* Trust indicators */}
+          <div className="flex flex-wrap justify-center gap-6 pt-4 text-white/80 text-sm">
+            <span className="flex items-center gap-2"><Shield className="w-4 h-4" /> Enterprise Security</span>
+            <span className="flex items-center gap-2"><Sparkles className="w-4 h-4" /> No Credit Card Required</span>
+            <span className="flex items-center gap-2"><Users className="w-4 h-4" /> 24/7 Support</span>
+          </div>
+        </div>
+      </section>
     </div>
   );
 }

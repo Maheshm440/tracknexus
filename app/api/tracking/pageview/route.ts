@@ -24,23 +24,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Verify visitor exists and has consent
+    // Verify visitor exists
     const visitor = await prisma.visitor.findUnique({
       where: { id: visitorId },
-      select: { id: true, consentGiven: true },
+      select: { id: true },
     });
 
     if (!visitor) {
       return NextResponse.json(
         { success: false, error: 'Visitor not found' },
         { status: 404 }
-      );
-    }
-
-    if (!visitor.consentGiven) {
-      return NextResponse.json(
-        { success: false, error: 'Consent required for tracking' },
-        { status: 403 }
       );
     }
 

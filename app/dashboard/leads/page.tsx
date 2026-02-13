@@ -109,37 +109,34 @@ export default function LeadsPage() {
       setLoading(true);
       setError(null);
 
-      // Read leads from localStorage
-      const leadsData = localStorage.getItem('tracknexus_leads') || '[]';
-      let allLeads = JSON.parse(leadsData);
+      // Build query params for API
+      const params = new URLSearchParams();
+      params.set('page', currentPage.toString());
+      params.set('limit', '10');
+      if (statusFilter) params.set('status', statusFilter);
+      if (search) params.set('search', search);
 
-      // Apply filters
-      if (statusFilter) {
-        allLeads = allLeads.filter((lead: Lead) => lead.status === statusFilter);
+      // Fetch leads from database API
+      const response = await fetch(`/api/leads?${params.toString()}`);
+      const result = await response.json();
+
+      if (!result.success) {
+        throw new Error(result.error || 'Failed to fetch leads');
       }
 
-      if (search) {
-        const searchLower = search.toLowerCase();
-        allLeads = allLeads.filter((lead: Lead) =>
-          lead.name.toLowerCase().includes(searchLower) ||
-          lead.companyName.toLowerCase().includes(searchLower) ||
-          lead.companyEmail.toLowerCase().includes(searchLower)
-        );
-      }
+      const allLeads = result.data;
 
-      // Sort by date (newest first)
-      allLeads.sort((a: Lead, b: Lead) =>
-        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-      );
+      // Also fetch all leads (no filters) for stats
+      const statsResponse = await fetch('/api/leads?page=1&limit=1000');
+      const statsResult = await statsResponse.json();
+      const allLeadsForStats = statsResult.success ? statsResult.data : [];
 
-      // Calculate stats from all leads (before pagination)
-      const leadsDataForStats = JSON.parse(localStorage.getItem('tracknexus_leads') || '[]');
-      const totalLeads = leadsDataForStats.length;
-      const newLeads = leadsDataForStats.filter((l: Lead) => l.status === 'NEW').length;
-      const convertedLeads = leadsDataForStats.filter((l: Lead) => l.status === 'CONVERTED').length;
+      const totalLeads = allLeadsForStats.length;
+      const newLeads = allLeadsForStats.filter((l: Lead) => l.status === 'NEW').length;
+      const convertedLeads = allLeadsForStats.filter((l: Lead) => l.status === 'CONVERTED').length;
       const conversionRate = totalLeads > 0 ? ((convertedLeads / totalLeads) * 100) : 0;
       const avgScore = totalLeads > 0
-        ? leadsDataForStats.reduce((sum: number, l: Lead) => sum + (l.score || 0), 0) / totalLeads
+        ? allLeadsForStats.reduce((sum: number, l: Lead) => sum + (l.score || 0), 0) / totalLeads
         : 0;
 
       setStats({
@@ -150,25 +147,12 @@ export default function LeadsPage() {
         avgScore: Math.round(avgScore),
       });
 
-      // Pagination
-      const limit = 10;
-      const total = allLeads.length;
-      const totalPages = Math.ceil(total / limit);
-      const start = (currentPage - 1) * limit;
-      const end = start + limit;
-      const paginatedLeads = allLeads.slice(start, end);
-
-      setLeads(paginatedLeads);
-      setPagination({
-        page: currentPage,
-        limit,
-        total,
-        totalPages,
-      });
+      setLeads(allLeads);
+      setPagination(result.pagination);
       setIsUsingMockData(false);
     } catch (err) {
       console.error('Error loading leads:', err);
-      setError('Failed to load leads from storage');
+      setError('Failed to load leads');
       setLeads([]);
       setPagination({
         page: currentPage,
@@ -193,27 +177,17 @@ export default function LeadsPage() {
 
   const updateLeadStatus = async (leadId: string, newStatus: string) => {
     try {
-      // Update in localStorage
-      const leadsData = localStorage.getItem('tracknexus_leads') || '[]';
-      const leads = JSON.parse(leadsData);
-      const updatedLeads = leads.map((lead: Lead) =>
-        lead.id === leadId ? { ...lead, status: newStatus } : lead
-      );
-      localStorage.setItem('tracknexus_leads', JSON.stringify(updatedLeads));
-
-      // Add activity log
-      const activitiesData = localStorage.getItem('tracknexus_activities') || '[]';
-      const activities = JSON.parse(activitiesData);
-      activities.push({
-        id: Date.now().toString(),
-        type: 'lead_updated',
-        description: `Lead status updated to ${newStatus}`,
-        timestamp: new Date().toISOString(),
-        userRef: { name: 'System', email: 'system@tracknexus.com' }
+      const response = await fetch(`/api/leads/${leadId}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status: newStatus }),
       });
-      localStorage.setItem('tracknexus_activities', JSON.stringify(activities));
 
-      // Refresh leads
+      if (!response.ok) {
+        throw new Error('Failed to update lead status');
+      }
+
+      // Refresh leads from database
       fetchLeads();
       setShowDropdown(null);
     } catch (err) {
@@ -225,23 +199,13 @@ export default function LeadsPage() {
     if (!confirm('Are you sure you want to delete this lead?')) return;
 
     try {
-      // Delete from localStorage
-      const leadsData = localStorage.getItem('tracknexus_leads') || '[]';
-      const leads = JSON.parse(leadsData);
-      const updatedLeads = leads.filter((lead: Lead) => lead.id !== leadId);
-      localStorage.setItem('tracknexus_leads', JSON.stringify(updatedLeads));
-
-      // Add activity log
-      const activitiesData = localStorage.getItem('tracknexus_activities') || '[]';
-      const activities = JSON.parse(activitiesData);
-      activities.push({
-        id: Date.now().toString(),
-        type: 'lead_deleted',
-        description: `Lead deleted`,
-        timestamp: new Date().toISOString(),
-        userRef: { name: 'System', email: 'system@tracknexus.com' }
+      const response = await fetch(`/api/leads/${leadId}`, {
+        method: 'DELETE',
       });
-      localStorage.setItem('tracknexus_activities', JSON.stringify(activities));
+
+      if (!response.ok) {
+        throw new Error('Failed to delete lead');
+      }
 
       fetchLeads();
       setShowDropdown(null);

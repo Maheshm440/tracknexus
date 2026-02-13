@@ -2,18 +2,11 @@
 
 import Link from "next/link"
 import Image from "next/image"
-import dynamic from "next/dynamic"
 import { Button } from "@/components/ui/button"
 import { Cookie } from "lucide-react"
 import { useState } from "react"
-import type { FormContext } from "@/components/contact-popup"
+import { ContactPopup, type FormContext } from "@/components/contact-popup"
 import { useCookieConsentContext } from "@/components/cookies"
-
-// Lazy load ContactPopup since it's only needed on interaction
-const ContactPopup = dynamic(
-  () => import("@/components/contact-popup").then((m) => m.ContactPopup),
-  { ssr: false }
-)
 
 export function Footer() {
   const [isContactPopupOpen, setIsContactPopupOpen] = useState(false)

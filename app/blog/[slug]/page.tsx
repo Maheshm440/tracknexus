@@ -62,6 +62,8 @@ export async function generateMetadata(
       title: post.seoTitle,
       description: post.metaDescription,
       images: [`${baseUrl}${post.heroImage}`],
+      creator: "@tracknexus",
+      site: "@tracknexus",
     },
     keywords: [post.slug.split("-").join(" "), post.category],
     authors: [

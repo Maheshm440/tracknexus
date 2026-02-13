@@ -11,7 +11,15 @@ interface SessionEndRequest {
 
 export async function POST(request: NextRequest) {
   try {
-    const body: SessionEndRequest = await request.json();
+    // Support both JSON and text/plain (sendBeacon sends text/plain)
+    const contentType = request.headers.get('content-type') || '';
+    let body: SessionEndRequest;
+    if (contentType.includes('application/json')) {
+      body = await request.json();
+    } else {
+      const text = await request.text();
+      body = JSON.parse(text);
+    }
     const { sessionId, duration, lastPageViewId, scrollDepth, timeOnPage } = body;
 
     if (!sessionId) {

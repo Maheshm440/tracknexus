@@ -551,6 +551,18 @@ export function Header() {
           >
             Pricing
           </Link>
+
+          {/* Support */}
+          <Link
+            href="/support"
+            className={`font-medium text-sm transition-colors ${
+              isMounted && pathname === "/support"
+                ? "text-white"
+                : "text-gray-300 hover:text-white"
+            }`}
+          >
+            Support
+          </Link>
         </nav>
 
         {/* Right side icons */}
@@ -741,13 +753,13 @@ export function Header() {
           <div className="relative">
             <button
               onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
-              className={`transition-colors ${isSignedIn ? "text-deloitte-green hover:text-deloitte-green-dark" : "text-gray-300 hover:text-white"}`}
+              className={`transition-colors ${isMounted && isSignedIn ? "text-deloitte-green hover:text-deloitte-green-dark" : "text-gray-300 hover:text-white"}`}
             >
               <User className="w-5 h-5" />
             </button>
 
             {/* User Dropdown - appears on click */}
-            {isUserMenuOpen && (
+            {isUserMenuOpen && isMounted && (
               <div className="absolute right-0 top-full mt-2 w-56 bg-white shadow-xl rounded-xl z-50 overflow-hidden border border-gray-100">
                 {!isSignedIn ? (
                   <>

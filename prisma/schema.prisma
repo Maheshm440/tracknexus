@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -172,19 +172,22 @@ model Attribution {
   @@index([leadId])
 }
 
-model BotActivity {
-  id              String   @id @default(cuid())
-  fingerprint     String
-  ipAddress       String?
-  userAgent       String
-  activityType    String
-  suspicionScore  Int      @default(0)
-  pageViewCount   Int      @default(0)
-  sessionDuration Int      @default(0)
-  detectedAt      DateTime @default(now())
+model BotVisit {
+  id           String      @id @default(cuid())
+  botName      String      @map("bot_name")
+  botCategory  BotCategory @map("bot_category")
+  path         String
+  method       String      @default("GET")
+  statusCode   Int         @default(200) @map("status_code")
+  userAgent    String      @map("user_agent") @db.VarChar(1000)
+  ip           String?     @db.VarChar(45)
+  responseTime Int?        @map("response_time")
+  timestamp    DateTime    @default(now())
 
-  @@index([activityType, detectedAt])
-  @@index([fingerprint])
+  @@index([timestamp])
+  @@index([botName])
+  @@index([botCategory])
+  @@map("bot_visits")
 }
 
 model FollowUp {
@@ -354,4 +357,11 @@ enum TeamMemberStatus {
   ACTIVE
   INACTIVE
   INVITED
+}
+
+enum BotCategory {
+  AI
+  SEARCH
+  SOCIAL
+  OTHER
 }

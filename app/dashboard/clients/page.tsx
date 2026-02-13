@@ -231,19 +231,19 @@ export default function ClientsPage() {
       const res = await fetch(`/api/clients?${params}`);
       const data = await res.json();
 
-      if (data.data && data.data.length > 0) {
-        // Use API data
-        const allClientsData = data.allClients || data.data;
+      if (data.success) {
+        // Use API data (even if empty)
+        const allClientsData = data.allClients || data.data || [];
         setAllClients(allClientsData);
-        setClients(data.data);
+        setClients(data.data || []);
         setPagination(data.pagination || { page: 1, limit: 10, total: 0, totalPages: 0 });
         // Always calculate stats from all clients data to ensure accuracy
         setStats(calculateStats(allClientsData));
         setIsUsingMockData(false);
+        setError(null);
       } else {
-        throw new Error('No data from API');
+        throw new Error(data.error || 'Failed to fetch clients');
       }
-      setError(null);
     } catch (err) {
       console.error('Clients fetch error:', err);
       // Use mock data as fallback
