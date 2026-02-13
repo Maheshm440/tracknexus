@@ -38,13 +38,7 @@ const envValidations: EnvValidation[] = [
   },
   {
     name: 'ADMIN_PASSWORD_HASH',
-    required: process.env.NODE_ENV === 'production',
-    validator: (val) => {
-      // Skip validation in development mode due to Windows env parsing issues with $ symbols
-      if (process.env.NODE_ENV !== 'production') return true;
-      return !val || val.startsWith('$2b$') || val.startsWith('$2a$');
-    },
-    errorMessage: 'ADMIN_PASSWORD_HASH must be a bcrypt hash'
+    required: false, // Not required - dotenv-expand corrupts $ in bcrypt hashes; bcrypt.compare() validates at login
   },
   {
     name: 'SMTP_HOST',
